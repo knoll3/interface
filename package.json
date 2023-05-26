@@ -1,0 +1,34 @@
+{
+  "name": "@create-web3/frontend",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^1.0.1",
+    "ethers": "^5.7.2",
+    "grommet": "^2.32.1",
+    "grommet-icons": "^4.10.0",
+    "next": "^13.1.6",
+    "polished": "^4.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^5.3.11",
+    "viem": "^0.3.37",
+    "wagmi": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@types/styled-components": "^5.1.26",
+    "eslint": "^8.27.0",
+    "eslint-config-next": "^13.0.2",
+    "typescript": "^4.9.5"
+  }
+}
