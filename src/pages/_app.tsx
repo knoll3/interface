@@ -1,16 +1,16 @@
 import { type AppType } from 'next/app';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { goerli } from '@wagmi/core/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { polygonMumbai } from '@wagmi/core/chains';
 import '@rainbow-me/rainbowkit/styles.css';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
 
 import { Grommet } from 'grommet';
 import './global.css';
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [goerli],
-  [publicProvider()]
+  [polygonMumbai],
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY! })]
 );
 
 const { connectors } = getDefaultWallets({

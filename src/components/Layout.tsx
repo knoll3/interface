@@ -12,7 +12,7 @@ export const Layout = ({ children }: Props) => {
   const { push, pathname } = useRouter();
 
   return (
-    <Box background="#F8F8F8">
+    <Box background="#F8FAFB" pad={{ bottom: 'xlarge' }}>
       <Header
         direction="row"
         align="center"
@@ -21,6 +21,7 @@ export const Layout = ({ children }: Props) => {
         fill
         border="bottom"
         gap="xlarge"
+        background="#FFFFFF"
       >
         <Box width="small">
           <Image src="logo.png" onClick={() => void push('/')} alt="logo" />
@@ -28,8 +29,11 @@ export const Layout = ({ children }: Props) => {
         <Menu />
         <Wallet />
       </Header>
-      <Main background={pathname === '/' ? 'url(main-bg.png)' : ''}>
-        <Box height="100vh">{children}</Box>
+      <Main
+        background={pathname === '/' ? 'url(main-bg.png)' : ''}
+        height="100vh"
+      >
+        <Box>{children}</Box>
       </Main>
     </Box>
   );

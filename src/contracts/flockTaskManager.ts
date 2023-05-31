@@ -1,0 +1,64 @@
+export const FLOCK_TASK_MANAGER_ABI = [
+  {
+    inputs: [
+      { internalType: 'address', name: '_flockTokenAddress', type: 'address' },
+      { internalType: 'address', name: '_coordinatorAddress', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
+    inputs: [],
+    name: 'coordinatorAddress',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'string', name: '_taskName', type: 'string' },
+      { internalType: 'string', name: '_taskDescription', type: 'string' },
+      { internalType: 'uint256', name: '_minutesPerRound', type: 'uint256' },
+      { internalType: 'string', name: '_globalModelHash', type: 'string' },
+      {
+        internalType: 'uint256',
+        name: '_totalNumberOfRounds',
+        type: 'uint256',
+      },
+    ],
+    name: 'createTask',
+    outputs: [
+      { internalType: 'address', name: 'newContract', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'flockTokenAddress',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getTasks',
+    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'subscriptionId',
+    outputs: [{ internalType: 'uint64', name: '', type: 'uint64' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'tasks',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+];
