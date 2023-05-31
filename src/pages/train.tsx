@@ -8,7 +8,7 @@ import {
   TextInput,
 } from 'grommet';
 import { CreateTask, Layout, PrimaryButton, Tasks } from '../components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search } from 'grommet-icons';
 
 export default function TrainPage() {

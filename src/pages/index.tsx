@@ -1,17 +1,15 @@
 import { Box, Heading, Text } from 'grommet';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Layout, PrimaryButton, SecondaryButton } from '../components';
 
 export default function IndexPage() {
   return (
     <Layout>
       <Box
-        width="xxlarge"
         align="center"
         justify="center"
         alignSelf="center"
         gap="xlarge"
-        height="100%"
+        height="100vh"
       >
         <Box>
           <Heading size="large" color="black" textAlign="center">
