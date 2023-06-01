@@ -10,7 +10,7 @@ const MenuItem = ({
   selected,
   text,
   ...rest
-}: MenuItemProps & ButtonProps & { onClick: () => void }) => (
+}: MenuItemProps & ButtonProps & { onClick?: () => void }) => (
   <Button
     {...rest}
     plain
@@ -48,22 +48,22 @@ export const Menu = () => {
         text="Train"
       />
       <MenuItem
-        href="/marketplace"
-        onClick={() => setSelected('/marketplace')}
+        //href="/marketplace"
+        //onClick={() => setSelected('/marketplace')}
         hoverIndicator={false}
         selected={selected === '/marketplace'}
         text="Marketplace"
       />
       <MenuItem
-        href="/analytics"
-        onClick={() => setSelected('/analytics')}
+        //href="/analytics"
+        //onClick={() => setSelected('/analytics')}
         hoverIndicator={false}
         selected={selected === '/analytics'}
         text="Analytics"
       />
       <MenuItem
-        href="/aboutUs"
-        onClick={() => setSelected('/aboutUs')}
+        //href="/aboutUs"
+        //onClick={() => setSelected('/aboutUs')}
         hoverIndicator={false}
         selected={selected === '/aboutUs'}
         text="About Us"

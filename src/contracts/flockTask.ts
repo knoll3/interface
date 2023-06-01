@@ -18,17 +18,12 @@ export const FLOCK_TASK_ABI = [
       },
       {
         internalType: 'string',
-        name: '_taskName',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_taskDescription',
+        name: '_metadata',
         type: 'string',
       },
       {
         internalType: 'uint256',
-        name: '_minutesPerRound',
+        name: '_secondsPerRound',
         type: 'uint256',
       },
       {
@@ -39,6 +34,21 @@ export const FLOCK_TASK_ABI = [
       {
         internalType: 'uint256',
         name: '_totalNumberOfRounds',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_minNumberOfParticipants',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_maxNumberOfParticipants',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_minStakeThreshold',
         type: 'uint256',
       },
     ],
@@ -470,19 +480,6 @@ export const FLOCK_TASK_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'getStatus',
-    outputs: [
-      {
-        internalType: 'enum FlockTask.Status',
-        name: '',
-        type: 'uint8',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -592,7 +589,33 @@ export const FLOCK_TASK_ABI = [
   },
   {
     inputs: [],
+    name: 'metadata',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'minNumberOfParticipants',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'minStakeThreshold',
     outputs: [
       {
         internalType: 'uint256',
@@ -1088,19 +1111,6 @@ export const FLOCK_TASK_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'stakeThreshold',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'address',
@@ -1141,32 +1151,6 @@ export const FLOCK_TASK_ABI = [
       },
     ],
     stateMutability: 'pure',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'taskDescription',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'taskName',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {

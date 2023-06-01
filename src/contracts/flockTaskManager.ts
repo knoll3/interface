@@ -16,15 +16,25 @@ export const FLOCK_TASK_MANAGER_ABI = [
   },
   {
     inputs: [
-      { internalType: 'string', name: '_taskName', type: 'string' },
-      { internalType: 'string', name: '_taskDescription', type: 'string' },
-      { internalType: 'uint256', name: '_minutesPerRound', type: 'uint256' },
+      { internalType: 'string', name: '_metadata', type: 'string' },
+      { internalType: 'uint256', name: '_secondsPerRound', type: 'uint256' },
       { internalType: 'string', name: '_globalModelHash', type: 'string' },
       {
         internalType: 'uint256',
         name: '_totalNumberOfRounds',
         type: 'uint256',
       },
+      {
+        internalType: 'uint256',
+        name: '_minNumberOfParticipants',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_maxNumberOfParticipants',
+        type: 'uint256',
+      },
+      { internalType: 'uint256', name: '_minStakeThreshold', type: 'uint256' },
     ],
     name: 'createTask',
     outputs: [

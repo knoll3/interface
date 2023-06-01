@@ -28,19 +28,13 @@ export const Tasks = () => {
     console.log('loadTasks');
     const loadedTasks: Task[] = await Promise.all(
       (data as Array<string>)?.map(async (item) => {
-        const name = await readContract({
+        const metadata = (await readContract({
           address: item as `0x${string}`,
           abi: FLOCK_TASK_ABI,
-          functionName: 'taskName',
-        });
+          functionName: 'metadata',
+        })) as string;
 
-        const description = await readContract({
-          address: item as `0x${string}`,
-          abi: FLOCK_TASK_ABI,
-          functionName: 'taskDescription',
-        });
-
-        return { address: item, name, description } as Task;
+        return { address: item, ...JSON.parse(metadata) } as Task;
       })
     );
 
@@ -74,7 +68,7 @@ export const Tasks = () => {
             margin={{ top: 'medium' }}
           >
             <Box align="center" justify="center">
-              <Heading level="3" margin="0">
+              <Heading level="2" margin="0">
                 {task.name}
               </Heading>
               <Text size="small">{task.description}</Text>
