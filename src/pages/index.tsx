@@ -27,6 +27,7 @@ export default function IndexPage() {
             pad={{ vertical: 'medium', horizontal: 'xlarge' }}
           />
           <PrimaryButton
+            href="/train"
             margin={{ top: 'large' }}
             label="Start Training"
             size="xlarge"

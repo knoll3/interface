@@ -32,6 +32,7 @@ type FormValues = {
   accuracy: number;
   stake: number;
   rewardPool: number;
+  modelDefinitionHash: string;
 };
 
 const TrainingSettingsForm = ({
@@ -196,6 +197,13 @@ const TaskDefinitionForm = ({
           <TextInput id="outputDescription" name="outputDescription" />
         </FormField>
       </Box>
+      <FormField
+        name="modelDefinitionHashField"
+        htmlFor="modelDefinitionHash"
+        label="Model Definition Hash"
+      >
+        <TextInput id="modelDefinitionHash" name="modelDefinitionHash" />
+      </FormField>
     </Form>
   );
 };
@@ -216,7 +224,7 @@ export const CreateTask = ({
     args: [
       JSON.stringify(value),
       120,
-      'dsadasdsadasdasdas',
+      value.modelDefinitionHash,
       value.rounds,
       value.minParticipants,
       value.maxParticipants,
@@ -243,7 +251,7 @@ export const CreateTask = ({
         align="center"
         justify="start"
         width="100%"
-        pad={{ horizontal: 'xlarge', vertical: 'medium' }}
+        pad={{ horizontal: 'xlarge', vertical: 'small' }}
       >
         <Box>
           <Box direction="row" gap="xsmall">
@@ -256,7 +264,7 @@ export const CreateTask = ({
         </Box>
       </Box>
       <Box
-        pad={{ horizontal: 'xlarge', vertical: 'large' }}
+        pad={{ horizontal: 'xlarge', vertical: 'small' }}
         direction="row-responsive"
         align="start"
         justify="start"
@@ -295,18 +303,18 @@ export const CreateTask = ({
         direction="row"
         gap="large"
         alignSelf="end"
-        pad={{ horizontal: 'xlarge', vertical: 'large' }}
+        pad={{ horizontal: 'xlarge', vertical: 'small' }}
       >
         <SecondaryButton
           onClick={() => setShowCreateTask(false)}
-          margin={{ top: 'large' }}
+          margin={{ top: 'medium' }}
           label="Cancel"
           size="medium"
           pad={{ vertical: 'small', horizontal: 'large' }}
         />
         <PrimaryButton
           onClick={step === 3 ? handleCreate : handleContinue}
-          margin={{ top: 'large' }}
+          margin={{ top: 'medium' }}
           label={step === 3 ? 'Create' : 'Continue'}
           size="medium"
           pad={{ vertical: 'small', horizontal: 'large' }}
