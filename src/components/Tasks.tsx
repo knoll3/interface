@@ -29,7 +29,7 @@ export const Tasks = () => {
 
   const loadTasks = async () => {
     console.log('loadTasks');
-    const loadedTasks: Task[] = await Promise.all(
+    const loadedTasks: Task[] = await Promise?.all(
       (data as Array<string>)?.map(async (item) => {
         const metadata = (await readContract({
           address: item as `0x${string}`,

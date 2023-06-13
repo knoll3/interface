@@ -10,8 +10,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@pinata/sdk": "^2.1.0",
     "@rainbow-me/rainbowkit": "^1.0.1",
     "ethers": "^5.7.2",
+    "formidable": "^2.1.1",
+    "genson-js": "^0.0.8",
     "grommet": "^2.32.1",
     "grommet-icons": "^4.10.0",
     "next": "^13.1.6",
@@ -23,6 +26,7 @@
     "wagmi": "^1.0.7"
   },
   "devDependencies": {
+    "@types/formidable": "^2.0.6",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",

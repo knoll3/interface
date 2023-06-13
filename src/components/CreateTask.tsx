@@ -1,7 +1,8 @@
-import { useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useContractWrite } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
 import {
   Box,
+  FileInput,
   Form,
   FormField,
   Heading,
@@ -16,6 +17,7 @@ import { DocumentText, SettingsOption, Table } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 import { SecondaryButton } from './SecondaryButton';
 import { useState } from 'react';
+import { createSchema } from 'genson-js';
 
 type FormValues = {
   name: string;
@@ -33,6 +35,51 @@ type FormValues = {
   stake: number;
   rewardPool: number;
   modelDefinitionHash: string;
+  schema: string;
+  sampleData: any;
+  sampleDataContent: string;
+};
+
+const DataDefinitionForm = ({
+  value,
+  setValue,
+}: {
+  value: any;
+  setValue: (value: any) => void;
+}) => {
+  const handleChange = (nextValue: any) => {
+    if (nextValue.sampleData[0]) {
+      const fileReader = new FileReader();
+      fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
+      fileReader.onload = (e) => {
+        setValue({
+          ...nextValue,
+          schema: JSON.stringify(
+            createSchema(JSON.parse(e?.target?.result as string)),
+            null,
+            2
+          ),
+        });
+      };
+    }
+  };
+
+  return (
+    <Form value={value} onChange={(nextValue) => handleChange(nextValue)}>
+      <FormField name="schemaField" htmlFor="schema" label="Data Schema">
+        <Box height="medium">
+          <TextArea id="schema" name="schema" fill />
+        </Box>
+      </FormField>
+      <FormField
+        name="sampleDataField"
+        htmlFor="sampleData"
+        label="Sample Data"
+      >
+        <FileInput id="sampleData" name="sampleData" multiple={false} />
+      </FormField>
+    </Form>
+  );
 };
 
 const TrainingSettingsForm = ({
@@ -216,26 +263,48 @@ export const CreateTask = ({
   const [value, setValue] = useState<FormValues>({} as FormValues);
   const [step, setStep] = useState(1);
 
-  const { config } = usePrepareContractWrite({
+  const { data, isLoading, isSuccess, writeAsync } = useContractWrite({
     address: process.env
       .NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
     abi: FLOCK_TASK_MANAGER_ABI,
     functionName: 'createTask',
-    args: [
-      JSON.stringify(value),
-      120,
-      value.modelDefinitionHash,
-      value.rounds,
-      value.minParticipants,
-      value.maxParticipants,
-      value.stake * 10 ** 18,
-    ],
   });
 
-  const { data, isLoading, isSuccess, writeAsync } = useContractWrite(config);
-
   const handleCreate = async () => {
-    await writeAsync?.();
+    const schemaUploadResponse = await fetch('/api/pinJsonToIPFS', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(value.schema),
+    });
+
+    const schemaUploaded = await schemaUploadResponse.json();
+
+    const sampleDataBody = new FormData();
+    sampleDataBody.append('file', value.sampleData[0]);
+
+    const sampleDataUploadResponse = await fetch('/api/pinFileToIPFS', {
+      method: 'POST',
+      body: sampleDataBody,
+    });
+    const sampleDataUploaded = await sampleDataUploadResponse.json();
+
+    value.sampleData = sampleDataUploaded.hash;
+    value.schema = schemaUploaded.hash;
+
+    console.log(JSON.stringify(value));
+    await writeAsync?.({
+      args: [
+        JSON.stringify(value),
+        120,
+        value.modelDefinitionHash,
+        value.rounds,
+        value.minParticipants,
+        value.maxParticipants,
+        value.stake * 10 ** 18,
+      ],
+    });
     setShowCreateTask(false);
   };
 
@@ -293,7 +362,9 @@ export const CreateTask = ({
           {step === 1 && (
             <TaskDefinitionForm value={value} setValue={setValue} />
           )}
-          {step === 2 && <></>}
+          {step === 2 && (
+            <DataDefinitionForm value={value} setValue={setValue} />
+          )}
           {step === 3 && (
             <TrainingSettingsForm value={value} setValue={setValue} />
           )}
