@@ -28,7 +28,7 @@ export const FLOCK_TASK_ABI = [
       },
       {
         internalType: 'string',
-        name: '_globalModelHash',
+        name: '_modelDefinitionHash',
         type: 'string',
       },
       {
@@ -468,6 +468,19 @@ export const FLOCK_TASK_ABI = [
   },
   {
     inputs: [],
+    name: 'getNumberOfParticipants',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'getNumberOfProposers',
     outputs: [
       {
@@ -621,6 +634,19 @@ export const FLOCK_TASK_ABI = [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'modelDefinitionHash',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
       },
     ],
     stateMutability: 'view',
@@ -782,6 +808,19 @@ export const FLOCK_TASK_ABI = [
       },
     ],
     name: 'requestIds',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'rewardPerStake',
     outputs: [
       {
         internalType: 'uint256',

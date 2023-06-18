@@ -16,8 +16,9 @@ import {
 import { DocumentText, SettingsOption, Table } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 import { SecondaryButton } from './SecondaryButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createSchema } from 'genson-js';
+import { FLOCK_ABI } from '../contracts/flock';
 
 type FormValues = {
   name: string;
@@ -40,57 +41,36 @@ type FormValues = {
   sampleDataContent: string;
 };
 
-const DataDefinitionForm = ({
-  value,
-  setValue,
-}: {
-  value: any;
-  setValue: (value: any) => void;
-}) => {
-  const handleChange = (nextValue: any) => {
-    if (nextValue.sampleData[0]) {
-      const fileReader = new FileReader();
-      fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
-      fileReader.onload = (e) => {
-        setValue({
-          ...nextValue,
-          schema: JSON.stringify(
-            createSchema(JSON.parse(e?.target?.result as string)),
-            null,
-            2
-          ),
-        });
-      };
-    }
-  };
-
+const DataDefinitionForm = () => {
   return (
-    <Form value={value} onChange={(nextValue) => handleChange(nextValue)}>
-      <FormField name="schemaField" htmlFor="schema" label="Data Schema">
+    <>
+      <FormField
+        name="schema"
+        htmlFor="schema"
+        label="Data Schema"
+        required
+        validateOn="blur"
+      >
         <Box height="medium">
           <TextArea id="schema" name="schema" fill />
         </Box>
       </FormField>
       <FormField
-        name="sampleDataField"
+        name="sampleData"
         htmlFor="sampleData"
         label="Sample Data"
+        required
+        validateOn="blur"
       >
         <FileInput id="sampleData" name="sampleData" multiple={false} />
       </FormField>
-    </Form>
+    </>
   );
 };
 
-const TrainingSettingsForm = ({
-  value,
-  setValue,
-}: {
-  value: any;
-  setValue: (value: any) => void;
-}) => {
+const TrainingSettingsForm = ({ value }: { value: any }) => {
   return (
-    <Form value={value} onChange={(nextValue) => setValue(nextValue)}>
+    <>
       <Box>
         <Heading level="4">Criteria to start training task:</Heading>
         <Box direction="row" align="center" justify="between">
@@ -101,7 +81,7 @@ const TrainingSettingsForm = ({
                 id="minParticipants"
                 name="minParticipants"
                 step={1}
-                max={1000}
+                max={100}
                 min={3}
               />
               <Box>{value.minParticipants}</Box>
@@ -115,7 +95,7 @@ const TrainingSettingsForm = ({
                 name="maxParticipants"
                 step={1}
                 min={3}
-                max={1000}
+                max={100}
               />
               <Box>{value.maxParticipants}</Box>
             </Box>
@@ -126,12 +106,15 @@ const TrainingSettingsForm = ({
         <Heading level="4">Criteria to end training task:</Heading>
         <Box direction="row" align="center" justify="between">
           <FormField
-            name="roundsField"
+            name="rounds"
             htmlFor="rounds"
             label="Number of training rounds in total"
+            required
+            validateOn="blur"
           >
             <TextInput id="rounds" name="rounds" type="number" />
           </FormField>
+          {/* 
           <Box>
             <Text>Expected training accuracy</Text>
             <Box direction="row" align="center" gap="xsmall">
@@ -145,6 +128,7 @@ const TrainingSettingsForm = ({
               <Box>{value.accuracy}%</Box>
             </Box>
           </Box>
+          */}
         </Box>
       </Box>
       <Box
@@ -154,51 +138,77 @@ const TrainingSettingsForm = ({
         margin={{ top: 'medium' }}
       >
         <FormField
-          name="stakeField"
+          name="stake"
           htmlFor="stake"
           label="Initial Stake Requirement"
+          required
+          validateOn="blur"
         >
           <TextInput id="stake" name="stake" type="number" />
         </FormField>
         <FormField
-          name="rewardPoolField"
+          name="rewardPool"
           htmlFor="rewardPool"
           label="Rewards Pool"
+          required
+          validateOn="blur"
         >
           <TextInput id="rewardPool" name="rewardPool" type="number" />
         </FormField>
       </Box>
-    </Form>
+    </>
   );
 };
 
-const TaskDefinitionForm = ({
-  value,
-  setValue,
-}: {
-  value: any;
-  setValue: (value: any) => void;
-}) => {
+const TaskDefinitionForm = ({ value }: { value: any }) => {
   return (
-    <Form value={value} onChange={(nextValue) => setValue(nextValue)}>
-      <FormField name="nameField" htmlFor="name" label="Name">
+    <>
+      <FormField
+        name="name"
+        htmlFor="name"
+        label="Name"
+        required
+        validateOn="blur"
+      >
         <TextInput id="name" name="name" />
       </FormField>
       <FormField
-        name="descriptionField"
+        name="description"
         htmlFor="description"
         label="Description"
+        required
+        validateOn="blur"
       >
         <TextArea id="description" name="description" />
       </FormField>
-      <FormField name="inputField" htmlFor="input" label="Input">
-        <TextInput id="input" name="input" />
-      </FormField>
-      <FormField name="outputField" htmlFor="output" label="Output">
-        <TextInput id="output" name="output" />
-      </FormField>
       <Box direction="row" align="center" justify="between">
-        <FormField name="modelNameField" htmlFor="modelName" label="Model Name">
+        <FormField
+          name="input"
+          htmlFor="input"
+          label="Input"
+          required
+          validateOn="blur"
+        >
+          <TextInput id="input" name="input" />
+        </FormField>
+        <FormField
+          name="output"
+          htmlFor="output"
+          label="Output"
+          required
+          validateOn="blur"
+        >
+          <TextInput id="output" name="output" />
+        </FormField>
+      </Box>
+      <Box direction="row" align="center" justify="between">
+        <FormField
+          name="modelName"
+          htmlFor="modelName"
+          label="Model Name"
+          required
+          validateOn="blur"
+        >
           <Select
             id="modelName"
             name="modelName"
@@ -213,7 +223,13 @@ const TaskDefinitionForm = ({
             ]}
           />
         </FormField>
-        <FormField name="taskTypeField" htmlFor="taskType" label="Task Type">
+        <FormField
+          name="taskType"
+          htmlFor="taskType"
+          label="Task Type"
+          required
+          validateOn="blur"
+        >
           <Select
             id="taskType"
             name="taskType"
@@ -237,21 +253,25 @@ const TaskDefinitionForm = ({
         </Box>
 
         <FormField
-          name="outputDescriptionField"
+          name="outputDescription"
           htmlFor="outputDescription"
           label="Output Description"
+          required
+          validateOn="blur"
         >
           <TextInput id="outputDescription" name="outputDescription" />
         </FormField>
       </Box>
       <FormField
-        name="modelDefinitionHashField"
+        name="modelDefinitionHash"
         htmlFor="modelDefinitionHash"
         label="Model Definition Hash"
+        required
+        validateOn="blur"
       >
         <TextInput id="modelDefinitionHash" name="modelDefinitionHash" />
       </FormField>
-    </Form>
+    </>
   );
 };
 
@@ -261,7 +281,16 @@ export const CreateTask = ({
   setShowCreateTask: (show: boolean) => void;
 }) => {
   const [value, setValue] = useState<FormValues>({} as FormValues);
+  const [errors, setErrors] = useState({});
+
   const [step, setStep] = useState(1);
+
+  const { isSuccess: isSuccessApprove, writeAsync: writeAsyncApprove } =
+    useContractWrite({
+      address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
+      abi: FLOCK_ABI,
+      functionName: 'approve',
+    });
 
   const { data, isLoading, isSuccess, writeAsync } = useContractWrite({
     address: process.env
@@ -293,24 +322,66 @@ export const CreateTask = ({
     value.sampleData = sampleDataUploaded.hash;
     value.schema = schemaUploaded.hash;
 
-    console.log(JSON.stringify(value));
-    await writeAsync?.({
+    await writeAsyncApprove?.({
       args: [
-        JSON.stringify(value),
-        120,
-        value.modelDefinitionHash,
-        value.rounds,
-        value.minParticipants,
-        value.maxParticipants,
-        value.stake * 10 ** 18,
+        process.env.NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
+        value.rewardPool * 10 ** 18,
       ],
     });
-    setShowCreateTask(false);
   };
+
+  useEffect(() => {
+    if (isSuccessApprove) {
+      writeAsync?.({
+        args: [
+          JSON.stringify(value),
+          120,
+          value.modelDefinitionHash,
+          value.rounds,
+          value.minParticipants,
+          value.maxParticipants,
+          value.stake * 10 ** 18,
+          value.rewardPool * 10 ** 18,
+        ],
+      });
+    }
+  }, [isSuccessApprove]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setShowCreateTask(false);
+    }
+  }, [isSuccess]);
+
+  const handleChange = (nextValue: any) => {
+    if (nextValue.sampleData && nextValue.sampleData[0]) {
+      const fileReader = new FileReader();
+      fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
+      fileReader.onload = (e) => {
+        setValue({
+          ...nextValue,
+          schema: JSON.stringify(
+            createSchema(JSON.parse(e?.target?.result as string)),
+            null,
+            2
+          ),
+        });
+      };
+    } else {
+      setValue(nextValue);
+    }
+  };
+
+  const hasNoValues =
+    (step === 1 && Object.keys(value).length < 9) ||
+    (step === 2 && Object.keys(value).length < 11) ||
+    (step === 3 && Object.keys(value).length < 16);
 
   const handleContinue = () => {
     setStep(step + 1);
   };
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <Box width="xlarge">
@@ -324,8 +395,8 @@ export const CreateTask = ({
       >
         <Box>
           <Box direction="row" gap="xsmall">
-            <Heading level="2">Create your</Heading>
-            <Heading level="2" color="#6C94EC">
+            <Heading level="3">Create your</Heading>
+            <Heading level="3" color="#6C94EC">
               task
             </Heading>
           </Box>
@@ -339,19 +410,34 @@ export const CreateTask = ({
         justify="start"
       >
         <Box width="30%">
-          <Box direction="row" align="center" gap="small">
+          <Box
+            direction="row"
+            align="center"
+            gap="small"
+            onClick={() => setStep(1)}
+          >
             <DocumentText size="medium" color={step === 1 ? '#6C94EC' : ''} />
             <Heading level="4" color={step === 1 ? '#6C94EC' : ''}>
               1. Task Definition
             </Heading>
           </Box>
-          <Box direction="row" align="center" gap="small">
+          <Box
+            direction="row"
+            align="center"
+            gap="small"
+            onClick={() => setStep(2)}
+          >
             <Table size="medium" color={step === 2 ? '#6C94EC' : ''} />
             <Heading level="4" color={step === 2 ? '#6C94EC' : ''}>
               2. Data Definition
             </Heading>
           </Box>
-          <Box direction="row" align="center" gap="small">
+          <Box
+            direction="row"
+            align="center"
+            gap="small"
+            onClick={() => setStep(3)}
+          >
             <SettingsOption size="medium" color={step === 3 ? '#6C94EC' : ''} />
             <Heading level="4" color={step === 3 ? '#6C94EC' : ''}>
               3. Training Settings
@@ -359,15 +445,18 @@ export const CreateTask = ({
           </Box>
         </Box>
         <Box width="70%">
-          {step === 1 && (
-            <TaskDefinitionForm value={value} setValue={setValue} />
-          )}
-          {step === 2 && (
-            <DataDefinitionForm value={value} setValue={setValue} />
-          )}
-          {step === 3 && (
-            <TrainingSettingsForm value={value} setValue={setValue} />
-          )}
+          <Form
+            value={value}
+            onChange={handleChange}
+            validate="change"
+            onValidate={(validationResults) => {
+              setErrors(validationResults.errors);
+            }}
+          >
+            {step === 1 && <TaskDefinitionForm value={value} />}
+            {step === 2 && <DataDefinitionForm />}
+            {step === 3 && <TrainingSettingsForm value={value} />}
+          </Form>
         </Box>
       </Box>
       <Box
@@ -385,6 +474,7 @@ export const CreateTask = ({
         />
         <PrimaryButton
           onClick={step === 3 ? handleCreate : handleContinue}
+          disabled={hasErrors || hasNoValues}
           margin={{ top: 'medium' }}
           label={step === 3 ? 'Create' : 'Continue'}
           size="medium"

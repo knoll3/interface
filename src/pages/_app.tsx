@@ -63,6 +63,7 @@ const flockTheme = {
       },
     },
   },
+  formField: { label: { requiredIndicator: true } },
 };
 
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {

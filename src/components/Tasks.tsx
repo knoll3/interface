@@ -11,6 +11,23 @@ export interface Task {
   address: string;
   name: string;
   description: string;
+  input: string;
+  output: string;
+  modelName: string;
+  taskType: string;
+  sizeMemory: number;
+  outputDescription: string;
+  minParticipants: number;
+  maxParticipants: number;
+  rounds: number;
+  accuracy: number;
+  stake: number;
+  rewardPool: number;
+  modelDefinitionHash: string;
+  schema: string;
+  sampleData: any;
+  sampleDataContent: string;
+  numberOfParticipants: number;
 }
 
 export const Tasks = () => {
@@ -28,20 +45,38 @@ export const Tasks = () => {
   });
 
   const loadTasks = async () => {
-    console.log('loadTasks');
-    const loadedTasks: Task[] = await Promise?.all(
-      (data as Array<string>)?.map(async (item) => {
-        const metadata = (await readContract({
-          address: item as `0x${string}`,
-          abi: FLOCK_TASK_ABI,
-          functionName: 'metadata',
-        })) as string;
+    if (data) {
+      const loadedTasks: Task[] = await Promise?.all(
+        (data as Array<string>)?.map(async (item) => {
+          const metadata = (await readContract({
+            address: item as `0x${string}`,
+            abi: FLOCK_TASK_ABI,
+            functionName: 'metadata',
+          })) as string;
 
-        return { address: item, ...JSON.parse(metadata) } as Task;
-      })
-    );
+          const currentRound = (await readContract({
+            address: item as `0x${string}`,
+            abi: FLOCK_TASK_ABI,
+            functionName: 'currentRound',
+          })) as number;
 
-    setTasks(loadedTasks);
+          const numberOfParticipants = (await readContract({
+            address: item as `0x${string}`,
+            abi: FLOCK_TASK_ABI,
+            functionName: 'getNumberOfParticipants',
+          })) as number;
+
+          console.log(metadata);
+          return {
+            address: item,
+            ...JSON.parse(metadata),
+            numberOfParticipants,
+          } as Task;
+        })
+      );
+
+      setTasks(loadedTasks);
+    }
   };
 
   useEffect(() => {
@@ -87,13 +122,13 @@ export const Tasks = () => {
               >
                 <Box align="center" justify="center">
                   <Heading level="2" color="#6C94EC" margin="0">
-                    10
+                    {task.minParticipants}
                   </Heading>
                   <Text size="small">Participants Requirements</Text>
                 </Box>
                 <Box align="center" justify="center">
                   <Heading level="2" margin="0">
-                    20%
+                    {((task.rewardPool / task.rounds) * 100) / task.rewardPool}%
                   </Heading>
                   <Text size="small">Rewards Return Rate</Text>
                 </Box>
@@ -112,28 +147,30 @@ export const Tasks = () => {
                   align="center"
                   justify="center"
                 >
-                  <Text size="small">Short of</Text>{' '}
+                  <Text size="small">Short of</Text>
                   <Text size="medium" color="#6C94EC">
-                    1
-                  </Text>{' '}
+                    {task.minParticipants - Number(task.numberOfParticipants)}
+                  </Text>
                   <Text size="small">to start</Text>
                 </Box>
-                <Box direction="row">
-                  <Stack anchor="right">
-                    <Box direction="row">
+                {task.numberOfParticipants > 2 && (
+                  <Box direction="row">
+                    <Stack anchor="right">
+                      <Box direction="row">
+                        <Avatar background="brand" size="small">
+                          <UserFemale size="small" />
+                        </Avatar>
+                        <Box pad="xsmall" />
+                      </Box>
+
                       <Avatar background="brand" size="small">
                         <UserFemale size="small" />
                       </Avatar>
-                      <Box pad="xsmall" />
-                    </Box>
+                    </Stack>
 
-                    <Avatar background="brand" size="small">
-                      <UserFemale size="small" />
-                    </Avatar>
-                  </Stack>
-
-                  <Text>+2</Text>
-                </Box>
+                    <Text>+{Number(task.numberOfParticipants) - 2}</Text>
+                  </Box>
+                )}
               </Box>
               <Box>
                 <PrimaryButton

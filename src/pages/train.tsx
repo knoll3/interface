@@ -10,9 +10,11 @@ import {
 import { CreateTask, Layout, PrimaryButton, Tasks } from '../components';
 import { useState } from 'react';
 import { Search } from 'grommet-icons';
+import { useAccount } from 'wagmi';
 
 export default function TrainPage() {
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const { isDisconnected } = useAccount();
 
   return (
     <Layout>
@@ -34,13 +36,14 @@ export default function TrainPage() {
             </Box>
             <Paragraph>
               Improve model performance by training it on distributed data
-              sources. Data stays local and rewards paid our based on
-              contribution to model performance.
+              sources. Data stays local and rewards paid based on contribution
+              to model performance.
             </Paragraph>
           </Box>
           <Box>
             <PrimaryButton
               onClick={() => setShowCreateTask(true)}
+              disabled={isDisconnected}
               margin={{ top: 'large' }}
               label="Create New"
               size="medium"
@@ -73,14 +76,14 @@ export default function TrainPage() {
               <Button
                 secondary
                 plain
-                label="Helthcare"
+                label="Healthcare"
                 color="#9E9E9E"
                 style={{ borderWidth: '0px' }}
               />
               <Button
                 secondary
                 plain
-                label="Fiance"
+                label="Finance"
                 color="#9E9E9E"
                 style={{ borderWidth: '0px' }}
               />

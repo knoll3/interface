@@ -18,7 +18,7 @@ export const FLOCK_TASK_MANAGER_ABI = [
     inputs: [
       { internalType: 'string', name: '_metadata', type: 'string' },
       { internalType: 'uint256', name: '_secondsPerRound', type: 'uint256' },
-      { internalType: 'string', name: '_globalModelHash', type: 'string' },
+      { internalType: 'string', name: '_modelDefinitionHash', type: 'string' },
       {
         internalType: 'uint256',
         name: '_totalNumberOfRounds',
@@ -35,12 +35,26 @@ export const FLOCK_TASK_MANAGER_ABI = [
         type: 'uint256',
       },
       { internalType: 'uint256', name: '_minStakeThreshold', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: '_initialRewardPoolSize',
+        type: 'uint256',
+      },
     ],
     name: 'createTask',
     outputs: [
       { internalType: 'address', name: 'newContract', type: 'address' },
     ],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'flockToken',
+    outputs: [
+      { internalType: 'contract FlockToken', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
