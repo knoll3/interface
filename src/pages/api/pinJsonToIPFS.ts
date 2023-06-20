@@ -6,6 +6,12 @@ const pinata = new Pinata(
   process.env.PINATA_SECRET_API_KEY
 );
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 type Data = {
   hash: string;
 };
