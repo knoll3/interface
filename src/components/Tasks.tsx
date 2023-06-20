@@ -128,7 +128,11 @@ export const Tasks = () => {
                 </Box>
                 <Box align="center" justify="center">
                   <Heading level="2" margin="0">
-                    {((task.rewardPool / task.rounds) * 100) / task.rewardPool}%
+                    {(
+                      ((task.rewardPool / task.rounds) * 100) /
+                      task.rewardPool
+                    ).toFixed(2)}
+                    %
                   </Heading>
                   <Text size="small">Rewards Return Rate</Text>
                 </Box>
