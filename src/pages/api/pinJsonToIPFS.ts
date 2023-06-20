@@ -16,7 +16,7 @@ type Data = {
   hash: string;
 };
 
-export default async function pinJsonToIPFSHandler(
+export async function pinJsonToIPFSHandler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
