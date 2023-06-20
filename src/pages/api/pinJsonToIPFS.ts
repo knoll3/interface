@@ -6,21 +6,16 @@ const pinata = new Pinata(
   process.env.PINATA_SECRET_API_KEY
 );
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 type Data = {
   hash: string;
 };
 
-export async function pinJsonToIPFSHandler(
+export default async function pinJsonToIPFSHandler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const json = JSON.parse(req.body);
+  const json = req.body;
+  console.log(json);
   const pinResponse = await pinata.pinJSONToIPFS(json);
   res.status(200).json({ hash: pinResponse.IpfsHash });
 }

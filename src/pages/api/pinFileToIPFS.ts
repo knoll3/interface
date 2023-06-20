@@ -18,7 +18,7 @@ export const config = {
   },
 };
 
-export async function pinFileToIPFSHandler(
+export default async function pinFileToIPFSHandler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {

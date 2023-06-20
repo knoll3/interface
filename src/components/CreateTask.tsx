@@ -305,7 +305,7 @@ export const CreateTask = ({
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(value.schema),
+      body: value.schema,
     });
 
     const schemaUploaded = await schemaUploadResponse.json();
