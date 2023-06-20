@@ -1,4 +1,4 @@
-import { useContractWrite } from 'wagmi';
+import { useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   Paragraph,
   RangeInput,
   Select,
+  Spinner,
   Text,
   TextArea,
   TextInput,
@@ -282,15 +283,19 @@ export const CreateTask = ({
 }) => {
   const [value, setValue] = useState<FormValues>({} as FormValues);
   const [errors, setErrors] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [step, setStep] = useState(1);
 
-  const { isSuccess: isSuccessApprove, writeAsync: writeAsyncApprove } =
-    useContractWrite({
-      address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
-      abi: FLOCK_ABI,
-      functionName: 'approve',
-    });
+  const { data: approveTx, writeAsync: writeAsyncApprove } = useContractWrite({
+    address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
+    abi: FLOCK_ABI,
+    functionName: 'approve',
+  });
+
+  const { isSuccess: isSuccessApprove } = useWaitForTransaction({
+    hash: approveTx?.hash,
+  });
 
   const { data, isLoading, isSuccess, writeAsync } = useContractWrite({
     address: process.env
@@ -300,6 +305,7 @@ export const CreateTask = ({
   });
 
   const handleCreate = async () => {
+    setIsProcessing(true);
     const schemaUploadResponse = await fetch('/api/pinJsonToIPFS', {
       method: 'POST',
       headers: {
@@ -349,6 +355,7 @@ export const CreateTask = ({
 
   useEffect(() => {
     if (isSuccess) {
+      setIsProcessing(false);
       setShowCreateTask(false);
     }
   }, [isSuccess]);
@@ -474,9 +481,19 @@ export const CreateTask = ({
         />
         <PrimaryButton
           onClick={step === 3 ? handleCreate : handleContinue}
-          disabled={hasErrors || hasNoValues}
+          disabled={hasErrors || hasNoValues || isProcessing}
           margin={{ top: 'medium' }}
-          label={step === 3 ? 'Create' : 'Continue'}
+          label={
+            step === 3 ? (
+              isProcessing ? (
+                <Spinner color="black" />
+              ) : (
+                'Create'
+              )
+            ) : (
+              'Continue'
+            )
+          }
           size="medium"
           pad={{ vertical: 'small', horizontal: 'large' }}
         />
