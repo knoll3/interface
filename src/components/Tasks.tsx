@@ -107,7 +107,7 @@ export const Tasks = () => {
               margin={{ top: 'medium' }}
             >
               <Box align="center" justify="center">
-                <Heading level="2" margin="0">
+                <Heading level="2" margin="0" truncate={true}>
                   {task.name}
                 </Heading>
                 <Text size="small">{task.description}</Text>
