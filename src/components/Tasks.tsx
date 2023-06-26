@@ -66,7 +66,6 @@ export const Tasks = () => {
             functionName: 'getNumberOfParticipants',
           })) as number;
 
-          console.log(metadata);
           return {
             address: item,
             ...JSON.parse(metadata),

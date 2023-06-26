@@ -18,8 +18,10 @@ import { DocumentText, SettingsOption, Table } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 import { SecondaryButton } from './SecondaryButton';
 import { useEffect, useState } from 'react';
-import { createSchema } from 'genson-js';
 import { FLOCK_ABI } from '../contracts/flock';
+import { create as ipfsHttpClient } from 'ipfs-http-client';
+import { createSchema } from 'genson-js/dist';
+const ipfsClient = ipfsHttpClient({ url: 'http://34.132.60.195:5001/api/v0' });
 
 type FormValues = {
   name: string;
@@ -42,9 +44,59 @@ type FormValues = {
   sampleDataContent: string;
 };
 
-const DataDefinitionForm = () => {
+const DataDefinitionForm = ({
+  value,
+  setValue,
+  setErrors,
+}: {
+  value: any;
+  setValue: (value: any) => void;
+  setErrors(value: any): void;
+}) => {
+  const handleChange = async (nextValue: any) => {
+    if (nextValue.sampleData) {
+      /*const sampleDataBody = new FormData();
+      sampleDataBody.append('file', nextValue.sampleData[0]);
+      const sampleDataUploadResponse = await fetch(
+        'https://us-central1-flock-demo-design.cloudfunctions.net/getSchema',
+        {
+          method: 'POST',
+          body: sampleDataBody,
+        }
+      );
+
+      const sampleDataSchema = await sampleDataUploadResponse.json();
+        
+      setValue({
+        ...nextValue,
+        schema: JSON.stringify(sampleDataSchema, null, 4),
+        
+      });
+      */
+      const fileReader = new FileReader();
+      fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
+      fileReader.onload = (e) => {
+        setValue({
+          ...nextValue,
+          schema: JSON.stringify(
+            createSchema(JSON.parse(e?.target?.result as string)),
+            null,
+            2
+          ),
+        });
+      };
+    }
+  };
+
   return (
-    <>
+    <Form
+      value={value}
+      onChange={handleChange}
+      validate="blur"
+      onValidate={(validationResults) => {
+        setErrors(validationResults.errors);
+      }}
+    >
       <FormField
         name="schema"
         htmlFor="schema"
@@ -65,13 +117,28 @@ const DataDefinitionForm = () => {
       >
         <FileInput id="sampleData" name="sampleData" multiple={false} />
       </FormField>
-    </>
+    </Form>
   );
 };
 
-const TrainingSettingsForm = ({ value }: { value: any }) => {
+const TrainingSettingsForm = ({
+  value,
+  setValue,
+  setErrors,
+}: {
+  value: any;
+  setValue: (value: any) => void;
+  setErrors(value: any): void;
+}) => {
   return (
-    <>
+    <Form
+      value={value}
+      onChange={setValue}
+      validate="blur"
+      onValidate={(validationResults) => {
+        setErrors(validationResults.errors);
+      }}
+    >
       <Box>
         <Heading level="4">Criteria to start training task:</Heading>
         <Box direction="row" align="center" justify="between">
@@ -157,13 +224,28 @@ const TrainingSettingsForm = ({ value }: { value: any }) => {
           <TextInput id="rewardPool" name="rewardPool" type="number" />
         </FormField>
       </Box>
-    </>
+    </Form>
   );
 };
 
-const TaskDefinitionForm = ({ value }: { value: any }) => {
+const TaskDefinitionForm = ({
+  value,
+  setValue,
+  setErrors,
+}: {
+  value: any;
+  setValue: (value: any) => void;
+  setErrors(value: any): void;
+}) => {
   return (
-    <>
+    <Form
+      value={value}
+      onChange={setValue}
+      validate="blur"
+      onValidate={(validationResults) => {
+        setErrors(validationResults.errors);
+      }}
+    >
       <FormField
         name="name"
         htmlFor="name"
@@ -272,7 +354,7 @@ const TaskDefinitionForm = ({ value }: { value: any }) => {
       >
         <TextInput id="modelDefinitionHash" name="modelDefinitionHash" />
       </FormField>
-    </>
+    </Form>
   );
 };
 
@@ -306,27 +388,14 @@ export const CreateTask = ({
 
   const handleCreate = async () => {
     setIsProcessing(true);
-    const schemaUploadResponse = await fetch('/api/pinJsonToIPFS', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: value.schema,
-    });
+    const { path: schemaPath } = await ipfsClient.add(
+      JSON.stringify(value.schema, null, 4)
+    );
 
-    const schemaUploaded = await schemaUploadResponse.json();
+    const { path: sampleDataPath } = await ipfsClient.add(value.sampleData[0]);
 
-    const sampleDataBody = new FormData();
-    sampleDataBody.append('file', value.sampleData[0]);
-
-    const sampleDataUploadResponse = await fetch('/api/pinFileToIPFS', {
-      method: 'POST',
-      body: sampleDataBody,
-    });
-    const sampleDataUploaded = await sampleDataUploadResponse.json();
-
-    value.sampleData = sampleDataUploaded.hash;
-    value.schema = schemaUploaded.hash;
+    value.sampleData = sampleDataPath;
+    value.schema = schemaPath;
 
     await writeAsyncApprove?.({
       args: [
@@ -359,25 +428,6 @@ export const CreateTask = ({
       setShowCreateTask(false);
     }
   }, [isSuccess]);
-
-  const handleChange = (nextValue: any) => {
-    if (nextValue.sampleData && nextValue.sampleData[0]) {
-      const fileReader = new FileReader();
-      fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
-      fileReader.onload = (e) => {
-        setValue({
-          ...nextValue,
-          schema: JSON.stringify(
-            createSchema(JSON.parse(e?.target?.result as string)),
-            null,
-            2
-          ),
-        });
-      };
-    } else {
-      setValue(nextValue);
-    }
-  };
 
   const hasNoValues =
     (step === 1 && Object.keys(value).length < 9) ||
@@ -452,18 +502,27 @@ export const CreateTask = ({
           </Box>
         </Box>
         <Box width="70%">
-          <Form
-            value={value}
-            onChange={handleChange}
-            validate="change"
-            onValidate={(validationResults) => {
-              setErrors(validationResults.errors);
-            }}
-          >
-            {step === 1 && <TaskDefinitionForm value={value} />}
-            {step === 2 && <DataDefinitionForm />}
-            {step === 3 && <TrainingSettingsForm value={value} />}
-          </Form>
+          {step === 1 && (
+            <TaskDefinitionForm
+              value={value}
+              setErrors={setErrors}
+              setValue={setValue}
+            />
+          )}
+          {step === 2 && (
+            <DataDefinitionForm
+              value={value}
+              setErrors={setErrors}
+              setValue={setValue}
+            />
+          )}
+          {step === 3 && (
+            <TrainingSettingsForm
+              value={value}
+              setErrors={setErrors}
+              setValue={setValue}
+            />
+          )}
         </Box>
       </Box>
       <Box

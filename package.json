@@ -17,6 +17,7 @@
     "genson-js": "^0.0.8",
     "grommet": "^2.32.1",
     "grommet-icons": "^4.10.0",
+    "ipfs-http-client": "^60.0.1",
     "next": "^13.1.6",
     "polished": "^4.2.2",
     "react": "^18.2.0",
