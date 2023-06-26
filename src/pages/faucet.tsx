@@ -37,10 +37,10 @@ export default function TrainPage() {
         >
           <Box>
             <Box direction="row" gap="xsmall">
-              <Heading level="2">Flock (FLC) tokens faucet </Heading>
+              <Heading level="2">FLock (FLC) tokens faucet </Heading>
             </Box>
             <Paragraph>
-              Mint your FLC tokens for participating in the Flock network.
+              Mint your FLC tokens for participating in the FLock network.
             </Paragraph>
             <Paragraph>
               Contract Address:{' '}
