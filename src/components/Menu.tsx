@@ -47,6 +47,15 @@ export const Menu = () => {
         selected={selected === '/train'}
         text="Train"
       />
+
+      <MenuItem
+        href="/faucet"
+        onClick={() => setSelected('/faucet')}
+        hoverIndicator={false}
+        selected={selected === '/faucet'}
+        text="Faucet"
+      />
+
       <MenuItem
         //href="/marketplace"
         //onClick={() => setSelected('/marketplace')}
