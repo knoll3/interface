@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react';
 import { FLOCK_ABI } from '../contracts/flock';
 import { create as ipfsHttpClient } from 'ipfs-http-client';
 import { createSchema } from 'genson-js/dist';
-const ipfsClient = ipfsHttpClient({ url: 'http://34.132.60.195:5001/api/v0' });
+const ipfsClient = ipfsHttpClient({ url: 'https://ipfs.flock.io/api/v0' });
 
 type FormValues = {
   name: string;
