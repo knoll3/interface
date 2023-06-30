@@ -7,6 +7,7 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 
 import { Grommet } from 'grommet';
 import './global.css';
+import { GoogleAnalytics } from 'nextjs-google-analytics';
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai],
@@ -71,6 +72,7 @@ const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
     <Grommet theme={flockTheme}>
       <WagmiConfig config={configWagmi}>
         <RainbowKitProvider chains={chains}>
+          <GoogleAnalytics trackPageViews />
           <Component {...pageProps} />
         </RainbowKitProvider>
       </WagmiConfig>
