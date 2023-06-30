@@ -71,7 +71,8 @@ export const Menu = () => {
         text="Analytics"
       />
       <MenuItem
-        //href="/aboutUs"
+        href="https://flock-io.gitbook.io/flock/"
+        target="_blank"
         //onClick={() => setSelected('/aboutUs')}
         hoverIndicator={false}
         selected={selected === '/aboutUs'}
