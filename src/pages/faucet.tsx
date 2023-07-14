@@ -4,7 +4,7 @@ import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
 import { useState } from 'react';
 
-export default function TrainPage() {
+export default function FaucetPage() {
   const { address, isDisconnected } = useAccount();
   const [amount, setAmount] = useState(0);
   const [errors, setErrors] = useState<any>({});
