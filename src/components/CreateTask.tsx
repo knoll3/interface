@@ -150,7 +150,7 @@ const TrainingSettingsForm = ({
                 name="minParticipants"
                 step={1}
                 max={100}
-                min={3}
+                min={1}
               />
               <Box>{value.minParticipants}</Box>
             </Box>
@@ -162,7 +162,7 @@ const TrainingSettingsForm = ({
                 id="maxParticipants"
                 name="maxParticipants"
                 step={1}
-                min={3}
+                min={1}
                 max={100}
               />
               <Box>{value.maxParticipants}</Box>
