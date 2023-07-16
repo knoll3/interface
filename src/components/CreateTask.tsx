@@ -262,7 +262,7 @@ const TaskDefinitionForm = ({
         required
         validateOn="blur"
       >
-        <TextArea id="description" name="description" />
+        <TextInput id="description" name="description" />
       </FormField>
       <Box direction="row" align="center" justify="between">
         <FormField
