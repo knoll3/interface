@@ -1,6 +1,6 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Avatar, Box, Heading, Layer, Stack, Text } from 'grommet';
+import { Anchor, Avatar, Box, Heading, Layer, Stack, Text } from 'grommet';
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
@@ -103,14 +103,16 @@ export const Tasks = () => {
               round="small"
               elevation="large"
               pad="medium"
-              margin={{ top: 'medium' }}
-              height="medium"
+              margin={{ top: 'small' }}
+              height={{ min: 'medium' }}
             >
               <Box align="center" justify="center">
                 <Heading level="2" margin="0">
                   {task.name}
                 </Heading>
-                <Text size="small">{task.description}</Text>
+                <Text size="small" truncate>
+                  {task.description}
+                </Text>
               </Box>
               <Box
                 direction="row"
@@ -196,8 +198,23 @@ export const Tasks = () => {
         <Layer responsive={true}>
           <Box pad="medium" gap="medium">
             <Box>
-              <Heading level="3">Task Id</Heading>
+              <Heading level="3">{taskToShow.name}</Heading>
+              <Text size="small">{taskToShow.description}</Text>
+            </Box>
+            <Box>
+              <Heading level="5">Task Id</Heading>
               <Text>{taskToShow.address}</Text>
+            </Box>
+            <Box>
+              <Anchor
+                href={
+                  taskToShow.address ===
+                  '0x7280c6EF7bB61e76b116b61e608110a85136A35a'
+                    ? 'https://drive.google.com/uc?export=download&id=1TBZruhiwYYf9HWN37TOnEW-0qePMxcxr'
+                    : 'https://drive.google.com/uc?export=download&id=1HbCqlSop48OETzTcDuo1Oaw3bMLIxA4n'
+                }
+                label="Test Case Dataset"
+              />
             </Box>
             <PrimaryButton label="close" onClick={() => setShowTask(false)} />
           </Box>
