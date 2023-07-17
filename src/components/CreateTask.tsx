@@ -55,24 +55,6 @@ const DataDefinitionForm = ({
 }) => {
   const handleChange = async (nextValue: any) => {
     if (nextValue.sampleData) {
-      /*const sampleDataBody = new FormData();
-      sampleDataBody.append('file', nextValue.sampleData[0]);
-      const sampleDataUploadResponse = await fetch(
-        'https://us-central1-flock-demo-design.cloudfunctions.net/getSchema',
-        {
-          method: 'POST',
-          body: sampleDataBody,
-        }
-      );
-
-      const sampleDataSchema = await sampleDataUploadResponse.json();
-        
-      setValue({
-        ...nextValue,
-        schema: JSON.stringify(sampleDataSchema, null, 4),
-        
-      });
-      */
       const fileReader = new FileReader();
       fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
       fileReader.onload = (e) => {

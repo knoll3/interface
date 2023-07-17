@@ -4,6 +4,7 @@ import {
   Form,
   FormField,
   Heading,
+  Spinner,
   Text,
   TextInput,
 } from 'grommet';
@@ -13,8 +14,10 @@ import { ethers } from 'ethers';
 
 export default function AnalyticsPage() {
   const [holders, setHolders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const loadHolders = async () => {
+    setLoading(true);
     const holdersRequest = await fetch(
       `/api/holders?tokenAddress=${process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}`
     );
@@ -22,6 +25,7 @@ export default function AnalyticsPage() {
     const { holders } = await holdersRequest.json();
     console.log(holders);
     setHolders(holders);
+    setLoading(false);
   };
   useEffect(() => {
     loadHolders();
@@ -45,23 +49,31 @@ export default function AnalyticsPage() {
           </Box>
         </Box>
         <Box width="100%" align="center" pad="large">
-          <DataTable
-            columns={[
-              {
-                property: 'address',
-                header: 'Address',
-                primary: true,
-              },
-              {
-                property: 'balance',
-                header: 'Balance',
-                render: (datum) => (
-                  <Text>{ethers.utils.formatEther(datum.balance)}</Text>
-                ),
-              },
-            ]}
-            data={holders}
-          />
+          {loading ? (
+            <Spinner size="medium" />
+          ) : (
+            <DataTable
+              columns={[
+                {
+                  property: 'address',
+                  header: 'Address',
+                  primary: true,
+                },
+                {
+                  property: 'interactions',
+                  header: 'Participations',
+                },
+                {
+                  property: 'balance',
+                  header: 'Balance',
+                  render: (datum) => (
+                    <Text>{ethers.utils.formatEther(datum.balance)}</Text>
+                  ),
+                },
+              ]}
+              data={holders}
+            />
+          )}
         </Box>
       </Box>
     </Layout>
