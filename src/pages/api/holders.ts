@@ -78,8 +78,8 @@ export default async function holdersHandler(
       item.interactions = interactions.length;
     });
 
-    const minutes = 1;
-    cacheData.put(tokenAddress, items, minutes * 1000 * 1);
+    const minutes = 15;
+    cacheData.put(tokenAddress, items, minutes * 1000 * 60);
 
     res.status(200).json({ holders: items });
   }
