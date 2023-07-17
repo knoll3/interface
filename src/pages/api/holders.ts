@@ -70,7 +70,7 @@ export default async function holdersHandler(
 
     const contractInteractionAddresses =
       await getContractInteractionAddresses();
-    console.log(contractInteractionAddresses);
+
     items.forEach((item: any) => {
       const interactions = contractInteractionAddresses.filter(
         (address) => address.toLowerCase() === item.address.toLowerCase()
