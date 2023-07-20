@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import cacheData from 'memory-cache';
 import { ethers } from 'ethers';
 import { FLOCK_TASK_MANAGER_ABI } from '@/src/contracts/flockTaskManager';
+//import fs from 'fs';
 
 type Data = {
   holders: string[];
@@ -21,6 +22,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 
 const getContractInteractionAddresses = async () => {
   const addresses: any[] = [];
+  // const results = [];
   for (let i = 0; i < flockTaskManagerContracts.length; i++) {
     const contract = new ethers.Contract(
       flockTaskManagerContracts[i],
@@ -34,11 +36,18 @@ const getContractInteractionAddresses = async () => {
         `https://api-testnet.polygonscan.com/api?module=account&action=txlist&address=${tasks[i]}&startblock=0&endblock=99999999&apikey=${process.env.POLYGONSCAN_API_KEY}`
       );
       const response = await contractInteractionsRequest.json();
-      console.log(response);
+      // results.push(response.result);
       addresses.push(response.result?.map((item: any) => item.from));
       await sleep(1000);
     }
   }
+
+  // fs.writeFile('transactions', JSON.stringify(results.flat()), function (err) {
+  //   if (err) {
+  //     return console.log(err);
+  //   }
+  //   console.log('The file was saved!');
+  // });
 
   return addresses.flat();
 };

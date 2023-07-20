@@ -53,6 +53,7 @@ export default function AnalyticsPage() {
             <Spinner size="medium" />
           ) : (
             <DataTable
+              sortable
               columns={[
                 {
                   property: 'address',
