@@ -28,7 +28,7 @@ export default function AnalyticsPage() {
     setLoading(false);
   };
   useEffect(() => {
-    loadHolders();
+    //loadHolders();
   }, []);
 
   return (
