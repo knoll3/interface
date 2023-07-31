@@ -493,6 +493,19 @@ export const FLOCK_TASK_ABI = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'getTotalScoreAllRounds',
+    outputs: [
+      {
+        internalType: 'int256[]',
+        name: '',
+        type: 'int256[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'uint256',
@@ -568,10 +581,42 @@ export const FLOCK_TASK_ABI = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'joinDeadline',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'joinRound',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'joinTime',
+    outputs: [
+      {
+        internalType: 'uint64',
+        name: '',
+        type: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -853,6 +898,54 @@ export const FLOCK_TASK_ABI = [
       },
     ],
     name: 'roundDeadline',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'roundParticipantRewardedAmount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'roundParticipantSlashedAmount',
     outputs: [
       {
         internalType: 'uint256',
@@ -1206,6 +1299,38 @@ export const FLOCK_TASK_ABI = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'totalRewaredAmountForAllRounds',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'totalScoreAllRounds',
+    outputs: [
+      {
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'uint256',
@@ -1219,6 +1344,19 @@ export const FLOCK_TASK_ABI = [
         internalType: 'int256',
         name: '',
         type: 'int256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalSlashedAmountForAllRounds',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -1276,27 +1414,17 @@ export const FLOCK_TASK_ABI = [
         type: 'uint256',
       },
       {
-        internalType: 'address',
+        internalType: 'uint256',
         name: '',
-        type: 'address',
+        type: 'uint256',
       },
     ],
     name: 'voters',
     outputs: [
       {
         internalType: 'address',
-        name: 'voterAddress',
+        name: '',
         type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'voteHash',
-        type: 'string',
-      },
-      {
-        internalType: 'int256',
-        name: 'voteScore',
-        type: 'int256',
       },
     ],
     stateMutability: 'view',
@@ -1310,9 +1438,9 @@ export const FLOCK_TASK_ABI = [
         type: 'uint256',
       },
       {
-        internalType: 'uint256',
+        internalType: 'address',
         name: '',
-        type: 'uint256',
+        type: 'address',
       },
     ],
     name: 'votes',

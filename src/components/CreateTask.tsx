@@ -42,6 +42,7 @@ type FormValues = {
   schema: string;
   sampleData: any;
   sampleDataContent: string;
+  secondsPerRound: number;
 };
 
 const DataDefinitionForm = ({
@@ -123,7 +124,7 @@ const TrainingSettingsForm = ({
     >
       <Box>
         <Heading level="4">Criteria to start training task:</Heading>
-        <Box direction="row" align="center" justify="between">
+        <Box direction="row" align="center" justify="between" gap="small">
           <Box>
             <Text>Limit minimum number of participants</Text>
             <Box direction="row" align="center" gap="xsmall">
@@ -150,6 +151,21 @@ const TrainingSettingsForm = ({
               <Box>{value.maxParticipants}</Box>
             </Box>
           </Box>
+          <Box>
+            <FormField
+              name="secondsPerRound"
+              htmlFor="secondsPerRound"
+              label="Round time in secods"
+              required
+              validateOn="blur"
+            >
+              <TextInput
+                id="secondsPerRound"
+                name="secondsPerRound"
+                type="number"
+              />
+            </FormField>
+          </Box>
         </Box>
       </Box>
       <Box>
@@ -164,21 +180,21 @@ const TrainingSettingsForm = ({
           >
             <TextInput id="rounds" name="rounds" type="number" />
           </FormField>
-          {/* 
-          <Box>
-            <Text>Expected training accuracy</Text>
-            <Box direction="row" align="center" gap="xsmall">
-              <RangeInput
-                id="accuracy"
-                name="accuracy"
-                step={1}
-                min={0}
-                max={100}
-              />
-              <Box>{value.accuracy}%</Box>
+          {
+            <Box>
+              <Text>Expected training accuracy</Text>
+              <Box direction="row" align="center" gap="xsmall">
+                <RangeInput
+                  id="accuracy"
+                  name="accuracy"
+                  step={1}
+                  min={0}
+                  max={100}
+                />
+                <Box>{value.accuracy}%</Box>
+              </Box>
             </Box>
-          </Box>
-          */}
+          }
         </Box>
       </Box>
       <Box
@@ -392,7 +408,7 @@ export const CreateTask = ({
       writeAsync?.({
         args: [
           JSON.stringify(value),
-          120,
+          value.secondsPerRound,
           value.modelDefinitionHash,
           value.rounds,
           value.minParticipants,
