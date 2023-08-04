@@ -25,6 +25,8 @@ export default function IndexPage() {
             label="Download App"
             size="xlarge"
             pad={{ vertical: 'medium', horizontal: 'xlarge' }}
+            href="https://github.com/FLock-io/client-interface/releases"
+            target="_blank"
           />
           <PrimaryButton
             href="/train"
