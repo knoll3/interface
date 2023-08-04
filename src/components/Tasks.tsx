@@ -1,6 +1,6 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Heading, Layer, Stack, Text } from 'grommet';
+import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet';
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
@@ -196,27 +196,198 @@ export const Tasks = () => {
       </Box>
       {showTask && (
         <Layer responsive={true}>
-          <Box pad="medium" gap="medium">
-            <Box>
-              <Heading level="3">{taskToShow.name}</Heading>
-              <Text size="small">{taskToShow.description}</Text>
+          <Box>
+            <Box direction="row" justify="between" gap="medium" pad="medium">
+              <Box direction="row" gap="small">
+                <Box gap="small">
+                  <Box>
+                    <Box direction="row" gap="small" align="center">
+                      <Heading level="3" margin="0">
+                        {taskToShow.name}
+                      </Heading>
+                    </Box>
+                  </Box>
+                  <Box direction="row" gap="small">
+                    <Box background="#F5F5F5" round="medium" pad="xsmall">
+                      <Text size="xsmall">
+                        Reward Pool: <b>$F {taskToShow.rewardPool}</b>
+                      </Text>
+                    </Box>
+                    <Box background="#F2F6FF" round="medium" pad="xsmall">
+                      <Text size="xsmall">
+                        Initial Stake: <b>$F {taskToShow.stake}</b>
+                      </Text>
+                    </Box>
+                  </Box>
+                  <Box
+                    background="#F8FAFB"
+                    round="small"
+                    pad="medium"
+                    width="500px"
+                  >
+                    <Box direction="row" justify="between" align="center">
+                      <Box direction="row" align="center" gap="xsmall">
+                        <Text color="brand" size="2xl" weight="bold">
+                          {Number(taskToShow.numberOfParticipants)}
+                        </Text>
+                        <Text weight="bold">
+                          participant
+                          {Number(taskToShow.numberOfParticipants) !== 1 && 's'} have
+                          joined the task
+                        </Text>
+                      </Box>
+                      <Box direction="row" align="center">
+                        <Stack anchor="right">
+                          {Array.from(
+                            {
+                              length: Math.min(
+                                Number(taskToShow.numberOfParticipants),
+                                4
+                              ),
+                            },
+                            (_, i) => (
+                              <Box key={i} direction="row">
+                                <Avatar background="brand" size="small">
+                                  <UserFemale size="small" />
+                                </Avatar>
+                                {Array.from(
+                                  {
+                                    length:
+                                      Number(taskToShow.numberOfParticipants) - (i + 1),
+                                  },
+                                  (_, j) => (
+                                    <Box key={j} pad="xsmall" />
+                                  )
+                                )}
+                              </Box>
+                            )
+                          )}
+                        </Stack>
+                        {Number(taskToShow.numberOfParticipants) > 4 && (
+                          <Text>+{Number(taskToShow.numberOfParticipants) - 4}</Text>
+                        )}
+                      </Box>
+                    </Box>
+                    <Box
+                      direction="row"
+                      justify="between"
+                      margin={{ top: 'small' }}
+                    >
+                      <Text size="small">Min: {taskToShow.minParticipants}</Text>
+                      <Text size="small">Max: {taskToShow.maxParticipants}</Text>
+                    </Box>
+                    <Box
+                      border={{
+                        color: 'grey',
+                        size: 'xsmall',
+                        style: 'solid',
+                        side: 'all',
+                      }}
+                      round="small"
+                      margin={{ top: 'xsmall' }}
+                    >
+                      <Meter
+                        values={[
+                          {
+                            value: Number(taskToShow.numberOfParticipants),
+                            color: 'brand',
+                            onClick: () => {},
+                            label: `Min: ${taskToShow.minParticipants}`,
+                            highlight: true,
+                          },
+                          {
+                            value: Number(taskToShow.maxParticipants),
+                            color: '#A0F2FF',
+                            onClick: () => {},
+                            label: `Max: ${taskToShow.maxParticipants}`,
+                            highlight: true,
+                          },
+                        ]}
+                        aria-label="meter"
+                        max={Number(taskToShow.maxParticipants)}
+                        round
+                        size="full"
+                        thickness="small"
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box direction="row" gap="medium">
+                <Box
+                  background="#F8FAFB"
+                  round="small"
+                  pad="medium"
+                  align="center"
+                  width="small"
+                  gap="medium"
+                >
+                  <Heading level="4" margin="0" alignSelf="start" weight="bold">
+                    Learning Rounds
+                  </Heading>
+                  <Heading level="1" color="#6C94EC" weight="bold">
+                    {Number(taskToShow.rounds)}
+                  </Heading>
+                </Box>
+                <Box
+                  background="#F8FAFB"
+                  round="small"
+                  pad="medium"
+                  align="center"
+                  width="small"
+                  gap="medium"
+                >
+                  <Heading level="4" margin="0" alignSelf="start" weight="bold">
+                    Target Accuracy
+                  </Heading>
+                  <Heading level="1" color="#6C94EC" weight="bold">
+                    {taskToShow.accuracy ? Number(taskToShow.accuracy) : '0'}%
+                  </Heading>
+                </Box>
+              </Box>
             </Box>
-            <Box>
-              <Heading level="5">Task Id</Heading>
-              <Text>{taskToShow.address}</Text>
+            <Box pad="medium" gap="medium">
+              <Box>
+                <Text weight="bold">Description</Text>
+                <Text>{taskToShow.description}</Text>
+              </Box>
+              <Box direction="row" justify="between">
+                <Box gap="medium">
+                  <Box>
+                    <Text weight="bold">Task Id</Text>
+                    <Text>{taskToShow.address}</Text>
+                  </Box>
+                  <Box>
+                    <Text weight="bold">Model name</Text>
+                    <Text>{taskToShow.modelName}</Text>
+                  </Box>
+                </Box>
+                <Box gap="medium">
+                  <Box>
+                    <Text weight="bold">Task type</Text>
+                    <Text>{taskToShow.taskType}</Text>
+                  </Box>
+                  <Box>
+                    <Text weight="bold">Model size</Text>
+                    <Text>{taskToShow.sizeMemory} MB</Text>
+                  </Box>
+                </Box>
+              </Box>
+              <Box direction="row" justify="between">
+                <Anchor
+                  href={
+                    taskToShow.address ===
+                    '0x7280c6EF7bB61e76b116b61e608110a85136A35a'
+                      ? 'https://drive.google.com/uc?export=download&id=1TBZruhiwYYf9HWN37TOnEW-0qePMxcxr'
+                      : 'https://drive.google.com/uc?export=download&id=1HbCqlSop48OETzTcDuo1Oaw3bMLIxA4n'
+                  }
+                  label="Test Case Dataset"
+                />
+                <Box>
+                  <PrimaryButton label="close" onClick={() => setShowTask(false)} />
+                </Box>
+              </Box>
             </Box>
-            <Box>
-              <Anchor
-                href={
-                  taskToShow.address ===
-                  '0x7280c6EF7bB61e76b116b61e608110a85136A35a'
-                    ? 'https://drive.google.com/uc?export=download&id=1TBZruhiwYYf9HWN37TOnEW-0qePMxcxr'
-                    : 'https://drive.google.com/uc?export=download&id=1HbCqlSop48OETzTcDuo1Oaw3bMLIxA4n'
-                }
-                label="Test Case Dataset"
-              />
-            </Box>
-            <PrimaryButton label="close" onClick={() => setShowTask(false)} />
           </Box>
         </Layer>
       )}
