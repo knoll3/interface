@@ -17,30 +17,12 @@ import { Image, CreditCard, Chat, Scorecard } from 'grommet-icons';
 
   
 
-/*
-                    <Box
-                        border={{ color: 'black', size: 'small' }}
-                        round="small"
-                        pad="xsmall"
-                        background="#E69FBD"
-                        direction="row"
-                        gap="small"
-                        align="center"
-                    >
-                        <Chat color="black" size="20px" />{model.type}
-                    </Box>
-*/
-
-
 export default function MarketplacePage() {
     const { isDisconnected } = useAccount();
 
     return (
         <Layout>
-            <Box
-                direction="row"
-                width="100%"
-                >
+            <Box direction="row" width="100%">
                 <Box basis="1/4" background="#EEEEEE" pad="xlarge">
                     <Box gap="small">
                         <Heading level="3">NLP</Heading>
@@ -48,7 +30,6 @@ export default function MarketplacePage() {
                             border={{ color: 'black', size: 'small' }}
                             round="small"
                             pad="xsmall"
-                            background="#E69FBD"
                             direction="row"
                             gap="small"
                             align="center"
@@ -102,7 +83,7 @@ export default function MarketplacePage() {
                         pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
                     >
                         <Box direction="row" gap="large">
-                            <Text alignSelf="end">Models<span>100</span></Text>
+                            <Text alignSelf="end">Models</Text>
                             <TextInput
                             placeholder="Search"
                             icon={<Search />}

@@ -25,45 +25,12 @@ const tasks = [
         "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
         "type": "LLM Chatbot",
         "creator": "Creator Name",
-        "price": 10,
+        "price": 0,
         "likes": 816,
         "views": 4510,
         "people": 99,
-        "link": "https://www.google.com"
-    },
-    {
-        "name": "FlockLLM finetuning on Dolly dataset",
-        "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-        "type": "LLM Chatbot",
-        "creator": "Creator Name",
-        "price": 10,
-        "likes": 816,
-        "views": 4510,
-        "people": 99,
-        "link": "https://www.google.com"
-    },
-    {
-        "name": "FlockLLM finetuning on Dolly dataset",
-        "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-        "type": "LLM Chatbot",
-        "creator": "Creator Name",
-        "price": 10,
-        "likes": 816,
-        "views": 4510,
-        "people": 99,
-        "link": "https://www.google.com"
-    },
-    {
-        "name": "FlockLLM finetuning on Dolly dataset",
-        "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-        "type": "LLM Chatbot",
-        "creator": "Creator Name",
-        "price": 10,
-        "likes": 816,
-        "views": 4510,
-        "people": 99,
-        "link": "https://www.google.com"
-    },
+        "link": "http://209.20.157.253:7860"
+    }
 ] as Model[];
 
 export const MarketplaceItems = () => {
@@ -144,7 +111,7 @@ export const MarketplaceItems = () => {
                     {model.name}
                 </Heading>
                 <Text>{model.description}</Text>
-                <Text margin={{ top: 'medium' }}>Updated</Text>
+                <Text margin={{ top: 'medium', bottom: "xsmall" }} size="small">Updated 0 days ago</Text>
                 <Box 
                     direction="row" 
                     width="100%" 
@@ -167,7 +134,7 @@ export const MarketplaceItems = () => {
                         gap="small"
                         align="center"
                     >
-                        <Chat color="black" size="20px" />{model.type}
+                        <Chat color="black" size="20px" /><Text weight="bold">{model.type}</Text>
                     </Box>
                     <Box direction="row" gap="small">
                         <Box direction="row" gap="1px"><Favorite color="black" /> {model.likes}</Box>
@@ -182,7 +149,7 @@ export const MarketplaceItems = () => {
                     </Box>
                     <Box direction="row" align="center" gap="small">
                         <Text weight="bold">FLC {model.price}</Text>
-                        <PrimaryButton label="Use" />
+                        <PrimaryButton label="Use" href={model.link} target="blank" />
                     </Box>
                 </Box>
             </Box>
