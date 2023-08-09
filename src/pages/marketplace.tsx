@@ -94,7 +94,7 @@ export default function MarketplacePage() {
                             <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
                         </Box>
                     </Box>
-                    <Box pad={{ horizontal: 'large'}} align="center">
+                    <Box pad={{ horizontal: 'large'}} align="center" height={{ min: 'large'}}>
                         <MarketplaceItems />
                     </Box>
                 </Box>

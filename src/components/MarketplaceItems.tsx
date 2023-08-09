@@ -26,9 +26,9 @@ const tasks = [
         "type": "LLM Chatbot",
         "creator": "Creator Name",
         "price": 0,
-        "likes": 816,
-        "views": 4510,
-        "people": 99,
+        "likes": 1,
+        "views": 1,
+        "people": 1,
         "link": "http://209.20.157.253:7860"
     }
 ] as Model[];
@@ -110,8 +110,7 @@ export const MarketplaceItems = () => {
                 <Heading level="3" margin="none">
                     {model.name}
                 </Heading>
-                <Text>{model.description}</Text>
-                <Text margin={{ top: 'medium', bottom: "xsmall" }} size="small">Updated 0 days ago</Text>
+                <Text margin={{ bottom: 'medium' }}>{model.description}</Text>
                 <Box 
                     direction="row" 
                     width="100%" 
