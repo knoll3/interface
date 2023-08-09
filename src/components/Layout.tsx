@@ -2,7 +2,7 @@ import { Box, Header, Image, Main } from 'grommet';
 
 import { useRouter } from 'next/router';
 import { Menu } from './Menu';
-import { Wallet } from './Wallet';
+import Wallet from './Wallet';
 
 interface Props {
   children: React.ReactNode;
