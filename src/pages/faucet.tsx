@@ -86,7 +86,7 @@ export default function FaucetPage() {
                 id="amount"
                 name="amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(Number(e.target.value))}
               />
             </FormField>
             <Box direction="row" align="end" justify="end">
