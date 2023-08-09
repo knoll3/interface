@@ -57,8 +57,8 @@ export const Menu = () => {
       />
 
       <MenuItem
-        //href="/marketplace"
-        //onClick={() => setSelected('/marketplace')}
+        href="/marketplace"
+        onClick={() => setSelected('/marketplace')}
         hoverIndicator={false}
         selected={selected === '/marketplace'}
         text="Marketplace"

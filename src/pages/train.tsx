@@ -6,96 +6,106 @@ import {
   Menu,
   Paragraph,
   TextInput,
+  Text,
 } from 'grommet';
 import { CreateTask, Layout, PrimaryButton, Tasks } from '../components';
 import { useState } from 'react';
-import { Search } from 'grommet-icons';
+import { Chat, CreditCard, Scorecard, Search, Image } from 'grommet-icons';
 import { useAccount } from 'wagmi';
 
 export default function TrainPage() {
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [numberOfTasks, setNumberOfTasks] = useState(0);
   const { isDisconnected } = useAccount();
 
   return (
     <Layout>
-      <Box width="100%" gap="large">
-        <Box
-          background="#EEEEEE"
-          direction="row"
-          align="center"
-          justify="around"
-          width="100%"
-          pad={{ vertical: 'large' }}
-        >
-          <Box>
-            <Box direction="row" gap="xsmall">
-              <Heading level="2">Model to</Heading>
-              <Heading level="2" color="#6C94EC">
-                train
-              </Heading>
-            </Box>
-            <Paragraph>
-              Improve model performance by training it on distributed data
-              sources. Data stays local and rewards paid based on contribution
-              to model performance.
-            </Paragraph>
+      <Box direction="row" width="100%">
+        <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: 'xlarge' }}>
+          <Box margin={{ vertical: 'small'}}>
+              <PrimaryButton
+                onClick={() => setShowCreateTask(true)}
+                disabled={isDisconnected}
+                margin={{ top: 'large' }}
+                label="Create New"
+                size="medium"
+                pad={{ vertical: 'small', horizontal: 'large' }}
+              />
+          </Box>
+          <Box gap="small">
+              <Heading level="3">NLP</Heading>
+              <Box
+                  border={{ color: 'black', size: 'small' }}
+                  round="small"
+                  pad="xsmall"
+                  direction="row"
+                  gap="small"
+                  align="center"
+              >
+                  <Scorecard color="black" size="20px" /><Text weight="bold">Sentiment Analysis</Text>
+              </Box>
+              <Box
+                  border={{ color: 'black', size: 'small' }}
+                  round="small"
+                  pad="xsmall"
+                  background="#E69FBD"
+                  direction="row"
+                  gap="small"
+                  align="center"
+              >
+                  <Chat color="black" size="20px" /><Text weight="bold">LLM Chatbot</Text>
+              </Box>
           </Box>
           <Box>
-            <PrimaryButton
-              onClick={() => setShowCreateTask(true)}
-              disabled={isDisconnected}
-              margin={{ top: 'large' }}
-              label="Create New"
-              size="medium"
-              pad={{ vertical: 'small', horizontal: 'large' }}
-            />
+              <Heading level="3">Finance</Heading>
+              <Box
+                  border={{ color: 'black', size: 'small' }}
+                  round="small"
+                  pad="xsmall"
+                  direction="row"
+                  gap="small"
+                  align="center"
+              >
+                  <CreditCard color="black" size="20px" /><Text weight="bold">Credit Card Fraud Detection</Text>
+              </Box>
+          </Box>
+          <Box>
+              <Heading level="3">Computer Vision</Heading>
+              <Box
+                  border={{ color: 'black', size: 'small' }}
+                  round="small"
+                  pad="xsmall"
+                  direction="row"
+                  gap="small"
+                  align="center"
+              >
+                  <Image color="black" size="20px" /><Text weight="bold">Image Classification</Text>
+              </Box>
           </Box>
         </Box>
-        <Box
-          direction="row"
-          align="center"
-          justify="around"
-          width="100%"
-          pad={{ horizontal: 'xlarge' }}
+        <Box basis="3/4">
+        <Box 
+            direction="row" 
+            align="center"
+            justify="between"
+            pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
         >
-          <Box>
-            <TextInput
-              placeholder="Search"
-              icon={<Search />}
-              width="medium"
-            ></TextInput>
-          </Box>
-          <Box direction="row" gap="xlarge" align="center">
             <Box direction="row" gap="large">
-              <Button
-                secondary
-                label="All"
-                style={{ borderWidth: '0px' }}
-                pad={{ vertical: 'small', horizontal: 'medium' }}
-              />
-              <Button
-                secondary
-                plain
-                label="Healthcare"
-                color="#9E9E9E"
-                style={{ borderWidth: '0px' }}
-              />
-              <Button
-                secondary
-                plain
-                label="Finance"
-                color="#9E9E9E"
-                style={{ borderWidth: '0px' }}
-              />
+                <Box direction="row" alignSelf="end" gap="xsmall"><Text>Tasks</Text>{numberOfTasks}</Box>
+                <TextInput
+                placeholder="Search"
+                icon={<Search />}
+                width="medium"
+                ></TextInput>
             </Box>
             <Box>
-              <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
+                <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
             </Box>
-          </Box>
         </Box>
-        <Box width="100%" align="center" pad="large">
-          <Tasks />
+        <Box pad={{ horizontal: 'large'}} align="center">
+          <Tasks setNumberOfTasks={setNumberOfTasks} />
         </Box>
+    </Box>
       </Box>
       {showCreateTask && (
         <Layer responsive={true}>

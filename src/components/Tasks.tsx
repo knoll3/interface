@@ -4,7 +4,7 @@ import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
-import { UserFemale } from 'grommet-icons';
+import { Chat, Favorite, Group, UserFemale, View } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 
 export interface Task {
@@ -30,7 +30,11 @@ export interface Task {
   numberOfParticipants: number;
 }
 
-export const Tasks = () => {
+export const Tasks = ({
+  setNumberOfTasks,
+}: {
+  setNumberOfTasks: (numberOfTasks: number) => void;
+}) => {
   const [tasks, setTasks] = useState<Task[]>([] as Task[]);
   const [showTask, setShowTask] = useState(false);
 
@@ -75,6 +79,7 @@ export const Tasks = () => {
       );
 
       setTasks(loadedTasks);
+      setNumberOfTasks(loadedTasks.length);
     }
   };
 
@@ -85,110 +90,128 @@ export const Tasks = () => {
   return (
     <>
       <Box
-        gap="medium"
         direction="row-responsive"
         wrap
         width="100%"
         align="center"
         justify="center"
+        gap="small"
       >
         {tasks?.map((task: Task, index: number) => {
           return (
             <Box
               background="#FFFFFF"
               key={index}
-              width="medium"
-              align="center"
+              align="start"
               justify="center"
               round="small"
               elevation="large"
               pad="medium"
               margin={{ top: 'small' }}
-              height={{ min: 'medium' }}
+              height={{ min: 'small' }}
+              width="430px"
+              border={{ color: 'black', size: 'small' }}
             >
-              <Box align="center" justify="center">
-                <Heading level="2" margin="0">
+              <Heading level="3" margin="none">
                   {task.name}
-                </Heading>
-                <Text size="small" truncate>
-                  {task.description}
-                </Text>
+              </Heading>
+              <Text>{task.description}</Text>
+              <Text margin={{ top: 'xsmall', bottom: 'xsmall' }} size="small">Updated 0 days ago</Text>
+              <Box 
+                  direction="row" 
+                  width="100%" 
+                  justify="between" 
+                  align="center" 
+                  pad={{ bottom: 'xsmall' }}
+                  >
+                  <Box
+                      border={{ color: 'black', size: 'small' }}
+                      round="small"
+                      pad="xsmall"
+                      background="#E69FBD"
+                      direction="row"
+                      gap="small"
+                      align="center"
+                  >
+                      <Chat color="black" size="20px" /><Text weight="bold">{task.taskType}</Text>
+                  </Box>
+                  <Box direction="row" gap="small">
+                      <Box direction="row" gap="1px"><Favorite color="black" /> {}</Box>
+                      <Box direction="row" gap="1px"><View color="black" /> {}</Box>
+                      <Box direction="row" gap="1px"><Group color="black" /> {}</Box>
+                  </Box>
               </Box>
               <Box
                 direction="row"
-                align="center"
-                justify="center"
-                pad={{ vertical: 'large' }}
-                width="100%"
-                gap="medium"
+                justify="between"
+                border={{
+                  color: 'black',
+                  size: 'small',
+                  style: 'solid',
+                  side: 'bottom'
+                }}
+                pad={{ bottom: 'xsmall' }}
               >
-                <Box align="center" justify="center">
-                  <Heading level="2" color="#6C94EC" margin="0">
-                    {task.minParticipants}
-                  </Heading>
-                  <Text size="small">Participants Requirements</Text>
-                </Box>
-                <Box align="center" justify="center">
-                  <Heading level="2" margin="0">
+                <Box
+                  direction="row" 
+                  align="center" 
+                  gap="xsmall"
+                  basis="1/2"
+                >
+                  <Heading level="3" margin="0">
                     {(
                       ((task.rewardPool / task.rounds) * 100) /
                       task.rewardPool
                     ).toFixed(2)}
                     %
                   </Heading>
-                  <Text size="small">Rewards Return Rate</Text>
-                </Box>
-              </Box>
-              <Box border={{ side: 'top' }} width="90%"></Box>
-              <Box
-                direction="row"
-                align="center"
-                justify="between"
-                width="100%"
-                pad="medium"
-              >
-                <Box
-                  direction="row"
-                  gap="xxsmall"
-                  align="center"
-                  justify="center"
-                >
-                  <Text size="small">Short of</Text>
-                  <Text size="medium" color="#6C94EC">
-                    {task.minParticipants - Number(task.numberOfParticipants)}
-                  </Text>
-                  <Text size="small">to start</Text>
-                </Box>
-                {task.numberOfParticipants > 2 && (
-                  <Box direction="row">
-                    <Stack anchor="right">
-                      <Box direction="row">
-                        <Avatar background="brand" size="small">
-                          <UserFemale size="small" />
-                        </Avatar>
-                        <Box pad="xsmall" />
-                      </Box>
-
-                      <Avatar background="brand" size="small">
-                        <UserFemale size="small" />
-                      </Avatar>
-                    </Stack>
-
-                    <Text>+{Number(task.numberOfParticipants) - 2}</Text>
+                  <Box basis="1/2">
+                    <Text size="small">Rewards Return Rate</Text>
                   </Box>
-                )}
+                </Box>
+                <Box 
+                  direction="row" 
+                  align="center"
+                  gap="xsmall"
+                  basis="1/2"
+                  justify="end"
+                >
+                  <Heading level="3" color="#6C94EC" margin="0">
+                    {task.minParticipants}
+                  </Heading>
+                  <Box basis="1/2">
+                    <Text size="small" color="#6C94EC">Participants Requirements</Text>
+                  </Box>
+                </Box>
               </Box>
-              <Box>
-                <PrimaryButton
-                  onClick={() => {
-                    setTaskToShow(task);
-                    setShowTask(true);
-                  }}
-                  label="Join"
-                  margin={{ top: 'medium' }}
-                  size="medium"
-                  pad={{ vertical: 'xsmall', horizontal: 'medium' }}
-                />
+              <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
+                <Box direction="row" gap="small" alignSelf="end">
+                      <UserFemale color='brand' />
+                      <Text>Creator Name</Text>
+                </Box>
+                <Box align="center">
+                  <Box
+                    direction="row"
+                    gap="xxsmall"
+                    align="center"
+                  >
+                    <Text size="small" weight="bold">Short of</Text>
+                    <Text size="medium" color="#6C94EC" weight="bold">
+                      {task.minParticipants - Number(task.numberOfParticipants)}
+                    </Text>
+                    <Text size="small" weight="bold">to start</Text>
+                  </Box>
+                  <PrimaryButton
+                    onClick={() => {
+                      setTaskToShow(task);
+                      setShowTask(true);
+                    }}
+                    label="Join"
+                    size="medium"
+                    alignSelf="end"
+                    pad={{ vertical: 'xsmall', horizontal: 'medium' }}
+                  />
+                </Box>
               </Box>
             </Box>
           );
