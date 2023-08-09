@@ -5,7 +5,7 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { useIsMounted } from '../hooks';
 
-function Wallet() {
+export function Wallet() {
   const { address } = useAccount();
   const [showWalletSettings, setShowWalletSettings] = useState(false);
   const { connectAsync, connectors } = useConnect();
