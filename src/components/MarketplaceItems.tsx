@@ -21,7 +21,7 @@ export interface Model {
 
 const tasks = [
     {
-        "name": "FlockLLM finetuning on Dolly dataset",
+        "name": "FlockLLM finetuned on Dolly dataset",
         "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
         "type": "LLM Chatbot",
         "creator": "Creator Name",
