@@ -21,8 +21,8 @@ export default function TrainPage() {
   return (
     <Layout>
       <Box direction="row" width="100%">
-        <Box basis="1/4" background="#EEEEEE" pad="xlarge">
-          <Box>
+        <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: 'xlarge' }}>
+          <Box margin={{ vertical: 'small'}}>
               <PrimaryButton
                 onClick={() => setShowCreateTask(true)}
                 disabled={isDisconnected}
