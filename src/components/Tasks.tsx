@@ -220,7 +220,7 @@ export const Tasks = ({
       {showTask && (
         <Layer responsive={true}>
           <Box>
-            <Box direction="row" justify="between" gap="medium" pad="medium">
+            <Box direction="row-responsive" justify="between" gap="medium" pad="medium">
               <Box direction="row" gap="small">
                 <Box gap="small">
                   <Box>
@@ -374,7 +374,7 @@ export const Tasks = ({
                 <Text weight="bold">Description</Text>
                 <Text>{taskToShow.description}</Text>
               </Box>
-              <Box direction="row" justify="between">
+              <Box direction="row-responsive" justify="between">
                 <Box gap="medium">
                   <Box>
                     <Text weight="bold">Task Id</Text>
