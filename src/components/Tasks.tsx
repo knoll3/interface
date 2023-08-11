@@ -219,7 +219,7 @@ export const Tasks = ({
       </Box>
       {showTask && (
         <Layer responsive={true}>
-          <Box>
+          <Box pad="small">
             <Box direction="row-responsive" justify="between" gap="medium" pad="medium">
               <Box direction="row" gap="small">
                 <Box gap="small">
@@ -288,7 +288,10 @@ export const Tasks = ({
                         </Stack>
                         {Number(taskToShow.numberOfParticipants) > 4 && (
                           <Text>+{Number(taskToShow.numberOfParticipants) - 4}</Text>
-                        )}
+                        )} */}
+                        <Avatar background="brand" size="small">
+                          <UserFemale size="small" />
+                        </Avatar>
                       </Box>
                     </Box>
                     <Box
@@ -378,7 +381,7 @@ export const Tasks = ({
                 <Box gap="medium">
                   <Box>
                     <Text weight="bold">Task Id</Text>
-                    <Text>{taskToShow.address}</Text>
+                    <Text wordBreak="break-word">{taskToShow.address}</Text>
                   </Box>
                   <Box>
                     <Text weight="bold">Model name</Text>
