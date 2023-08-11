@@ -1,4 +1,4 @@
-import { Box, Form, FormField, Heading, Paragraph, TextInput } from 'grommet';
+import { Box, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
 import { Layout, PrimaryButton, Tasks } from '../components';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
@@ -29,14 +29,14 @@ export default function FaucetPage() {
       <Box width="100%" gap="large">
         <Box
           background="#EEEEEE"
-          direction="row"
+          direction="row-responsive"
           align="center"
           justify="center"
           width="100%"
-          pad={{ vertical: 'large' }}
+          pad={{ vertical: 'large', horizontal: 'large' }}
         >
           <Box>
-            <Box direction="row" gap="xsmall">
+            <Box direction="row-responsive" gap="xsmall">
               <Heading level="2">FLock (FLC) tokens faucet </Heading>
             </Box>
             <Paragraph>
@@ -44,8 +44,8 @@ export default function FaucetPage() {
             </Paragraph>
             <Paragraph>
               Contract Address:{' '}
-              <code>{process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}</code>
-            </Paragraph>
+              <Text wordBreak="break-word">{process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}</Text>
+            </Paragraph> 
           </Box>
         </Box>
         <Box width="100%" align="center" pad="large">
