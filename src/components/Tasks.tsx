@@ -219,8 +219,8 @@ export const Tasks = ({
       </Box>
       {showTask && (
         <Layer responsive={true}>
-          <Box>
-            <Box direction="row" justify="between" gap="medium" pad="medium">
+          <Box pad="small">
+            <Box direction="row-responsive" justify="between" gap="medium" pad="medium">
               <Box direction="row" gap="small">
                 <Box gap="small">
                   <Box>
@@ -260,7 +260,7 @@ export const Tasks = ({
                         </Text>
                       </Box>
                       <Box direction="row" align="center">
-                        <Stack anchor="right">
+                        {/* <Stack anchor="right">
                           {Array.from(
                             {
                               length: Math.min(
@@ -288,7 +288,10 @@ export const Tasks = ({
                         </Stack>
                         {Number(taskToShow.numberOfParticipants) > 4 && (
                           <Text>+{Number(taskToShow.numberOfParticipants) - 4}</Text>
-                        )}
+                        )} */}
+                        <Avatar background="brand" size="small">
+                          <UserFemale size="small" />
+                        </Avatar>
                       </Box>
                     </Box>
                     <Box
@@ -374,11 +377,11 @@ export const Tasks = ({
                 <Text weight="bold">Description</Text>
                 <Text>{taskToShow.description}</Text>
               </Box>
-              <Box direction="row" justify="between">
+              <Box direction="row-responsive" justify="between">
                 <Box gap="medium">
                   <Box>
                     <Text weight="bold">Task Id</Text>
-                    <Text>{taskToShow.address}</Text>
+                    <Text wordBreak="break-word">{taskToShow.address}</Text>
                   </Box>
                   <Box>
                     <Text weight="bold">Model name</Text>

@@ -7,23 +7,24 @@ import {
     Paragraph,
     TextInput,
     Text,
+    ResponsiveContext
   } from 'grommet';
 import { Layout, PrimaryButton } from '../components';
 import { MarketplaceItems } from '../components/MarketplaceItems';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Search } from 'grommet-icons';
 import { useAccount } from 'wagmi';
 import { Image, CreditCard, Chat, Scorecard } from 'grommet-icons';
-
   
 
 export default function MarketplacePage() {
     const { isDisconnected } = useAccount();
+    const size = useContext(ResponsiveContext);
 
     return (
         <Layout>
-            <Box direction="row" width="100%">
-                <Box basis="1/4" background="#EEEEEE" pad="xlarge">
+            <Box direction="row-responsive" width="100%">
+                <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: size === 'large' ? 'xlarge' : 'medium', bottom: 'large' }}>
                     <Box gap="small">
                         <Heading level="3">NLP</Heading>
                         <Box
@@ -77,21 +78,22 @@ export default function MarketplacePage() {
                 </Box>
                 <Box basis="3/4">
                     <Box 
-                        direction="row" 
+                        direction="row-responsive" 
                         align="center"
                         justify="between"
                         pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
                     >
-                        <Box direction="row" gap="large">
+                        <Box direction="row-responsive" gap="large">
                             <Text alignSelf="end">Models</Text>
                             <TextInput
                             placeholder="Search"
                             icon={<Search />}
-                            width="medium"
                             ></TextInput>
                         </Box>
                         <Box>
-                            <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
+                            { size === "large" &&
+                                <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
+                            }                        
                         </Box>
                     </Box>
                     <Box pad={{ horizontal: 'large'}} align="center" height={{ min: 'large'}}>

@@ -1,13 +1,5 @@
-import {
-  Box,
-  Button,
-  Form,
-  FormField,
-  Heading,
-  Paragraph,
-  TextInput,
-} from 'grommet';
-import { Layout } from '../components';
+import { Box, Button, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
+import { Layout, PrimaryButton, Tasks } from '../components';
 import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
 import { useEffect, useState } from 'react';
@@ -42,23 +34,23 @@ export default function FaucetPage() {
       <Box width="100%" gap="large">
         <Box
           background="#EEEEEE"
-          direction="row"
+          direction="row-responsive"
           align="center"
           justify="center"
           width="100%"
-          pad={{ vertical: 'large' }}
+          pad={{ vertical: 'large', horizontal: 'large' }}
         >
           <Box>
-            <Box direction="row" gap="xsmall">
+            <Box direction="row-responsive" gap="xsmall">
               <Heading level="2">FLock (FLC) tokens faucet </Heading>
             </Box>
             <Paragraph>
               Mint your FLC tokens for participating in the FLock network.
             </Paragraph>
             <Paragraph>
-              Contract Address:
-              <code>{process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}</code>
-            </Paragraph>
+              Contract Address:{' '}
+              <Text wordBreak="break-word">{process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}</Text>
+            </Paragraph> 
           </Box>
         </Box>
         <Box

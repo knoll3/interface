@@ -7,9 +7,10 @@ import {
   Paragraph,
   TextInput,
   Text,
+  ResponsiveContext,
 } from 'grommet';
 import { CreateTask, Layout, PrimaryButton, Tasks } from '../components';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Chat, CreditCard, Scorecard, Search, Image } from 'grommet-icons';
 import { useAccount } from 'wagmi';
 
@@ -17,11 +18,12 @@ export default function TrainPage() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [numberOfTasks, setNumberOfTasks] = useState(0);
   const { isDisconnected } = useAccount();
+  const size = useContext(ResponsiveContext);
 
   return (
     <Layout>
-      <Box direction="row" width="100%">
-        <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: 'xlarge' }}>
+      <Box direction="row-responsive" width="100%">
+        <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: size === 'large' ? 'xlarge' : 'medium', bottom: 'large' }}>
           <Box margin={{ vertical: 'small'}}>
               <PrimaryButton
                 onClick={() => setShowCreateTask(true)}
@@ -84,28 +86,29 @@ export default function TrainPage() {
           </Box>
         </Box>
         <Box basis="3/4">
-        <Box 
-            direction="row" 
-            align="center"
-            justify="between"
-            pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
-        >
-            <Box direction="row" gap="large">
-                <Box direction="row" alignSelf="end" gap="xsmall"><Text>Tasks</Text>{numberOfTasks}</Box>
-                <TextInput
-                placeholder="Search"
-                icon={<Search />}
-                width="medium"
-                ></TextInput>
-            </Box>
-            <Box>
-                <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
-            </Box>
+          <Box 
+              direction="row-responsive" 
+              align="center"
+              justify="between"
+              pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
+          >
+              <Box direction="row-responsive" gap="large">
+                  <Box direction="row" alignSelf="end" gap="xsmall"><Text>Tasks</Text>{numberOfTasks}</Box>
+                  <TextInput
+                  placeholder="Search"
+                  icon={<Search />}
+                  ></TextInput>
+              </Box>
+              <Box>
+                { size === "large" &&
+                  <Menu plain label="Sort by" items={[]} color="#9E9E9E" />
+                }
+              </Box>
+          </Box>
+          <Box pad={{ horizontal: 'large'}} align="center">
+            <Tasks setNumberOfTasks={setNumberOfTasks} />
+          </Box>
         </Box>
-        <Box pad={{ horizontal: 'large'}} align="center">
-          <Tasks setNumberOfTasks={setNumberOfTasks} />
-        </Box>
-    </Box>
       </Box>
       {showCreateTask && (
         <Layer responsive={true}>
