@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@pinata/sdk": "^2.1.0",
-    "@rainbow-me/rainbowkit": "^1.0.1",
+    "@web3auth/modal": "^6.1.7",
+    "@web3auth/openlogin-adapter": "^6.1.7",
+    "@web3auth/web3auth-wagmi-connector": "^4.0.1",
     "ethers": "^5.7.2",
     "formidable": "^2.1.1",
     "genson-js": "^0.0.8",
@@ -26,6 +28,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.11",
+    "truncate-eth-address": "^1.0.2",
     "viem": "^0.3.37",
     "wagmi": "^1.0.7"
   },

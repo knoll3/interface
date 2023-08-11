@@ -1,7 +1,9 @@
-import { Box, Heading, Text } from 'grommet';
-import { Layout, PrimaryButton, SecondaryButton } from '../components';
+import { Box, Heading, Text, Image } from 'grommet';
+import { Layout, PrimaryButton, SecondaryButton, TasksForHome } from '../components';
+import { useState } from 'react';
 
 export default function IndexPage() {
+  const [numberOfTasks, setNumberOfTasks] = useState(0);
   return (
     <Layout>
       <Box
@@ -36,6 +38,21 @@ export default function IndexPage() {
             pad={{ vertical: 'medium', horizontal: 'xlarge' }}
           />
         </Box>
+      </Box>
+        <Image
+          src="/try-model.png" 
+          alt="Image Description"
+          margin={{ bottom: 'xlarge' }}
+        />
+      <Box
+          align="center"
+          justify="center"
+          alignSelf="center"
+          gap="xlarge"
+          height="100vh"
+          pad={{ horizontal: 'large' }} 
+          basis="3/4">
+          <TasksForHome setNumberOfTasks={setNumberOfTasks} />
       </Box>
     </Layout>
   );

@@ -1,26 +1,31 @@
-import { Box, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
+import { Box, Button, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
 import { Layout, PrimaryButton, Tasks } from '../components';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function FaucetPage() {
-  const { address, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const [amount, setAmount] = useState(0);
   const [errors, setErrors] = useState<any>({});
 
-  const { config, error } = usePrepareContractWrite({
+  const { data, write } = useContractWrite({
     address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
     abi: FLOCK_ABI,
     functionName: 'mint',
-    args: [address, amount * 10 ** 18],
   });
-  const { writeAsync } = useContractWrite(config);
+
+  const { isSuccess, isLoading } = useWaitForTransaction({
+    hash: data?.hash,
+  });
 
   const handleMint = async () => {
-    await writeAsync?.();
-    setAmount(0);
+    write?.({ args: [address, amount * 10 ** 18] });
   };
+
+  useEffect(() => {
+    setAmount(0);
+  }, [isSuccess]);
 
   const hasErrors = Object.keys(errors).length > 0;
 
@@ -48,7 +53,14 @@ export default function FaucetPage() {
             </Paragraph> 
           </Box>
         </Box>
-        <Box width="100%" align="center" pad="large">
+        <Box
+          width="100%"
+          align="center"
+          pad="large"
+          background="white"
+          justify="center"
+          round="small"
+        >
           <Form
             onValidate={(validationResults) => {
               setErrors(validationResults.errors);
@@ -65,17 +77,18 @@ export default function FaucetPage() {
                 type="number"
                 id="amount"
                 name="amount"
+                value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
               />
             </FormField>
-            <PrimaryButton
-              onClick={handleMint}
-              disabled={isDisconnected || amount === 0 || hasErrors}
-              margin={{ top: 'medium' }}
-              label="Mint"
-              size="medium"
-              pad={{ vertical: 'small', horizontal: 'xlarge' }}
-            />
+            <Box direction="row" align="end" justify="end">
+              <Button
+                primary
+                onClick={handleMint}
+                disabled={!address || amount === 0 || hasErrors || isLoading}
+                label={isLoading ? 'Minting...' : 'Mint'}
+              />
+            </Box>
           </Form>
         </Box>
       </Box>
