@@ -1,7 +1,7 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Grid, Heading, Layer, Meter, Stack, Text } from 'grommet';
-import { useEffect, useState } from 'react';
+import { Anchor, Avatar, Box, Grid, Heading, Layer, Meter, Stack, Text, ResponsiveContext } from 'grommet';
+import { useEffect, useState, useContext } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
 import { Chat, Favorite, Group, UserFemale, View } from 'grommet-icons';
@@ -39,6 +39,8 @@ export const TasksForHome = ({
   const [showTask, setShowTask] = useState(false);
 
   const [taskToShow, setTaskToShow] = useState<Task>({} as Task);
+
+  const size = useContext(ResponsiveContext);
 
   const { data, isError, isLoading, refetch } = useContractRead({
     address: process.env
@@ -100,10 +102,12 @@ export const TasksForHome = ({
     return acc;
   }, {} as Record<string, Task[]>);
 
+  const numberOfColumns = size === 'small' ? 1 : size === 'medium' ? 2 : 3;
+
   return (
     <>
     <Grid
-      columns={{ count: 3, size: 'auto' }} 
+      columns={{ count: numberOfColumns, size: 'auto' }} 
       gap="medium"
       justifyContent="center"
       alignContent="start"
