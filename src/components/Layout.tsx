@@ -36,7 +36,7 @@ export const Layout = ({ children }: Props) => {
           <Image src="logo.png" onClick={() => void push('/')} alt="logo" />
         </Box>
         {size === 'large' && <Menu />}
-        <Wallet />
+        {size !== 'small' && <Wallet />}
       </Header>
       {showSidebar &&
         <Layer
