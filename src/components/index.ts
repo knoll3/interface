@@ -5,3 +5,4 @@ export { SecondaryButton } from './SecondaryButton';
 export { Tasks } from './Tasks';
 export { Wallet } from './Wallet';
 export { CreateTask } from './CreateTask';
+export { TasksForHome } from './TasksForHome';

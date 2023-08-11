@@ -314,7 +314,7 @@ const TaskDefinitionForm = ({
           <Select
             id="taskType"
             name="taskType"
-            options={['Time series prediction', 'Classification', 'Large Language Model Finetuning']}
+            options={['NLP', 'Finance', 'Computer Vision']}
           />
         </FormField>
       </Box>

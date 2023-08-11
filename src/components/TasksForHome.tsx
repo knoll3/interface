@@ -1,6 +1,6 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet';
+import { Anchor, Avatar, Box, Grid, Heading, Layer, Meter, Stack, Text } from 'grommet';
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
@@ -30,7 +30,7 @@ export interface Task {
   numberOfParticipants: number;
 }
 
-export const Tasks = ({
+export const TasksForHome = ({
   setNumberOfTasks,
 }: {
   setNumberOfTasks: (numberOfTasks: number) => void;
@@ -87,18 +87,40 @@ export const Tasks = ({
     loadTasks();
   }, [data]);
 
+  const allowedTaskTypes = ["NLP", "Finance", "Computer Vision"];
+  const filteredTasks = tasks.filter((task) =>
+    allowedTaskTypes.includes(task.taskType)
+  );
+
+  const groupedTasks: Record<string, Task[]> = filteredTasks.reduce((acc, task) => {
+    if (!acc[task.taskType]) {
+      acc[task.taskType] = [];
+    }
+    acc[task.taskType].push(task);
+    return acc;
+  }, {} as Record<string, Task[]>);
+
   return (
     <>
-      <Box
-        direction="row-responsive"
-        wrap
-        width="100%"
-        align="center"
-        justify="center"
-        gap="small"
-      >
-        {tasks?.map((task: Task, index: number) => {
-          return (
+    <Grid
+      columns={{ count: 3, size: 'auto' }} 
+      gap="medium"
+      justifyContent="center"
+      alignContent="start"
+    >
+    {Object.entries(groupedTasks).map(([taskType, typeTasks]) => (
+      <Box key={taskType} width="100%">
+        <Box margin={{ bottom: 'medium' }}>
+        <Heading level="2" margin={{ top: 'medium', bottom: 'small' }}>
+          {taskType}
+        </Heading>
+        <Box
+          direction="column"
+          align="center"
+          justify="center"
+          gap="small"
+        >
+          {typeTasks.slice(0,5).map((task: Task, index: number) => (
             <Box
               background="#FFFFFF"
               key={index}
@@ -109,11 +131,11 @@ export const Tasks = ({
               pad="medium"
               margin={{ top: 'small' }}
               height={{ min: 'small' }}
-              width="30%"
+              width="100%"
               border={{ color: 'black', size: 'small' }}
             >
               <Heading level="3" margin="none">
-                  {task.name}
+                {task.name}
               </Heading>
               <Text>{task.description}</Text>
               <Text margin={{ top: 'xsmall', bottom: 'xsmall' }} size="small">Updated 0 days ago</Text>
@@ -186,11 +208,11 @@ export const Tasks = ({
               </Box>
               <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
                 <Box direction="row" gap="small" alignSelf="end">
-                      <UserFemale color='brand' />
-                      <Text>Creator Name</Text>
+                  <UserFemale color='brand' />
+                  <Text>Creator Name</Text>
                 </Box>
                 <Box align="center">
-                  <Box
+                <Box
                     direction="row"
                     gap="xxsmall"
                     align="center"
@@ -201,25 +223,17 @@ export const Tasks = ({
                     </Text>
                     <Text size="small" weight="bold">to start</Text>
                   </Box>
-                  <PrimaryButton
-                    onClick={() => {
-                      setTaskToShow(task);
-                      setShowTask(true);
-                    }}
-                    label="Join"
-                    size="medium"
-                    alignSelf="end"
-                    pad={{ vertical: 'xsmall', horizontal: 'medium' }}
-                  />
                 </Box>
               </Box>
             </Box>
-          );
-        })}
+          ))}
+        </Box>
       </Box>
-      {showTask && (
-        <Layer responsive={true}>
-          <Box>
+      </Box>
+    ))}
+    {showTask && (
+      <Layer responsive={true}>
+        <Box>
             <Box direction="row" justify="between" gap="medium" pad="medium">
               <Box direction="row" gap="small">
                 <Box gap="small">
@@ -412,8 +426,9 @@ export const Tasks = ({
               </Box>
             </Box>
           </Box>
-        </Layer>
-      )}
-    </>
+      </Layer>
+    )}
+    </Grid>
+  </>
   );
 };
