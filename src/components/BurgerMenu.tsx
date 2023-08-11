@@ -2,6 +2,7 @@ import { Box, Button, type ButtonProps, Image } from 'grommet';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useContext } from 'react';
 import { Close } from 'grommet-icons';
+import { Wallet } from './Wallet';
 
 interface MenuItemProps {
   selected: boolean;
@@ -45,6 +46,7 @@ export const BurgerMenu = ({
           </Box>
         </Box>
         <Box align="center" gap="large" margin={{ top: "xlarge" }}>
+          <Wallet />
           <MenuItem
               href="/"
               onClick={() => setSelected('/')}
