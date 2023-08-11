@@ -45,6 +45,7 @@ export const Layout = ({ children }: Props) => {
           onClickOutside={() => setShowSidebar(false)}
           animation="slide" 
           position='left'
+          full='vertical'
         >
           <Box>
             <BurgerMenu setShowSidebar={setShowSidebar} />
