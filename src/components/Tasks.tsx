@@ -260,7 +260,7 @@ export const Tasks = ({
                         </Text>
                       </Box>
                       <Box direction="row" align="center">
-                        <Stack anchor="right">
+                        {/* <Stack anchor="right">
                           {Array.from(
                             {
                               length: Math.min(
