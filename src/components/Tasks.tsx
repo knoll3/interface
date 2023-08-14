@@ -4,7 +4,7 @@ import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text, ResponsiveCont
 import { useEffect, useState, useContext } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
-import { Chat, Favorite, Group, UserFemale, View } from 'grommet-icons';
+import { Chat, CreditCard, Favorite, Group, Scorecard, UserFemale, View, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 
 export interface Task {
@@ -30,10 +30,36 @@ export interface Task {
   numberOfParticipants: number;
 }
 
+type CardColors = {
+  [key: string]: TaskCardProps;
+}
+
+interface TaskCardProps {
+  cardColor: string;
+  cardIcon: JSX.Element;
+}
+
+const cardColors: CardColors = {
+  "Large Language Model Finetuning": {
+    cardColor: "#A4C0FF", cardIcon: <Chat color="black" size="20px" />
+  },
+  "NLP": {
+    cardColor: "#E69FBD", cardIcon: <Scorecard color="black" size="20px" />
+  },
+  "Time series prediction": {
+    cardColor: "#D9D9D9", cardIcon: <CreditCard color="black" size="20px" />
+  },
+  "Classification": {
+    cardColor: "#BDD4DA", cardIcon: <Image color="black" size="20px" />
+  },
+}
+
 export const Tasks = ({
   setNumberOfTasks,
+  filterItems,
 }: {
   setNumberOfTasks: (numberOfTasks: number) => void;
+  filterItems: string[];
 }) => {
   const [tasks, setTasks] = useState<Task[]>([] as Task[]);
   const [showTask, setShowTask] = useState(false);
@@ -99,7 +125,9 @@ export const Tasks = ({
         justify="center"
         gap="small"
       >
-        {tasks?.map((task: Task, index: number) => {
+        {tasks
+          ?.filter((task) => filterItems.length === 0 || filterItems.includes(task.taskType))
+          .map((task: Task, index: number) => {
           return (
             <Box
               background="#FFFFFF"
@@ -130,12 +158,13 @@ export const Tasks = ({
                       border={{ color: 'black', size: 'small' }}
                       round="small"
                       pad="xsmall"
-                      background="#E69FBD"
+                      background={cardColors[task.taskType]?.cardColor}
                       direction="row"
                       gap="small"
                       align="center"
+                      width={{ max: '70%'}}
                   >
-                      <Chat color="black" size="20px" /><Text weight="bold">{task.taskType}</Text>
+                      {cardColors[task.taskType]?.cardIcon}<Text weight="bold" truncate={true}>{task.taskType === "Large Language Model Finetuning" ? "LLM Finetuning" : task.taskType}</Text>
                   </Box>
                   <Box direction="row" gap="small">
                       <Box direction="row" gap="1px"><Favorite color="black" /> {}</Box>
@@ -158,7 +187,6 @@ export const Tasks = ({
                   direction="row" 
                   align="center" 
                   gap="xsmall"
-                  basis="1/2"
                 >
                   <Heading level="3" margin="0">
                     {(
@@ -175,13 +203,14 @@ export const Tasks = ({
                   direction="row" 
                   align="center"
                   gap="xsmall"
-                  basis="1/2"
                   justify="end"
+                  margin={{ left: 'small'}}
+                  basis='1/2'
                 >
                   <Heading level="3" color="#6C94EC" margin="0">
                     {task.minParticipants}
                   </Heading>
-                  <Box basis="1/2">
+                  <Box width="xsmall">
                     <Text size="small" color="#6C94EC">Participants Requirements</Text>
                   </Box>
                 </Box>
