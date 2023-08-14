@@ -1,6 +1,6 @@
-import { Box, Button, type ButtonProps, ResponsiveContext } from 'grommet';
+import { Box, Button, type ButtonProps } from 'grommet';
 import { useRouter } from 'next/router';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 
 interface MenuItemProps {
   selected: boolean;
@@ -24,7 +24,6 @@ const MenuItem = ({
 export const Menu = () => {
   const { pathname } = useRouter();
   const [selected, setSelected] = useState(pathname);
-  const size = useContext(ResponsiveContext);
 
   useEffect(() => {
     if (pathname) {
@@ -34,56 +33,54 @@ export const Menu = () => {
   
   return (
       <Box>
-        { size === 'large' &&
-          <Box direction="row" align="center" gap="large">
-            <MenuItem
-              href="/"
-              onClick={() => setSelected('/')}
-              hoverIndicator={false}
-              selected={selected === '/'}
-              text="Home"
-            />
+        <Box direction="row" align="center" gap="large">
+          <MenuItem
+            href="/"
+            onClick={() => setSelected('/')}
+            hoverIndicator={false}
+            selected={selected === '/'}
+            text="Home"
+          />
 
-            <MenuItem
-              href="/train"
-              onClick={() => setSelected('/train')}
-              hoverIndicator={false}
-              selected={selected === '/train'}
-              text="Train"
-            />
+          <MenuItem
+            href="/train"
+            onClick={() => setSelected('/train')}
+            hoverIndicator={false}
+            selected={selected === '/train'}
+            text="Train"
+          />
 
-            <MenuItem
-              href="/faucet"
-              onClick={() => setSelected('/faucet')}
-              hoverIndicator={false}
-              selected={selected === '/faucet'}
-              text="Faucet"
-            />
+          <MenuItem
+            href="/faucet"
+            onClick={() => setSelected('/faucet')}
+            hoverIndicator={false}
+            selected={selected === '/faucet'}
+            text="Faucet"
+          />
 
-            <MenuItem
-              href="/marketplace"
-              onClick={() => setSelected('/marketplace')}
-              hoverIndicator={false}
-              selected={selected === '/marketplace'}
-              text="Marketplace"
-            />
-            <MenuItem
-              //href="/analytics"
-              //onClick={() => setSelected('/analytics')}
-              hoverIndicator={false}
-              selected={selected === '/analytics'}
-              text="Analytics"
-            />
-            <MenuItem
-              href="https://flock-io.gitbook.io/flock/"
-              target="_blank"
-              //onClick={() => setSelected('/aboutUs')}
-              hoverIndicator={false}
-              selected={selected === '/aboutUs'}
-              text="About Us"
-            />
-          </Box>
-        }
+          <MenuItem
+            href="/marketplace"
+            onClick={() => setSelected('/marketplace')}
+            hoverIndicator={false}
+            selected={selected === '/marketplace'}
+            text="Marketplace"
+          />
+          <MenuItem
+            //href="/analytics"
+            //onClick={() => setSelected('/analytics')}
+            hoverIndicator={false}
+            selected={selected === '/analytics'}
+            text="Analytics"
+          />
+          <MenuItem
+            href="https://flock-io.gitbook.io/flock/"
+            target="_blank"
+            //onClick={() => setSelected('/aboutUs')}
+            hoverIndicator={false}
+            selected={selected === '/aboutUs'}
+            text="About Us"
+          />
+        </Box>
       </Box>
   );
 };
