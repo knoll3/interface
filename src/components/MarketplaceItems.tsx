@@ -4,7 +4,7 @@ import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
-import { UserFemale, Favorite, View, Group, Chat } from 'grommet-icons';
+import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 
 export interface Model {
@@ -33,7 +33,35 @@ const tasks = [
     }
 ] as Model[];
 
-export const MarketplaceItems = () => {
+type CardColors = {
+  [key: string]: TaskCardProps;
+}
+
+interface TaskCardProps {
+  cardColor: string;
+  cardIcon: JSX.Element;
+}
+
+const cardColors: CardColors = {
+  "Large Language Model Finetuning": {
+    cardColor: "#A4C0FF", cardIcon: <Chat color="black" size="20px" />
+  },
+  "NLP": {
+    cardColor: "#E69FBD", cardIcon: <Scorecard color="black" size="20px" />
+  },
+  "Time series prediction": {
+    cardColor: "#D9D9D9", cardIcon: <CreditCard color="black" size="20px" />
+  },
+  "Classification": {
+    cardColor: "#BDD4DA", cardIcon: <Image color="black" size="20px" />
+  },
+}
+
+export const MarketplaceItems = ({
+  filterItems,
+}: {
+  filterItems: string[];
+}) => {
   const [models, setModels] = useState<Model[]>([] as Model[]);
 
 //   const { data, isError, isLoading, refetch } = useContractRead({
@@ -92,7 +120,9 @@ export const MarketplaceItems = () => {
         justify='center'
         gap="small"
       >
-        {tasks?.map((model: Model, index: number) => {
+        {tasks
+          ?.filter((task) => filterItems.length === 0 || filterItems.includes(task.type))
+          .map((model: Model, index: number) => {
           return (
             <Box
               background="#FFFFFF"
@@ -128,12 +158,12 @@ export const MarketplaceItems = () => {
                         border={{ color: 'black', size: 'small' }}
                         round="small"
                         pad="xsmall"
-                        background="#E69FBD"
+                        background={cardColors[model.type]?.cardColor}
                         direction="row"
                         gap="small"
                         align="center"
                     >
-                        <Chat color="black" size="20px" /><Text weight="bold">{model.type}</Text>
+                        <Chat color="black" size="20px" /><Text weight="bold" truncate={true}>{model.type}</Text>
                     </Box>
                     <Box direction="row" gap="small">
                         <Box direction="row" gap="1px"><Favorite color="black" /> {model.likes}</Box>
