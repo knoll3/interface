@@ -6,6 +6,7 @@ import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
 import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
+import { PrismaClient } from '@prisma/client';
 
 export interface Model {
     name: string;
@@ -64,51 +65,16 @@ export const MarketplaceItems = ({
 }) => {
   const [models, setModels] = useState<Model[]>([] as Model[]);
 
-//   const { data, isError, isLoading, refetch } = useContractRead({
-//     address: process.env
-//       .NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
-//     abi: FLOCK_TASK_MANAGER_ABI,
-//     functionName: 'getTasks',
-//     watch: true,
-//   });
+  const prisma = new PrismaClient();
 
-//   const loadTasks = async () => {
-//     if (data) {
-//       const loadedTasks: Task[] = await Promise?.all(
-//         (data as Array<string>)?.map(async (item) => {
-//           const metadata = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'metadata',
-//           })) as string;
+  const loadModels = async () => {
+    const loadedModels = await prisma.marketplacemodel.findMany();
+    setModels(loadedModels);
+  };
 
-//           const currentRound = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'currentRound',
-//           })) as number;
-
-//           const numberOfParticipants = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'getNumberOfParticipants',
-//           })) as number;
-
-//           return {
-//             address: item,
-//             ...JSON.parse(metadata),
-//             numberOfParticipants,
-//           } as Task;
-//         })
-//       );
-
-//       setTasks(loadedTasks);
-//     }
-//   };
-
-//   useEffect(() => {
-//     loadTasks();
-//   }, [data]);
+  useEffect(() => {
+    loadModels();
+  }, []);
 
   return (
     <>
