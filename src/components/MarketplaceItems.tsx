@@ -8,31 +8,34 @@ import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image }
 import { PrimaryButton } from './PrimaryButton';
 import { PrismaClient } from '@prisma/client';
 
-export interface Model {
-    name: string;
-    description: string;
-    type: string;
-    creator: string;
-    price: number;
-    likes: number;
-    views: number;
-    people: number;
-    link: string;
-}
+export interface ModelData {
+  id: string;
+  name: string;
+  type: string;
+  creator: string;
+  description: string;
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+  views: number;
+  likes: number;
+  shares: number;
+  link: string;
+};
 
-const tasks = [
-    {
-        "name": "FlockLLM finetuned on Dolly dataset",
-        "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-        "type": "LLM Chatbot",
-        "creator": "Creator Name",
-        "price": 0,
-        "likes": 1,
-        "views": 1,
-        "people": 1,
-        "link": "http://209.20.157.253:7860"
-    }
-] as Model[];
+// const tasks = [
+//     {
+//         "name": "FlockLLM finetuned on Dolly dataset",
+//         "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
+//         "type": "LLM Chatbot",
+//         "creator": "Creator Name",
+//         "price": 0,
+//         "likes": 1,
+//         "views": 1,
+//         "people": 1,
+//         "link": "http://209.20.157.253:7860"
+//     }
+// ] as Model[];
 
 type CardColors = {
   [key: string]: TaskCardProps;
@@ -63,13 +66,44 @@ export const MarketplaceItems = ({
 }: {
   filterItems: string[];
 }) => {
-  const [models, setModels] = useState<Model[]>([] as Model[]);
+  const [models, setModels] = useState<ModelData[]>([] as ModelData[]);
 
-  const prisma = new PrismaClient();
+  const likeTask = async (id: string) => {
+    const likeTaskRequest = await fetch('/api/likeTask', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    });
+    const likedTask = await likeTaskRequest.json();
+  }
 
   const loadModels = async () => {
-    const loadedModels = await prisma.marketplacemodel.findMany();
-    setModels(loadedModels);
+    try {
+      // const getModelsRequest = await fetch('/api/getModelData', {
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
+      // console.log(getModelsRequest);
+      // const loadedModels = await getModelsRequest.json();
+      // setModels(loadedModels);
+      const marketplaceModels = await fetch(
+        "https://us-central1-flock-demo-design.cloudfunctions.net/getModelData",
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const { data } = await marketplaceModels.json();
+    setModels(data);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
@@ -86,9 +120,9 @@ export const MarketplaceItems = ({
         justify='center'
         gap="small"
       >
-        {tasks
-          ?.filter((task) => filterItems.length === 0 || filterItems.includes(task.type))
-          .map((model: Model, index: number) => {
+        {models
+          ?.filter((model) => filterItems.length === 0 || filterItems.includes(model.type))
+          .map((model: ModelData, index: number) => {
           return (
             <Box
               background="#FFFFFF"
@@ -134,13 +168,13 @@ export const MarketplaceItems = ({
                     <Box direction="row" gap="small">
                         <Box direction="row" gap="1px"><Favorite color="black" /> {model.likes}</Box>
                         <Box direction="row" gap="1px"><View color="black" /> {model.views}</Box>
-                        <Box direction="row" gap="1px"><Group color="black" /> {model.people}</Box>
+                        <Box direction="row" gap="1px"><Group color="black" /> {model.shares}</Box>
                     </Box>
                 </Box>
                 <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
                     <Box direction="row" gap="small">
                         <UserFemale color='brand' />
-                        <Text>Creator Name</Text>
+                        <Text>{model.creator}</Text>
                     </Box>
                     <Box direction="row" align="center" gap="small">
                         <Text weight="bold">FLC {model.price}</Text>
