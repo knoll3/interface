@@ -13,7 +13,7 @@ export default async function handler(
   try {
     const { modelId, userToken, userEmail, publicKey } = req.body;
     const updateLikes = await fetch(
-        "https://us-central1-flock-demo-design.cloudfunctions.net/updateModelLikes",
+        "https://us-central1-flock-demo-design.cloudfunctions.net/updateModelViews",
       {
         method: 'POST',
         headers: {

@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { type } from 'os';
 
 type ModelData = {
     id: string;
@@ -31,8 +30,7 @@ export default async function handler(
         },
       }
     );
-    const { data } = await marketplaceModels.json();
-    console.log(data);
+    const data  = await marketplaceModels.json();
     res.status(200).json(data);
   } catch (error) {
     console.error(error);
