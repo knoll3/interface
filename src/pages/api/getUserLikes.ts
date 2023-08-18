@@ -11,13 +11,12 @@ export default async function handler(
     const { userEmail } = req.body;
     
     const modelLikes = await fetch(
-        "https://us-central1-flock-demo-design.cloudfunctions.net/getUserLikes",
+        `https://us-central1-flock-demo-design.cloudfunctions.net/getUserLikes?userEmail=${userEmail}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userEmail: userEmail }),
       }
     );
     const data  = await modelLikes.json();
