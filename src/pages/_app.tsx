@@ -11,6 +11,7 @@ import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider';
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter';
 import { Web3AuthConnector } from '@web3auth/web3auth-wagmi-connector';
 import { WalletContextProvider } from '../context/walletContext';
+import { web3AuthInstance } from '../hooks/web3AuthInstance';
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai],
@@ -28,19 +29,19 @@ const chainConfig = {
   blockExplorer: chains[0]?.blockExplorers.default?.url,
 };
 
-const web3AuthInstance = new Web3Auth({
-  clientId: process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENT_ID as string,
-  web3AuthNetwork: 'cyan',
-  // @ts-ignore
-  chainConfig,
-  authMode: 'WALLET',
-  uiConfig: {
-    theme: 'light',
-    appName: 'FLock Client',
-    appLogo:
-      'https://drive.google.com/uc?export=download&id=1Pm_naD3LlamhxkEVv-i2VBVG2RC4DYaZ',
-  },
-});
+// const web3AuthInstance = new Web3Auth({
+//   clientId: process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENT_ID as string,
+//   web3AuthNetwork: 'cyan',
+//   // @ts-ignore
+//   chainConfig,
+//   authMode: 'WALLET',
+//   uiConfig: {
+//     theme: 'light',
+//     appName: 'FLock Client',
+//     appLogo:
+//       'https://drive.google.com/uc?export=download&id=1Pm_naD3LlamhxkEVv-i2VBVG2RC4DYaZ',
+//   },
+// });
 
 const privateKeyProvider = new EthereumPrivateKeyProvider({
   // @ts-ignore
