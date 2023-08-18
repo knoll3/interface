@@ -1,11 +1,12 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text, ResponsiveContext } from 'grommet';
+import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text, ResponsiveContext, Button } from 'grommet';
 import { useEffect, useState, useContext } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
 import { Chat, CreditCard, Favorite, Group, Scorecard, UserFemale, View, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
+import download from 'downloadjs';
 
 export interface Task {
   address: string;
@@ -114,6 +115,19 @@ export const Tasks = ({
   useEffect(() => {
     loadTasks();
   }, [data]);
+
+  const ipfsGatewayURL = `https://gateway.ipfs.io/ipfs/${taskToShow.sampleData}`;
+  
+  const downloadJSON = async () => {
+    try {
+      const response = await fetch(ipfsGatewayURL);
+      const data = await response.blob();
+
+      download(data, 'data.json', 'application/json');
+    } catch (error) {
+      console.error('Error downloading JSON:', error);
+    }
+  };
 
   return (
     <>
@@ -431,15 +445,7 @@ export const Tasks = ({
                 </Box>
               </Box>
               <Box direction="row" justify="between">
-                <Anchor
-                  href={
-                    taskToShow.address ===
-                    '0x7280c6EF7bB61e76b116b61e608110a85136A35a'
-                      ? 'https://drive.google.com/uc?export=download&id=1TBZruhiwYYf9HWN37TOnEW-0qePMxcxr'
-                      : 'https://drive.google.com/uc?export=download&id=1HbCqlSop48OETzTcDuo1Oaw3bMLIxA4n'
-                  }
-                  label="Test Case Dataset"
-                />
+                <PrimaryButton onClick={downloadJSON} label="Download Test Case Dataset"/>
                 <Box>
                   <PrimaryButton label="close" onClick={() => setShowTask(false)} />
                 </Box>
