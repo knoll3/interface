@@ -76,7 +76,8 @@ export const MarketplaceItems = ({
             userEmail: userEmail,
           }),
         });
-        await likeTaskRequest
+        const models = await likeTaskRequest.json();
+        setModels(models);
       } catch (e) {
         console.log(e);
       }
@@ -106,7 +107,7 @@ export const MarketplaceItems = ({
     if (web3AuthInstance.connected) {
       getLikes();
     }
-  }, [web3AuthInstance.connected]);
+  }, [web3AuthInstance.connected, models]);
 
   const loadModels = async () => {
     try {
@@ -142,7 +143,8 @@ export const MarketplaceItems = ({
             userEmail: userEmail,
           }),
         });
-        await viewTaskRequest
+        const models = await viewTaskRequest.json();
+        setModels(models);
       } catch (e) {
         console.log(e);
       }
