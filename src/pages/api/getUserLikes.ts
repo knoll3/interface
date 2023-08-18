@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { web3AuthInstance } from '@/src/components/Web3AuthInstance';
+import { web3AuthInstance } from '@/src/hooks/web3AuthInstance';
 import { getPublicCompressed } from "@toruslabs/eccrypto";
 
 export default async function handler(
