@@ -1,12 +1,11 @@
-import { useContractRead } from 'wagmi';
+import { useContractRead, useAccount } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
 import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet';
-import { useEffect, useState } from 'react';
-import { FLOCK_TASK_ABI } from '../contracts/flockTask';
-import { readContract } from '@wagmi/core';
+import { use, useEffect, useState } from 'react';
 import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
-import { PrismaClient } from '@prisma/client';
+import { web3AuthInstance, userDataHook } from '../hooks';
+
 
 export interface ModelData {
   id: string;
@@ -22,20 +21,6 @@ export interface ModelData {
   shares: number;
   link: string;
 };
-
-// const tasks = [
-//     {
-//         "name": "FlockLLM finetuned on Dolly dataset",
-//         "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-//         "type": "LLM Chatbot",
-//         "creator": "Creator Name",
-//         "price": 0,
-//         "likes": 1,
-//         "views": 1,
-//         "people": 1,
-//         "link": "http://209.20.157.253:7860"
-//     }
-// ] as Model[];
 
 type CardColors = {
   [key: string]: TaskCardProps;
@@ -67,40 +52,72 @@ export const MarketplaceItems = ({
   filterItems: string[];
 }) => {
   const [models, setModels] = useState<ModelData[]>([] as ModelData[]);
+  const [likes, setLikes] = useState<string[]>([] as string[]);
+  const {
+    userEmail,
+    userToken,
+    publicKey,
+  } = userDataHook();
 
-  const likeTask = async (id: string) => {
-    const likeTaskRequest = await fetch('/api/likeTask', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    });
-    const likedTask = await likeTaskRequest.json();
+
+
+  const likeTask = async (modelId: string) => {
+    if (web3AuthInstance.connected) {
+      try {
+        const likeTaskRequest = await fetch('/api/updateModelLikes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: modelId,
+            publicKey: publicKey,
+            userToken: userToken,
+            userEmail: userEmail,
+          }),
+        });
+        await likeTaskRequest
+      } catch (e) {
+        console.log(e);
+      }
+    }
   }
+
+  const getLikes = async () => {
+    try {
+      const user = await web3AuthInstance.getUserInfo();
+      const getLikesRequest = await fetch('/api/getUserLikes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+        }), 
+      });
+      const loadedLikes = await getLikesRequest.json();
+      setLikes(loadedLikes);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    if (web3AuthInstance.connected) {
+      getLikes();
+    }
+  }, [web3AuthInstance.connected]);
 
   const loadModels = async () => {
     try {
-      // const getModelsRequest = await fetch('/api/getModelData', {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
-      // console.log(getModelsRequest);
-      // const loadedModels = await getModelsRequest.json();
-      // setModels(loadedModels);
-      const marketplaceModels = await fetch(
-        "https://us-central1-flock-demo-design.cloudfunctions.net/getModelData",
-      {
+      const getModelsRequest = await fetch('/api/getModelData', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      }
-    );
-    const { data } = await marketplaceModels.json();
-    setModels(data);
+      });
+      const loadedModels = await getModelsRequest.json();
+      setModels(loadedModels);
     } catch (e) {
       console.log(e);
     }
@@ -109,6 +126,28 @@ export const MarketplaceItems = ({
   useEffect(() => {
     loadModels();
   }, []);
+
+  const viewTask = async (modelId: string) => {
+    if (web3AuthInstance.connected) {
+      try {
+        const viewTaskRequest = await fetch('/api/updateModelViews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: modelId,
+            publicKey: publicKey,
+            userToken: userToken,
+            userEmail: userEmail,
+          }),
+        });
+        await viewTaskRequest
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
 
   return (
     <>
@@ -166,7 +205,7 @@ export const MarketplaceItems = ({
                         <Chat color="black" size="20px" /><Text weight="bold" truncate={true}>{model.type}</Text>
                     </Box>
                     <Box direction="row" gap="small">
-                        <Box direction="row" gap="1px"><Favorite color="black" /> {model.likes}</Box>
+                        <Box direction="row" gap="1px"><Favorite color={ likes.includes(model.id) ? "red" : "black"} onClick={() => likeTask(model.id)} /> {model.likes}</Box>
                         <Box direction="row" gap="1px"><View color="black" /> {model.views}</Box>
                         <Box direction="row" gap="1px"><Group color="black" /> {model.shares}</Box>
                     </Box>
@@ -178,7 +217,7 @@ export const MarketplaceItems = ({
                     </Box>
                     <Box direction="row" align="center" gap="small">
                         <Text weight="bold">FLC {model.price}</Text>
-                        <PrimaryButton label="Use" href={model.link} target="blank" />
+                        <PrimaryButton label="Use" href={model.link} target="blank" onClick={() => viewTask(model.id)} />
                     </Box>
                 </Box>
             </Box>
