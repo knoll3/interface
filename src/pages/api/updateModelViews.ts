@@ -1,18 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-type Data = {
-  modelId: string;
-}
+type ModelData = {
+    id: string;
+    name: string;
+    type: string;
+    creator: string;
+    description: string;
+    price: number;
+    createdAt: string;
+    updatedAt: string;
+    views: number;
+    likes: number;
+    shares: number;
+    link: string;
+  };
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ModelData[]>
 ) {
 
 
   try {
     const { modelId, userToken, userEmail, publicKey } = req.body;
-    const updateLikes = await fetch(
+    const updateViews = await fetch(
         "https://us-central1-flock-demo-design.cloudfunctions.net/updateModelViews",
       {
         method: 'POST',
@@ -23,8 +34,8 @@ export default async function handler(
         body: JSON.stringify({ pubKey: publicKey, modelId: modelId, userEmail: userEmail }),
       }
     );
-    await updateLikes.json();
-    res.status(200).json({ modelId: modelId });
+    const models = await updateViews.json();
+    res.status(200).json(models);
   } catch (error) {
     console.error(error);
     res.status(500).end();
