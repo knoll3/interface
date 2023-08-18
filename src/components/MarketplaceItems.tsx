@@ -1,37 +1,26 @@
-import { useContractRead } from 'wagmi';
+import { useContractRead, useAccount } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
 import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet';
-import { useEffect, useState } from 'react';
-import { FLOCK_TASK_ABI } from '../contracts/flockTask';
-import { readContract } from '@wagmi/core';
+import { use, useEffect, useState } from 'react';
 import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
+import { web3AuthInstance, userDataHook } from '../hooks';
 
-export interface Model {
-    name: string;
-    description: string;
-    type: string;
-    creator: string;
-    price: number;
-    likes: number;
-    views: number;
-    people: number;
-    link: string;
-}
 
-const tasks = [
-    {
-        "name": "FlockLLM finetuned on Dolly dataset",
-        "description": "Finetune Vicuna v1.1 pre-trained model on Dolly dataset for 20 communication rounds.",
-        "type": "LLM Chatbot",
-        "creator": "Creator Name",
-        "price": 0,
-        "likes": 1,
-        "views": 1,
-        "people": 1,
-        "link": "http://209.20.157.253:7860"
-    }
-] as Model[];
+export interface ModelData {
+  id: string;
+  name: string;
+  type: string;
+  creator: string;
+  description: string;
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+  views: number;
+  likes: number;
+  shares: number;
+  link: string;
+};
 
 type CardColors = {
   [key: string]: TaskCardProps;
@@ -62,53 +51,105 @@ export const MarketplaceItems = ({
 }: {
   filterItems: string[];
 }) => {
-  const [models, setModels] = useState<Model[]>([] as Model[]);
+  const [models, setModels] = useState<ModelData[]>([] as ModelData[]);
+  const [likes, setLikes] = useState<string[]>([] as string[]);
+  const {
+    userEmail,
+    userToken,
+    publicKey,
+  } = userDataHook();
 
-//   const { data, isError, isLoading, refetch } = useContractRead({
-//     address: process.env
-//       .NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
-//     abi: FLOCK_TASK_MANAGER_ABI,
-//     functionName: 'getTasks',
-//     watch: true,
-//   });
 
-//   const loadTasks = async () => {
-//     if (data) {
-//       const loadedTasks: Task[] = await Promise?.all(
-//         (data as Array<string>)?.map(async (item) => {
-//           const metadata = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'metadata',
-//           })) as string;
 
-//           const currentRound = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'currentRound',
-//           })) as number;
+  const likeTask = async (modelId: string) => {
+    if (web3AuthInstance.connected) {
+      try {
+        const likeTaskRequest = await fetch('/api/updateModelLikes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: modelId,
+            publicKey: publicKey,
+            userToken: userToken,
+            userEmail: userEmail,
+          }),
+        });
+        const models = await likeTaskRequest.json();
+        setModels(models);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
 
-//           const numberOfParticipants = (await readContract({
-//             address: item as `0x${string}`,
-//             abi: FLOCK_TASK_ABI,
-//             functionName: 'getNumberOfParticipants',
-//           })) as number;
+  const getLikes = async () => {
+    try {
+      const user = await web3AuthInstance.getUserInfo();
+      const getLikesRequest = await fetch('/api/getUserLikes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+        }), 
+      });
+      const loadedLikes = await getLikesRequest.json();
+      setLikes(loadedLikes);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
-//           return {
-//             address: item,
-//             ...JSON.parse(metadata),
-//             numberOfParticipants,
-//           } as Task;
-//         })
-//       );
+  useEffect(() => {
+    if (web3AuthInstance.connected) {
+      getLikes();
+    }
+  }, [web3AuthInstance.connected, models]);
 
-//       setTasks(loadedTasks);
-//     }
-//   };
+  const loadModels = async () => {
+    try {
+      const getModelsRequest = await fetch('/api/getModelData', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const loadedModels = await getModelsRequest.json();
+      setModels(loadedModels);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-//   useEffect(() => {
-//     loadTasks();
-//   }, [data]);
+  useEffect(() => {
+    loadModels();
+  }, []);
+
+  const viewTask = async (modelId: string) => {
+    if (web3AuthInstance.connected) {
+      try {
+        const viewTaskRequest = await fetch('/api/updateModelViews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            modelId: modelId,
+            publicKey: publicKey,
+            userToken: userToken,
+            userEmail: userEmail,
+          }),
+        });
+        const models = await viewTaskRequest.json();
+        setModels(models);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
 
   return (
     <>
@@ -120,9 +161,9 @@ export const MarketplaceItems = ({
         justify='center'
         gap="small"
       >
-        {tasks
-          ?.filter((task) => filterItems.length === 0 || filterItems.includes(task.type))
-          .map((model: Model, index: number) => {
+        {models
+          ?.filter((model) => filterItems.length === 0 || filterItems.includes(model.type))
+          .map((model: ModelData, index: number) => {
           return (
             <Box
               background="#FFFFFF"
@@ -166,19 +207,19 @@ export const MarketplaceItems = ({
                         <Chat color="black" size="20px" /><Text weight="bold" truncate={true}>{model.type}</Text>
                     </Box>
                     <Box direction="row" gap="small">
-                        <Box direction="row" gap="1px"><Favorite color="black" /> {model.likes}</Box>
+                        <Box direction="row" gap="1px"><Favorite color={ likes.includes(model.id) ? "red" : "black"} onClick={() => likeTask(model.id)} /> {model.likes}</Box>
                         <Box direction="row" gap="1px"><View color="black" /> {model.views}</Box>
-                        <Box direction="row" gap="1px"><Group color="black" /> {model.people}</Box>
+                        <Box direction="row" gap="1px"><Group color="black" /> {model.shares}</Box>
                     </Box>
                 </Box>
                 <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
                     <Box direction="row" gap="small">
                         <UserFemale color='brand' />
-                        <Text>Creator Name</Text>
+                        <Text>{model.creator}</Text>
                     </Box>
                     <Box direction="row" align="center" gap="small">
                         <Text weight="bold">FLC {model.price}</Text>
-                        <PrimaryButton label="Use" href={model.link} target="blank" />
+                        <PrimaryButton label="Use" href={model.link} target="blank" onClick={() => viewTask(model.id)} />
                     </Box>
                 </Box>
             </Box>

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@pinata/sdk": "^2.1.0",
+    "@prisma/client": "^5.1.1",
     "@web3auth/modal": "^6.1.7",
     "@web3auth/openlogin-adapter": "^6.1.7",
     "@web3auth/web3auth-wagmi-connector": "^4.0.1",
@@ -25,6 +26,7 @@
     "next": "^13.1.6",
     "nextjs-google-analytics": "^2.3.3",
     "polished": "^4.2.2",
+    "prisma": "^5.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.11",
