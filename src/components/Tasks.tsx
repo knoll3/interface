@@ -398,7 +398,7 @@ export const Tasks = ({
                     Target Accuracy
                   </Heading>
                   <Heading level="1" color="#6C94EC" weight="bold">
-                    {taskToShow.accuracy ? Number(taskToShow.accuracy) : '0'}%
+                    {taskToShow.accuracy ? `${Number(taskToShow.accuracy)} %`  : 'N/A'} 
                   </Heading>
                 </Box>
               </Box>
