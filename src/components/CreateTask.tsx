@@ -54,7 +54,7 @@ const DataDefinitionForm = ({
   setErrors(value: any): void;
 }) => {
   const handleChange = async (nextValue: any) => {
-    if (nextValue.sampleData) {
+    if (nextValue.sampleData[0]) {
       const fileReader = new FileReader();
       fileReader.readAsText(nextValue.sampleData[0], 'UTF-8');
       fileReader.onload = (e) => {
@@ -87,7 +87,38 @@ const DataDefinitionForm = ({
         validateOn="blur"
       >
         <Box height="medium">
-          <TextArea id="schema" name="schema" fill />
+        <TextArea
+            id="schema"
+            name="schema"
+            fill
+            resize={false}
+            placeholder={JSON.stringify({
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "context": {
+                    "type": "string"
+                  },
+                  "response": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instruction",
+                  "context",
+                  "response",
+                  "category"
+                ]
+              }
+            }, null, 2)}
+          />
         </Box>
       </FormField>
       <FormField
