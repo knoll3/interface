@@ -21,7 +21,6 @@ import { useEffect, useState } from 'react';
 import { FLOCK_ABI } from '../contracts/flock';
 import { create as ipfsHttpClient } from 'ipfs-http-client';
 import { createSchema } from 'genson-js/dist';
-const ipfsClient = ipfsHttpClient({ url: 'https://ipfs.flock.io/api/v0' });
 
 type FormValues = {
   name: string;
@@ -385,22 +384,39 @@ export const CreateTask = ({
   });
 
   const handleCreate = async () => {
-    setIsProcessing(true);
-    const { path: schemaPath } = await ipfsClient.add(
-      JSON.stringify(value.schema, null, 4)
-    );
+    try {
+      setIsProcessing(true);
+      const { hash: schemaPath } = await fetch('/api/pinJsonToIPFS', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          json: value.schema,
+        }),
+      }).then((res) => res.json());
+      value.schema = schemaPath;
 
-    const { path: sampleDataPath } = await ipfsClient.add(value.sampleData[0]);
+      const formData = new FormData();
+      formData.append('file', value.sampleData[0], value.sampleData[0].name);
 
-    value.sampleData = sampleDataPath;
-    value.schema = schemaPath;
+      const { hash: fileHash } = await fetch('/api/pinFileToIPFS', {
+        method: 'POST',
+        body: formData,
+      }).then((res) => res.json());
 
-    await writeAsyncApprove?.({
-      args: [
-        process.env.NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
-        value.rewardPool * 10 ** 18,
-      ],
-    });
+      value.sampleData = fileHash;
+
+      await writeAsyncApprove?.({
+        args: [
+          process.env.NEXT_PUBLIC_FLOCK_TASK_MANAGER_ADDRESS as `0x${string}`,
+          value.rewardPool * 10 ** 18,
+        ],
+      });
+
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
