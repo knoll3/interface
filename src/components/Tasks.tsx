@@ -129,6 +129,16 @@ export const Tasks = ({
     }
   };
 
+  const handleRedirect = () => {
+    window.location.assign('flock:');
+
+    setTimeout(function(){
+      if (confirm("You do not seem to have Flock client installed, do you want to go download it now?")) {
+        window.location.assign('https://github.com/FLock-io/client-interface/releases');
+      }
+    }, 1000);
+  };
+
   return (
     <>
       <Box
@@ -448,6 +458,9 @@ export const Tasks = ({
                 <PrimaryButton onClick={downloadJSON} label="Download Test Case Dataset"/>
                 <Box>
                   <PrimaryButton label="close" onClick={() => setShowTask(false)} />
+                </Box>
+                <Box>
+                  <a onClick={handleRedirect}>JOIN</a>
                 </Box>
               </Box>
             </Box>
