@@ -3,9 +3,10 @@ import { polygonMumbai } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { Web3Auth } from '@web3auth/modal';
 
-const { chains } = configureChains([polygonMumbai], [
-  alchemyProvider({ apiKey: 'Qsvi2mE7TTt44pEwkojqyqdRb1s0xAQV' }),
-]);
+const { chains } = configureChains(
+  [polygonMumbai],
+  [alchemyProvider({ apiKey: 'Qsvi2mE7TTt44pEwkojqyqdRb1s0xAQV' })]
+);
 
 const chainConfig = {
   chainNamespace: 'eip155',
@@ -23,7 +24,7 @@ export const web3AuthInstance = new Web3Auth({
   web3AuthNetwork: 'cyan',
   // @ts-ignore
   chainConfig,
-  authMode: 'WALLET',
+  // authMode: 'WALLET',
   uiConfig: {
     theme: 'light',
     appName: 'FLock Client',
