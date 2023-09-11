@@ -467,13 +467,17 @@ export const Tasks = ({
                   </Box>
                 </Box>
               </Box>
+              <Box justify="start" width="small">
+                <Button
+                  onClick={handleRedirect}
+                  label="Join"
+                  primary
+                />              
+              </Box>
               <Box direction="row" justify="between">
                 <PrimaryButton onClick={downloadJSON} label="Download Test Case Dataset"/>
                 <Box>
                   <PrimaryButton label="close" onClick={() => setShowTask(false)} />
-                </Box>
-                <Box>
-                  <a onClick={handleRedirect}>JOIN</a>
                 </Box>
               </Box>
             </Box>
