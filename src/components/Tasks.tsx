@@ -116,6 +116,19 @@ export const Tasks = ({
     loadTasks();
   }, [data]);
 
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const taskAddress = params.get('taskAddress');
+    if (taskAddress) {
+      const task = tasks.find((task) => task.address === taskAddress);
+      if (task) {
+        setTaskToShow(task);
+        setShowTask(true);
+      }
+    }
+  }, [tasks]);
+
   const ipfsGatewayURL = `https://gateway.ipfs.io/ipfs/${taskToShow.sampleData}`;
   
   const downloadJSON = async () => {
