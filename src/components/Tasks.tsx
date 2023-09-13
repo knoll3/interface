@@ -116,6 +116,19 @@ export const Tasks = ({
     loadTasks();
   }, [data]);
 
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const taskAddress = params.get('taskAddress');
+    if (taskAddress) {
+      const task = tasks.find((task) => task.address === taskAddress);
+      if (task) {
+        setTaskToShow(task);
+        setShowTask(true);
+      }
+    }
+  }, [tasks]);
+
   const ipfsGatewayURL = `https://gateway.ipfs.io/ipfs/${taskToShow.sampleData}`;
   
   const downloadJSON = async () => {
@@ -127,6 +140,16 @@ export const Tasks = ({
     } catch (error) {
       console.error('Error downloading JSON:', error);
     }
+  };
+
+  const handleRedirect = () => {
+    window.location.assign('flock:');
+
+    setTimeout(function(){
+      if (confirm("You do not seem to have Flock client installed, do you want to go download it now?")) {
+        window.location.assign('https://github.com/FLock-io/client-interface/releases');
+      }
+    }, 1000);
   };
 
   return (
@@ -443,6 +466,13 @@ export const Tasks = ({
                     <Text>{taskToShow.sizeMemory} MB</Text>
                   </Box>
                 </Box>
+              </Box>
+              <Box justify="start" width="small">
+                <Button
+                  onClick={handleRedirect}
+                  label="Join"
+                  primary
+                />              
               </Box>
               <Box direction="row" justify="between">
                 <PrimaryButton onClick={downloadJSON} label="Download Test Case Dataset"/>
