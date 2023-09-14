@@ -54,15 +54,14 @@ export const MarketplaceItems = ({
   const [models, setModels] = useState<ModelData[]>([] as ModelData[]);
   const [likes, setLikes] = useState<string[]>([] as string[]);
   const {
-    userEmail,
     userToken,
     publicKey,
   } = userDataHook();
 
-
+  const { address } = useAccount();
 
   const likeTask = async (modelId: string) => {
-    if (web3AuthInstance.connected) {
+    if (web3AuthInstance.connected && address) {
       try {
         const likeTaskRequest = await fetch('/api/updateModelLikes', {
           method: 'POST',
@@ -73,10 +72,14 @@ export const MarketplaceItems = ({
             modelId: modelId,
             publicKey: publicKey,
             userToken: userToken,
-            userEmail: userEmail,
+            wallet: address,
           }),
         });
         const models = await likeTaskRequest.json();
+        if (models.error) {
+          console.log(models.error);
+          return;
+        }
         setModels(models);
       } catch (e) {
         console.log(e);
@@ -86,17 +89,20 @@ export const MarketplaceItems = ({
 
   const getLikes = async () => {
     try {
-      const user = await web3AuthInstance.getUserInfo();
       const getLikesRequest = await fetch('/api/getUserLikes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userEmail: user.email,
+          wallet: address,
         }), 
       });
       const loadedLikes = await getLikesRequest.json();
+      if (loadedLikes.error) {
+        console.log(loadedLikes.error);
+        return;
+      }
       setLikes(loadedLikes);
     } catch (e) {
       console.log(e);
@@ -104,10 +110,10 @@ export const MarketplaceItems = ({
   }
 
   useEffect(() => {
-    if (web3AuthInstance.connected) {
+    if (web3AuthInstance.connected && address) {
       getLikes();
     }
-  }, [web3AuthInstance.connected, models]);
+  }, [web3AuthInstance.connected, models, address]);
 
   const loadModels = async () => {
     try {
@@ -118,6 +124,10 @@ export const MarketplaceItems = ({
         },
       });
       const loadedModels = await getModelsRequest.json();
+      if (loadedModels.error) {
+        console.log(loadedModels.error);
+        return;
+      }
       setModels(loadedModels);
     } catch (e) {
       console.log(e);
@@ -129,7 +139,7 @@ export const MarketplaceItems = ({
   }, []);
 
   const viewTask = async (modelId: string) => {
-    if (web3AuthInstance.connected) {
+    if (web3AuthInstance.connected && address) {
       try {
         const viewTaskRequest = await fetch('/api/updateModelViews', {
           method: 'POST',
@@ -140,10 +150,14 @@ export const MarketplaceItems = ({
             modelId: modelId,
             publicKey: publicKey,
             userToken: userToken,
-            userEmail: userEmail,
+            wallet: address,
           }),
         });
         const models = await viewTaskRequest.json();
+        if (models.error) {
+          console.log(models.error);
+          return;
+        }
         setModels(models);
       } catch (e) {
         console.log(e);
