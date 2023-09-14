@@ -8,10 +8,10 @@ export default async function handler(
 ) {
 
   try {
-    const { userEmail } = req.body;
+    const { wallet } = req.body;
     
     const modelLikes = await fetch(
-        `https://us-central1-flock-demo-design.cloudfunctions.net/getUserLikes?userEmail=${userEmail}`,
+        `https://us-central1-flock-demo-design.cloudfunctions.net/getUserLikes?userEmail=${wallet}`,
       {
         method: 'GET',
         headers: {
