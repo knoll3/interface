@@ -22,7 +22,7 @@ export default async function handler(
 
 
   try {
-    const { modelId, userToken, userEmail, publicKey } = req.body;
+    const { modelId, userToken, wallet, publicKey } = req.body;
     const updateLikes = await fetch(
         "https://us-central1-flock-demo-design.cloudfunctions.net/updateModelLikes",
       {
@@ -31,7 +31,7 @@ export default async function handler(
           'Content-Type': 'application/json',
           Authorization: "Bearer " + userToken, 
         },
-        body: JSON.stringify({ pubKey: publicKey, modelId: modelId, userEmail: userEmail }),
+        body: JSON.stringify({ pubKey: publicKey, modelId: modelId, wallet: wallet }),
       }
     );
     const models = await updateLikes.json();
