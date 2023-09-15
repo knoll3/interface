@@ -1,0 +1,73 @@
+// schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+}
+
+model User {
+  id        String   @id @default(cuid())
+  wallet    String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MarketplaceModel {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  type      String   @db.VarChar(255)
+  creator   String   @db.VarChar(255)
+  description String?
+  price     Float    @db.DoublePrecision 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  views     Int      @default(0)
+  likes     Int      @default(0)
+  shares    Int      @default(0)
+  link      String   @db.VarChar(255)
+}
+
+model MarketplaceModelLikes {
+  id        String   @id @default(cuid())
+  modelId   String   @db.VarChar(255)
+  userEmail String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model MarketplaceModelViews {
+  id        String   @id @default(cuid())
+  modelId   String   @db.VarChar(255)
+  userEmail String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model MarketplaceModelLikesV2 {
+  id        String   @id @default(cuid())
+  modelId   String   @db.VarChar(255)
+  wallet    String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model MarketplaceModelViewsV2 {
+  id        String   @id @default(cuid())
+  modelId   String   @db.VarChar(255)
+  wallet    String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model ClaimedRewards {
+  id        String   @id @default(cuid())
+  wallet    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
