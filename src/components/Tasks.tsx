@@ -142,15 +142,15 @@ export const Tasks = ({
     }
   };
 
-  const handleRedirect = () => {
-    window.location.assign('flock:');
-
+  const handleRedirect = async () => {
     setTimeout(function(){
-      if (confirm("You do not seem to have Flock client installed, do you want to go download it now?")) {
+      if (confirm("If you don't have Flock client installed, you can download it now by clicking OK.")) {
         window.location.assign('https://github.com/FLock-io/client-interface/releases');
       }
     }, 1000);
-  };
+
+    window.location.assign('flock://test');
+  }
 
   return (
     <>
