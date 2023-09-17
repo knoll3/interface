@@ -16,6 +16,23 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userQuest UserQuest?
+}
+
+model UserQuest {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+
+  discordId String @unique
+  discordName String
+  discordVerified Boolean
+  discordRole String
+
+  twitterIdstr String @unique
+  twitterName String
+  twitterFollowingVerification Boolean
+  twitterPostVerification Boolean
 }
 
 model MarketplaceModel {
