@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 const client = new PrismaClient();
 import { ethers } from 'ethers';
-import { FLOCK_ABI } from '../../contracts/flock';
+import { CLAIM_REWARDS_ABI } from '@/src/contracts/claimRewards';
 
 
 interface ClaimedReward {
@@ -26,35 +26,21 @@ export default async function handler(
         return;
     }
 
-    const maticToClaim = ethers.utils.parseEther('0.01');
-    const flcToClaim = ethers.utils.parseEther('100');
-
     const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_WEB3_AUTH_RPC);
 
     const wallet = new ethers.Wallet(process.env.NEXT_PRIVATE_KEY!, provider);
     
-    const flockContract = new ethers.Contract(
-        process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS!,
-        FLOCK_ABI,
+    const claimContract = new ethers.Contract(
+        process.env.NEXT_PUBLIC_CLAIM_REWARDS_ADDRESS!,
+        CLAIM_REWARDS_ABI,
         wallet
     );
 
     try {
-        const txResponse = await wallet.sendTransaction({
-            to: walletAddress,
-            value: maticToClaim,
-        });    
+        const txResponse = await claimContract.claim(walletAddress);
         await txResponse.wait();
     } catch (error) {
-        res.status(200).json({ message: 'Error claiming MATIC' });
-        return;
-    }
-
-    try {
-        const txResponse = await flockContract.mint(walletAddress, flcToClaim);    
-        await txResponse.wait();
-    } catch (error) {
-        res.status(200).json({ message: 'Error claiming FLC' });
+        res.status(200).json({ message: error });
         return;
     }
 
