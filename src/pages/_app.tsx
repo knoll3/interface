@@ -81,7 +81,9 @@ const flockTheme = {
     },
     colors: {
       brand: '#6C94EC',
-      black: '#000000'
+      black: '#000000',
+      white: '#FFFFFF',
+      disabled: '#879095',
     },
   },
   button: {
@@ -97,7 +99,7 @@ const flockTheme = {
       color: '#FFFFFF',
       background: {
         color: '#6C94EC',
-      }
+      },
     },
     secondary: {
       border: { width: '2px', radius: '30px', color: '#000000' },
