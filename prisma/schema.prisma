@@ -16,6 +16,49 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userQuestSocialData UserQuestSocialData?
+  userQuestTask UserQuestTask[]
+}
+
+model UserQuestSocialData {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+
+  discordId String @unique @default("")
+  discordName String @default("")
+  discordVerified Boolean @default(false)
+  discordRole String @default("")
+
+  twitterIdstr String @unique @default("")
+  twitterName String @default("")
+  twitterFollowingVerification Boolean @default(false)
+  twitterPostVerification Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model TabQuestTask {
+  id String @id @default(cuid())
+  taskName String @unique
+  userQuestTask UserQuestTask[]
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model UserQuestTask {
+  id String @id @default(cuid())
+  userId String @unique
+  taskId String 
+  taskStatusCompleted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  
+  task TabQuestTask @relation(fields: [taskId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model MarketplaceModel {
