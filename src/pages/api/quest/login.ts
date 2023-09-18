@@ -20,7 +20,7 @@ export default async function handler(
   try {
     let user = await prismaDB.user.findUnique({
       where: {
-        wallet: req.body.public_address,
+        wallet: req.body.user_key
       },
       select: {
         wallet: true,
@@ -32,8 +32,7 @@ export default async function handler(
     if (!user){
       user = await prismaDB.user.create({
         data: {
-          wallet: req.body.public_address,
-          email: "",
+          wallet: req.body.user_key
         },
         select: {
           wallet: true,
