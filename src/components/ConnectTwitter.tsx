@@ -1,12 +1,12 @@
 import { Button } from 'grommet';
-import ClaimStep from './ClaimStep';
+import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useState } from 'react';
 
 export default function ConnectTwitter() {
   const mounted = useIsMounted();
 
-  const [status, setStatus] = useState<String>('active');
+  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleConnectButton = () => {
     setStatus('complete');
@@ -21,7 +21,12 @@ export default function ConnectTwitter() {
   const content = {
     disabled: <></>,
     active: (
-      <Button primary label="Connect Now" onClick={handleConnectButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
+      <Button
+        primary
+        label="Connect Now"
+        onClick={handleConnectButton}
+        style={{ boxShadow: '3px 4px 0px 0px #000' }}
+      />
     ),
     complete: <Button primary label="@BrunoSouto" />,
   };

@@ -2,10 +2,12 @@ import { Box, Text } from 'grommet';
 import { Checkmark } from 'grommet-icons';
 import { ReactNode } from 'react';
 
+export type ClaimStatus = 'active' | 'disabled' | 'complete';
+
 export type ClaimStepProps = {
   step: number;
   label: string;
-  status: 'active' | 'disabled' | 'complete';
+  status: ClaimStatus;
   children?: ReactNode;
   actions?: JSX.Element | JSX.Element[];
 };
@@ -79,7 +81,9 @@ export default function ClaimStep({
       <Text weight={600} color={colors.content[status]}>
         {label}
       </Text>
-      <Box margin={{left: 'auto'}} gap="small">{children}</Box>
+      <Box margin={{ left: 'auto' }} gap="small">
+        {children}
+      </Box>
     </Box>
   );
 }
