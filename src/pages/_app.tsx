@@ -81,6 +81,7 @@ const flockTheme = {
     },
     colors: {
       brand: '#6C94EC',
+      black: '#000000'
     },
   },
   button: {
@@ -91,15 +92,15 @@ const flockTheme = {
     color: '#FFFFFF',
     border: { width: '2px', radius: '8px', color: '#000000' },
     primary: {
-      border: { width: '2px', radius: '8px', color: '#000000' },
+      border: { width: '2px', radius: '30px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#FFFFFF',
       background: {
         color: '#6C94EC',
-      },
+      }
     },
     secondary: {
-      border: { width: '2px', radius: '8px', color: '#000000' },
+      border: { width: '2px', radius: '30px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#000000',
       background: {
