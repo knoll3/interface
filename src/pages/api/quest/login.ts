@@ -5,7 +5,7 @@ import { PrismaClient, User } from '@prisma/client'
 
 type Response = {
   data: {
-    user: any | null
+    message: string
   }
 };
 
@@ -17,63 +17,34 @@ export default async function handler(
   const prismaDB = new PrismaClient()
   await prismaDB.$connect()
 
-  const getUser = await prismaDB.user.findUnique({
-    where: {
-      wallet: req.body.public_address,
-    },
-    select: {
-      wallet: true,
-      email: true,
-      userQuest: {
-        select: {
-          discordName: true,
-          discordVerified: true,
-
-          twitterIdstr: true,
-          twitterName : true,
-          twitterFollowingVerification: true,
-          twitterPostVerification : true
-        }
-      }
-    },
-  })
-
-  if (!getUser){
-    const createUser = await prismaDB.user.create({
-      data: {
+  try {
+    let user = await prismaDB.user.findUnique({
+      where: {
         wallet: req.body.public_address,
-        email: "",
-        userQuest: {
-          create: {
-            discordId:"",
-            discordName: "",
-            discordVerified: false,
-            discordRole: "",
-            twitterIdstr : "",
-            twitterName : "",
-            twitterFollowingVerification: false,
-            twitterPostVerification : false
-          }
-        }
       },
       select: {
         wallet: true,
-        email: true,
-        userQuest: {
-          select: {
-            discordName: true,
-            discordVerified: true,
-  
-            twitterIdstr: true,
-            twitterName : true,
-            twitterFollowingVerification: true,
-            twitterPostVerification : true
-          }
-        }
-      },
+        userQuestTask: true
+      }
     })
-    res.status(200).json({data: {user: createUser}})
-  } else {
-    res.status(200).json({data: {user: getUser}})
+    console.log(user)
+
+    if (!user){
+      user = await prismaDB.user.create({
+        data: {
+          wallet: req.body.public_address,
+          email: "",
+        },
+        select: {
+          wallet: true,
+          userQuestTask: true
+        }
+      })
+      console.log(user)
+    }
+    res.status(200).json({data: {message: "OK"}})
+  } catch (error){
+    console.log(error)
+    res.status(500).json({data: {message: "Internal Server Error"}})
   }
 }
