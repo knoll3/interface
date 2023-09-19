@@ -2,7 +2,7 @@ import { useIsMounted } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
 import { web3AuthInstance } from '@/src/hooks/web3AuthInstance';
-import ClaimStep from './ClaimStep';
+import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useState } from 'react';
 
 export default function ConnectWallet() {
@@ -11,7 +11,7 @@ export default function ConnectWallet() {
   const mounted = useIsMounted();
 
   const [token, setToken] = useState('');
-  const [status, setStatus] = useState("active");
+  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleConnectButton = async () => {
     const connection = await connectAsync({
@@ -20,7 +20,7 @@ export default function ConnectWallet() {
     const { idToken } = await web3AuthInstance.authenticateUser();
     if (idToken) {
       setToken(idToken);
-      setStatus("complete")
+      setStatus('complete');
     }
 
     const params = {
@@ -29,7 +29,7 @@ export default function ConnectWallet() {
       timestamp: Date.now(),
       signature: idToken,
     };
-    
+
     // send to api
     console.log({ connection, params });
   };
@@ -41,7 +41,12 @@ export default function ConnectWallet() {
   return (
     <ClaimStep label="Get your Wallet Ready" status={status} step={1}>
       {!token && (
-        <Button primary label="Connect Now" onClick={handleConnectButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
+        <Button
+          primary
+          label="Connect Now"
+          onClick={handleConnectButton}
+          style={{ boxShadow: '3px 4px 0px 0px #000' }}
+        />
       )}
     </ClaimStep>
   );

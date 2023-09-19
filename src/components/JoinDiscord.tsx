@@ -1,12 +1,12 @@
 import { Box, Button } from 'grommet';
-import ClaimStep from './ClaimStep';
+import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useState } from 'react';
 
 export default function JoinDiscord() {
   const mounted = useIsMounted();
 
-  const [status, setStatus] = useState<String>('active');
+  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleJoinButton = () => {
     // open invite modal
@@ -28,8 +28,18 @@ export default function JoinDiscord() {
     >
       {status !== 'complete' && (
         <Box direction="row" gap="xsmall">
-          <Button primary label="Join Now" onClick={handleJoinButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
-          <Button secondary label="Verify" onClick={handleVerifyButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
+          <Button
+            primary
+            label="Join Now"
+            onClick={handleJoinButton}
+            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+          />
+          <Button
+            secondary
+            label="Verify"
+            onClick={handleVerifyButton}
+            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+          />
         </Box>
       )}
     </ClaimStep>

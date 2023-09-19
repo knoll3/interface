@@ -1,12 +1,12 @@
 import { Box, Button } from 'grommet';
-import ClaimStep from './ClaimStep';
+import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useState } from 'react';
 
 export default function BroadcastTwitter() {
   const mounted = useIsMounted();
 
-  const [status, setStatus] = useState<String>('active');
+  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleBroadcastButton = () => {
     // open invite modal
@@ -28,8 +28,18 @@ export default function BroadcastTwitter() {
     >
       {status !== 'complete' && (
         <Box direction="row" gap="xsmall">
-          <Button primary label="Broadcast Now" onClick={handleBroadcastButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
-          <Button secondary label="Verify" onClick={handleVerifyButton} style={{boxShadow: '3px 4px 0px 0px #000'}} />
+          <Button
+            primary
+            label="Broadcast Now"
+            onClick={handleBroadcastButton}
+            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+          />
+          <Button
+            secondary
+            label="Verify"
+            onClick={handleVerifyButton}
+            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+          />
         </Box>
       )}
     </ClaimStep>
