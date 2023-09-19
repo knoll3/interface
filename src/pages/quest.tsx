@@ -7,6 +7,7 @@ import ConnectTwitter from '../components/ConnectTwitter';
 import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
 import styled from 'styled-components';
+import { useState } from 'react';
 
 const Divider = styled.span`
   border-left: 2px solid #6c94ec;
@@ -16,6 +17,22 @@ const Divider = styled.span`
 `;
 
 export default function QuestPage() {
+  const [activeStep, setActiveStep] = useState(1);
+
+  const stepStatus = (step: number) => {
+    if (step === activeStep) {
+      return 'active';
+    }
+    if (step < activeStep) {
+      return 'complete';
+    }
+    return 'disabled';
+  };
+
+  const onNext = () => {
+    setActiveStep(activeStep + 1);
+  };
+
   return (
     <Layout>
       <Box
@@ -37,17 +54,17 @@ export default function QuestPage() {
             Complete the tasks to claim $FLC
           </Text>
           <Box gap="xsmall">
-            <ConnectWallet />
+            <ConnectWallet step={1} status={stepStatus(1)} nextStep={onNext} />
             <Divider />
-            <ConnectDiscord />
+            <ConnectDiscord step={2} status={stepStatus(2)} nextStep={onNext} />
             <Divider />
-            <JoinDiscord />
+            <JoinDiscord step={3} status={stepStatus(3)} nextStep={onNext}  />
             <Divider />
-            <ConnectTwitter />
+            <ConnectTwitter step={4} status={stepStatus(4)} nextStep={onNext}  />
             <Divider />
-            <FollowTwitter />
+            <FollowTwitter step={5} status={stepStatus(5)} nextStep={onNext}  />
             <Divider />
-            <BroadcastTwitter />
+            <BroadcastTwitter step={6} status={stepStatus(6)} nextStep={onNext}  />
           </Box>
         </Box>
       </Box>

@@ -1,15 +1,12 @@
 import { Button } from 'grommet';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
-import { useState } from 'react';
 
-export default function ConnectTwitter() {
+export default function ConnectTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
 
-  const [status, setStatus] = useState<ClaimStatus>('active');
-
   const handleConnectButton = () => {
-    setStatus('complete');
+    nextStep()
 
     // connect twitter
   };
@@ -32,7 +29,7 @@ export default function ConnectTwitter() {
   };
 
   return (
-    <ClaimStep label="Connect your Twitter account" step={4} status={status}>
+    <ClaimStep label="Connect your Twitter account" step={step} status={status}>
       {content[status]}
     </ClaimStep>
   );

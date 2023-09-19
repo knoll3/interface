@@ -1,20 +1,40 @@
 import { Button } from 'grommet';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
-import { useIsMounted } from '../hooks';
-import { useState } from 'react';
+import { useIsMounted, userDataHook } from '../hooks';
+import { useEffect } from 'react';
+import { useAccount } from 'wagmi';
 
-export default function ConnectDiscord() {
+export default function ConnectDiscord({ step, status, nextStep }: any) {
+  const { address } = useAccount();
   const mounted = useIsMounted();
-
-  const [status, setStatus] = useState<ClaimStatus>('active');
+  const { publicKey } = userDataHook();
 
   const handleConnectButton = () => {
-    setStatus('complete');
-    window.open(
-      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http://localhost:3000/api/quest/discord-callback&response_type=code&scope=identify',
-      '_blank'
-    );
+    document.location.href =
+      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http%3A%2F%2Flocalhost:3000%2Foauth%2Fdiscord&response_type=code&scope=identify%20guilds%20guilds.members.read';
   };
+
+  const checkDiscordAuth = async (code: string) => {
+    const response = await fetch('/api/quest/oauth/discord', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${publicKey}`,
+      },
+      body: JSON.stringify({ code, wallet: address }),
+    });
+
+    // TODO - check response success to complete task
+    console.log({ response });
+    nextStep()
+  };
+
+  useEffect(() => {
+    const discordCode = localStorage.getItem('discordCode');
+    if (discordCode) {
+      checkDiscordAuth(discordCode);
+    }
+  }, []);
 
   if (!mounted) {
     return <></>;
@@ -34,7 +54,7 @@ export default function ConnectDiscord() {
   };
 
   return (
-    <ClaimStep label="Connect your Discord account" step={2} status={status}>
+    <ClaimStep label="Connect your Discord account" step={step} status={status}>
       {content[status]}
     </ClaimStep>
   );
