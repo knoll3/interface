@@ -9,11 +9,11 @@ import BroadcastTwitter from '../components/BroadcastTwitter';
 import styled from 'styled-components';
 
 const Divider = styled.span`
-  border-left: 2px solid #6C94EC;
+  border-left: 2px solid #6c94ec;
   width: 1px;
   height: 20px;
   margin-left: 26px;
-`
+`;
 
 export default function QuestPage() {
   return (
@@ -28,8 +28,7 @@ export default function QuestPage() {
         <Box gap="large">
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
-            <Button secondary size="large" label="Step 1: Claim $MATIC" />
-            <Button secondary size="large" label="Step2: Claim $FLC" />
+            <Button secondary size="large" label="Claim $MATIC & $FLC" />
           </Box>
         </Box>
 
