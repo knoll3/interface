@@ -1,7 +1,7 @@
 import { useIsMounted, userDataHook, web3AuthInstance } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
+import ClaimStep from './ClaimStep';
 import { useEffect } from 'react';
 
 export default function ConnectWallet({ step, status, nextStep }: any) {
@@ -19,16 +19,16 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
   };
 
   const fetchLogin = async () => {
-    const token = await web3AuthInstance.authenticateUser()
-    console.log(token)
-
     const response = await fetch('/api/quest/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token.idToken}`,
+        Authorization: `Bearer ${userToken}`,
       },
-      body: JSON.stringify({ auth_key: publicKey, wallet: (address as string).toLocaleLowerCase() }),
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string).toLocaleLowerCase(),
+      }),
     });
     if (response.status === 200) {
       nextStep();
