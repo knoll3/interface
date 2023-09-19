@@ -19,16 +19,16 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
   };
 
   const fetchLogin = async () => {
+    const token = await web3AuthInstance.authenticateUser()
+    console.log(token)
+
     const response = await fetch('/api/quest/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${userToken}`,
+        Authorization: `Bearer ${token.idToken}`,
       },
-      body: JSON.stringify({
-        wallet: address,
-        auth_key: userToken,
-      }),
+      body: JSON.stringify({ auth_key: publicKey, wallet: (address as string).toLocaleLowerCase() }),
     });
     if (response.status === 200) {
       nextStep();
