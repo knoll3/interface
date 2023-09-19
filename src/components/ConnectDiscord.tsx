@@ -11,7 +11,7 @@ export default function ConnectDiscord() {
   const handleConnectButton = () => {
     setStatus('complete');
     window.open(
-      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http://localhost:3000/api/quest/discord-callback&response_type=code&scope=identify',
+      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fquest%2Foauth%2Fdiscord-callback&response_type=code&scope=identify%20guilds%20guilds.join',
       '_blank'
     );
   };

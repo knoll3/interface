@@ -1,4 +1,4 @@
-import { useIsMounted, userDataHook } from '@/src/hooks';
+import { useIsMounted, userDataHook, web3AuthInstance } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
@@ -17,13 +17,16 @@ export default function ConnectWallet() {
   };
 
   const fetchLogin = async () => {
-    const response = await fetch('/api/login', {
+    const token = await web3AuthInstance.authenticateUser()
+    console.log(token)
+
+    const response = await fetch('/api/quest/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${publicKey}`,
+        Authorization: `Bearer ${token.idToken}`,
       },
-      body: JSON.stringify({ wallet: address }),
+      body: JSON.stringify({ auth_key: publicKey, wallet: (address as string).toLocaleLowerCase() }),
     });
     if (response.status === 200) {
       setStatus('complete');
