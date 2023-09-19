@@ -1,38 +1,43 @@
-import { useIsMounted } from '@/src/hooks';
+import { useIsMounted, userDataHook } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
-import { web3AuthInstance } from '@/src/hooks/web3AuthInstance';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ConnectWallet() {
   const { address, isConnected } = useAccount();
   const { connectAsync, connectors } = useConnect();
+  const { publicKey } = userDataHook();
   const mounted = useIsMounted();
 
-  const [token, setToken] = useState('');
   const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleConnectButton = async () => {
-    const connection = await connectAsync({
-      connector: connectors[0],
-    });
-    const { idToken } = await web3AuthInstance.authenticateUser();
-    if (idToken) {
-      setToken(idToken);
-      setStatus('complete');
-    }
-
-    const params = {
-      wallet_address: connection.account,
-      chain_id: connection.chain.id,
-      timestamp: Date.now(),
-      signature: idToken,
-    };
-
-    // send to api
-    console.log({ connection, params });
+    await connectAsync({ connector: connectors[0] });
   };
+
+  const fetchLogin = async () => {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${publicKey}`,
+      },
+      body: JSON.stringify({ wallet: address }),
+    });
+    if (response.status === 200) {
+      setStatus('complete');
+    } else {
+      // TODO - show error toaster
+      console.log({ response });
+    }
+  };
+
+  useEffect(() => {
+    if (address && publicKey) {
+      fetchLogin();
+    }
+  }, [address, publicKey]);
 
   if (!mounted) {
     return <></>;
@@ -40,7 +45,7 @@ export default function ConnectWallet() {
 
   return (
     <ClaimStep label="Get your Wallet Ready" status={status} step={1}>
-      {!token && (
+      {status !== 'complete' && (
         <Button
           primary
           label="Connect Now"
