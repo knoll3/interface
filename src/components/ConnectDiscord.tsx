@@ -1,13 +1,15 @@
 import { Button } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted, userDataHook } from '../hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 export default function ConnectDiscord({ step, status, nextStep }: any) {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const { publicKey, userToken } = userDataHook();
+
+  const [discordCode, setDiscordCode] = useState<string>("")
 
   const handleConnectButton = () => {
     const params =
@@ -19,6 +21,7 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   };
 
   const checkDiscordAuth = async (code: string) => {
+    console.log({ publicKey, address, userToken, code });
     const response = await fetch('/api/quest/oauth/discord', {
       method: 'POST',
       headers: {
@@ -39,16 +42,22 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
 
   useEffect(() => {
     const popupResponse = (event: any) => {
-      const discordCode = event?.data?.code;
-      if (discordCode) {
+      const code = event?.data?.code;
+      if (code) {
         window.removeEventListener('message', popupResponse);
-        checkDiscordAuth(discordCode);
+        setDiscordCode(code);
       }
     };
 
     window.addEventListener('message', popupResponse);
     return () => window.removeEventListener('message', popupResponse);
   }, []);
+
+  useEffect(() => {
+    if(discordCode && publicKey && userToken && address) {
+      checkDiscordAuth(discordCode)
+    }
+  }, [discordCode, publicKey, userToken, address])
 
   if (!mounted) {
     return <></>;
