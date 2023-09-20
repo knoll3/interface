@@ -9,7 +9,7 @@ export const userDataHook = () => {
   const { address } = useAccount();
 
   const loadUserData = async () => {
-    if (web3AuthInstance.connectedAdapterName == 'OPENLOGIN') {
+    if (web3AuthInstance.connectedAdapterName === 'openlogin') {
       const user = await web3AuthInstance.getUserInfo();
       const privateKey = (await web3AuthInstance.provider?.request({
         method: 'eth_private_key',
