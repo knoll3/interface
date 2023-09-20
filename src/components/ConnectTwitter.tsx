@@ -6,7 +6,7 @@ export default function ConnectTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
 
   const handleConnectButton = () => {
-    nextStep()
+    nextStep();
 
     // connect twitter
   };
@@ -15,7 +15,7 @@ export default function ConnectTwitter({ step, status, nextStep }: any) {
     return <></>;
   }
 
-  const content = {
+  const content: any = {
     disabled: <></>,
     active: (
       <Button
