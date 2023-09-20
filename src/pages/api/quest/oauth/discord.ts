@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import querystring from 'querystring';
-import { Code } from 'grommet-icons';
 
 type Response = {};
 
@@ -48,6 +47,19 @@ async function getDiscordUserInfo(code: string, redirectUri: string) {
   return userInfo;
 }
 
+async function prismaGetUserDiscordData(
+  prismaDB: PrismaClient,
+  userId: string
+) {
+  const userDiscordData = await prismaDB.userDiscordData.findUnique({
+    where: {
+      userId: userId,
+    },
+  });
+
+  return userDiscordData;
+}
+
 async function prismaInsertUserDiscordData(
   prismaDB: PrismaClient,
   userId: string,
@@ -55,14 +67,14 @@ async function prismaInsertUserDiscordData(
   discordUserName: string
 ) {
   try {
-    const _ = await prismaDB.userDiscordData.create({
+    const userDiscordData = await prismaDB.userDiscordData.create({
       data: {
         userId: userId,
         discordId: discordId,
         discordName: discordUserName,
       },
     });
-    return { error: false, status: 201, message: 'OK' };
+    return { error: false, status: 201, message: 'OK', data: userDiscordData };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code == 'P2002') {
@@ -93,6 +105,15 @@ export default async function handler(
   });
 
   if (getUser) {
+    const userDiscordData = await prismaGetUserDiscordData(
+      prismaDB,
+      getUser.id
+    );
+
+    if (userDiscordData) {
+      return res.status(201).json({ data: userDiscordData });
+    }
+
     const resp = await getDiscordUserInfo(discord_code as string, redirectUri);
     if (resp.error) {
       return res.status(404).json({ data: { message: 'Not Found' } });
@@ -104,9 +125,7 @@ export default async function handler(
       resp.id,
       resp.username
     );
-    return res
-      .status(result.status)
-      .json({ data: { message: result.message } });
+    return res.status(result.status).json({ data: result.data });
   }
 
   return res.status(404).json({ data: { message: 'Not Found' } });
