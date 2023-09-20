@@ -11,7 +11,7 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
   const { publicKey, userToken } = userDataHook();
   const mounted = useIsMounted();
   const { setQuestInfo, getQuestInfo } = useQuest();
-  const {activeStep} = getQuestInfo()
+  const { activeStep } = getQuestInfo();
 
   const handleConnectButton = async () => {
     if (!address) {

@@ -45,7 +45,6 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   };
 
   useEffect(() => {
-    nextStep();
     const popupResponse = (event: any) => {
       const code = event?.data?.code;
       if (code) {
