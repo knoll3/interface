@@ -29,6 +29,8 @@ export const userDataHook = () => {
         setUserToken(idToken);
         setPublicKey(address!.toLocaleLowerCase());
       } catch (error) {
+        setUserToken('');
+        setPublicKey('');
         console.log('error', error);
       }
     }

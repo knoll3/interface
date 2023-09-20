@@ -6,17 +6,11 @@ import JoinDiscord from '../components/JoinDiscord';
 import ConnectTwitter from '../components/ConnectTwitter';
 import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
-import { useEffect, useState } from 'react';
-import useQuest from '../hooks/useQuest';
+import { useState } from 'react';
 import QuestDivider from '../components/QuestDivider';
 
 export default function QuestPage() {
-  const { setQuestInfo, getQuestInfo } = useQuest();
-  const [activeStep, setActiveStep] = useState(getQuestInfo().activeStep || 1);
-
-  useEffect(() => {
-    setQuestInfo({ activeStep });
-  }, []);
+  const [activeStep, setActiveStep] = useState(1);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -31,7 +25,6 @@ export default function QuestPage() {
   const onNext = () => {
     const nextStep = activeStep + 1;
     setActiveStep(nextStep);
-    setQuestInfo({ activeStep: nextStep });
   };
 
   return (

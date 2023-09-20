@@ -1,4 +1,7 @@
+import { useAccount } from 'wagmi';
+
 export default function useQuest() {
+  const { address } = useAccount();
   const isWindowLoaded = () => typeof window !== 'undefined';
 
   const getLocalStorageJSON = (key: string) => {
@@ -16,7 +19,7 @@ export default function useQuest() {
     }
   };
 
-  const getQuestInfo = () => getLocalStorageJSON('questInfo')
+  const getQuestInfo = () => getLocalStorageJSON('questInfo');
 
   return { setQuestInfo, getQuestInfo };
 }

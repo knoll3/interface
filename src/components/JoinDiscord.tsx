@@ -1,5 +1,5 @@
 import { Box, Button } from 'grommet';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
+import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 
@@ -10,11 +10,7 @@ export default function JoinDiscord({ step, status, nextStep }: any) {
     // open invite modal
   };
 
-  const handleVerifyButton = () => {
-    setTimeout(() => {
-      nextStep();
-    }, 3000);
-  };
+  const handleVerifyButton = () => {};
 
   if (!mounted) {
     return <></>;

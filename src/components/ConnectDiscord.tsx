@@ -10,6 +10,7 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   const { publicKey, userToken } = userDataHook();
 
   const [discordCode, setDiscordCode] = useState<string>('');
+  const [discordUser, setDiscordUser] = useState<any>('');
 
   const handleConnectButton = () => {
     const params =
@@ -20,7 +21,6 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   };
 
   const checkDiscordAuth = async (code: string) => {
-    console.log({ publicKey, address, userToken, code });
     const response = await fetch('/api/quest/oauth/discord', {
       method: 'POST',
       headers: {
@@ -36,10 +36,13 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
     });
 
     if (response.status === 201) {
+      const {
+        data: { discordName },
+      } = await response.json();
+
+      setDiscordUser(discordName);
       nextStep();
     } else {
-      nextStep();
-      // TODO - show error toaster
       console.log({ response });
     }
   };
@@ -58,10 +61,10 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   }, []);
 
   useEffect(() => {
-    if (discordCode && publicKey && userToken && address) {
+    if (publicKey && userToken && address && status === 'active') {
       checkDiscordAuth(discordCode);
     }
-  }, [discordCode, publicKey, userToken, address]);
+  }, [discordCode, publicKey, userToken, address, status]);
 
   if (!mounted) {
     return <></>;
@@ -77,7 +80,7 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
         style={{ boxShadow: '3px 4px 0px 0px #000' }}
       />
     ),
-    complete: <Button primary label="BrunoSouto" />,
+    complete: <Button primary label={discordUser} />,
   };
 
   return (
