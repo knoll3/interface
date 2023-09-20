@@ -9,15 +9,14 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
   const { publicKey, userToken } = userDataHook();
 
-  const [discordCode, setDiscordCode] = useState<string>("")
+  const [discordCode, setDiscordCode] = useState<string>('');
 
   const handleConnectButton = () => {
     const params =
       'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
-    const url =
-      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth%2Fdiscord&response_type=code&scope=identify%20guilds%20guilds.join';
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/discord&response_type=code&scope=identify%20guilds%20guilds.join`;
     const popup = window.open(url, 'Discord Auth', params);
-    popup?.postMessage('message', 'https://localhost:3000/quest');
+    popup?.postMessage('message', window.location.href);
   };
 
   const checkDiscordAuth = async (code: string) => {
@@ -32,6 +31,7 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
         auth_key: publicKey,
         wallet: (address as string)?.toLocaleLowerCase(),
         code,
+        redirectUri: `${window.location.origin}/oauth/discord`,
       }),
     });
 
@@ -54,16 +54,16 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
   }, []);
 
   useEffect(() => {
-    if(discordCode && publicKey && userToken && address) {
-      checkDiscordAuth(discordCode)
+    if (discordCode && publicKey && userToken && address) {
+      checkDiscordAuth(discordCode);
     }
-  }, [discordCode, publicKey, userToken, address])
+  }, [discordCode, publicKey, userToken, address]);
 
   if (!mounted) {
     return <></>;
   }
 
-  const content = {
+  const content: any = {
     disabled: <></>,
     active: (
       <Button
