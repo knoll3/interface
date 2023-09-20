@@ -35,9 +35,12 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
       }),
     });
 
-    // TODO - check response success to complete task
-    console.log({ response });
-    // nextStep();
+    if (response.status === 201) {
+      nextStep();
+    } else {
+      // TODO - show error toaster
+      console.log({ response });
+    }
   };
 
   useEffect(() => {
