@@ -5,13 +5,13 @@ import ClaimStep from './ClaimStep';
 import { useEffect } from 'react';
 
 export default function ConnectWallet({ step, status, nextStep }: any) {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { connectAsync, connectors } = useConnect();
   const { publicKey, userToken } = userDataHook();
   const mounted = useIsMounted();
 
   const handleConnectButton = async () => {
-    if (!isConnected) {
+    if (!address) {
       await connectAsync({ connector: connectors[0] });
     } else {
       fetchLogin();
