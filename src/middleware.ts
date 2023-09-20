@@ -54,7 +54,7 @@ async function verifyByWalletAddress(req: NextRequest, wallet_Address: any) {
 // This function can be marked `async` if using `await` inside
 export async function middleware(req: NextRequest) {
   // passed from the frontend in the request body
-  const auth_key = (await req.json())['auth_key'];
+  const auth_key = (await req.json())['auth_key'].toLocaleLowerCase();
 
   const isVerifiedPublicKey = await verifyByPublicKey(req, auth_key);
   const isVerifiedWalletAddress = await verifyByWalletAddress(req, auth_key);

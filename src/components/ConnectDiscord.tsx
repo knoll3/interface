@@ -1,26 +1,69 @@
 import { Button } from 'grommet';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
-import { useIsMounted } from '../hooks';
-import { useState } from 'react';
+import ClaimStep from './ClaimStep';
+import { useIsMounted, userDataHook } from '../hooks';
+import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 
-export default function ConnectDiscord() {
+export default function ConnectDiscord({ step, status, nextStep }: any) {
+  const { address } = useAccount();
   const mounted = useIsMounted();
+  const { publicKey, userToken } = userDataHook();
 
-  const [status, setStatus] = useState<ClaimStatus>('active');
+  const [discordCode, setDiscordCode] = useState<string>('');
 
   const handleConnectButton = () => {
-    setStatus('complete');
-    window.open(
-      'https://discord.com/api/oauth2/authorize?client_id=1153110663946842162&redirect_uri=http://localhost:3000/api/quest/discord-callback&response_type=code&scope=identify',
-      '_blank'
-    );
+    const params =
+      'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/discord&response_type=code&scope=identify%20guilds%20guilds.join`;
+    const popup = window.open(url, 'Discord Auth', params);
+    popup?.postMessage('message', window.location.href);
   };
+
+  const checkDiscordAuth = async (code: string) => {
+    console.log({ publicKey, address, userToken, code });
+    const response = await fetch('/api/quest/oauth/discord', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        code,
+        redirectUri: `${window.location.origin}/oauth/discord`,
+      }),
+    });
+
+    // TODO - check response success to complete task
+    console.log({ response });
+    // nextStep();
+  };
+
+  useEffect(() => {
+    const popupResponse = (event: any) => {
+      const code = event?.data?.code;
+      if (code) {
+        window.removeEventListener('message', popupResponse);
+        setDiscordCode(code);
+      }
+    };
+
+    window.addEventListener('message', popupResponse);
+    return () => window.removeEventListener('message', popupResponse);
+  }, []);
+
+  useEffect(() => {
+    if (discordCode && publicKey && userToken && address) {
+      checkDiscordAuth(discordCode);
+    }
+  }, [discordCode, publicKey, userToken, address]);
 
   if (!mounted) {
     return <></>;
   }
 
-  const content = {
+  const content: any = {
     disabled: <></>,
     active: (
       <Button
@@ -34,7 +77,7 @@ export default function ConnectDiscord() {
   };
 
   return (
-    <ClaimStep label="Connect your Discord account" step={2} status={status}>
+    <ClaimStep label="Connect your Discord account" step={step} status={status}>
       {content[status]}
     </ClaimStep>
   );

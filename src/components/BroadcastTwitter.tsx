@@ -1,19 +1,17 @@
 import { Box, Button } from 'grommet';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
-import { useState } from 'react';
 
-export default function BroadcastTwitter() {
+export default function BroadcastTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
-
-  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleBroadcastButton = () => {
     // open invite modal
   };
 
   const handleVerifyButton = () => {
-    setStatus('complete');
+    nextStep();
+    // setStatus('complete');
   };
 
   if (!mounted) {
@@ -23,10 +21,10 @@ export default function BroadcastTwitter() {
   return (
     <ClaimStep
       label="Broadcast your Journey to your mate"
-      step={6}
+      step={step}
       status={status}
     >
-      {status !== 'complete' && (
+      {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <Button
             primary

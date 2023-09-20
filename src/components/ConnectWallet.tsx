@@ -1,32 +1,37 @@
-import { useIsMounted, userDataHook } from '@/src/hooks';
+import { useIsMounted, userDataHook, web3AuthInstance } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
-import { useEffect, useState } from 'react';
+import ClaimStep from './ClaimStep';
+import { useEffect } from 'react';
 
-export default function ConnectWallet() {
+export default function ConnectWallet({ step, status, nextStep }: any) {
   const { address, isConnected } = useAccount();
   const { connectAsync, connectors } = useConnect();
-  const { publicKey } = userDataHook();
+  const { publicKey, userToken } = userDataHook();
   const mounted = useIsMounted();
 
-  const [status, setStatus] = useState<ClaimStatus>('active');
-
   const handleConnectButton = async () => {
-    await connectAsync({ connector: connectors[0] });
+    if (!isConnected) {
+      await connectAsync({ connector: connectors[0] });
+    } else {
+      fetchLogin();
+    }
   };
 
   const fetchLogin = async () => {
-    const response = await fetch('/api/login', {
+    const response = await fetch('/api/quest/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${publicKey}`,
+        Authorization: `Bearer ${userToken}`,
       },
-      body: JSON.stringify({ wallet: address }),
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string).toLocaleLowerCase(),
+      }),
     });
     if (response.status === 200) {
-      setStatus('complete');
+      nextStep();
     } else {
       // TODO - show error toaster
       console.log({ response });
@@ -44,7 +49,7 @@ export default function ConnectWallet() {
   }
 
   return (
-    <ClaimStep label="Get your Wallet Ready" status={status} step={1}>
+    <ClaimStep label="Get your Wallet Ready" status={status} step={step}>
       {status !== 'complete' && (
         <Button
           primary

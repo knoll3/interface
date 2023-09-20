@@ -16,24 +16,34 @@ model User {
   email     String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userQuestSocialData UserQuestSocialData?
   userQuestTask UserQuestTask[]
+  userDiscordData UserDiscordData?
+  userTwitterData UserTwitterData?
 }
 
-model UserQuestSocialData {
+model UserDiscordData{
   id String @id @default(cuid())
   userId String @unique
   user User @relation(fields: [userId], references: [id])
 
   discordId String @unique @default("")
   discordName String @default("")
-  discordVerified Boolean @default(false)
   discordRole String @default("")
+  discordVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model UserTwitterData{
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
 
   twitterIdstr String @unique @default("")
   twitterName String @default("")
-  twitterFollowingVerification Boolean @default(false)
-  twitterPostVerification Boolean @default(false)
+  twitterFollowingVerified Boolean @default(false)
+  twitterPostVerified Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()

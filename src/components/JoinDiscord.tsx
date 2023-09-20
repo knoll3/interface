@@ -1,19 +1,16 @@
 import { Box, Button } from 'grommet';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
-import { useState } from 'react';
 
-export default function JoinDiscord() {
+export default function JoinDiscord({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
-
-  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleJoinButton = () => {
     // open invite modal
   };
 
   const handleVerifyButton = () => {
-    setStatus('complete');
+    nextStep()
   };
 
   if (!mounted) {
@@ -23,10 +20,10 @@ export default function JoinDiscord() {
   return (
     <ClaimStep
       label="Join our Discord and acquire a role"
-      step={3}
+      step={step}
       status={status}
     >
-      {status !== 'complete' && (
+      {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <Button
             primary

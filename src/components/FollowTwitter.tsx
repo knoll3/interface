@@ -1,19 +1,16 @@
 import { Box, Button } from 'grommet';
 import ClaimStep, { ClaimStatus } from './ClaimStep';
 import { useIsMounted } from '../hooks';
-import { useState } from 'react';
 
-export default function FollowTwitter() {
+export default function FollowTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
-
-  const [status, setStatus] = useState<ClaimStatus>('active');
 
   const handleFollowButton = () => {
     // open invite modal
   };
 
   const handleVerifyButton = () => {
-    setStatus('complete');
+    nextStep()
   };
 
   if (!mounted) {
@@ -21,8 +18,8 @@ export default function FollowTwitter() {
   }
 
   return (
-    <ClaimStep label="Follow @flock_io on Twitter" step={5} status={status}>
-      {status !== 'complete' && (
+    <ClaimStep label="Follow @flock_io on Twitter" step={step} status={status}>
+      {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <Button
             primary
