@@ -7,7 +7,7 @@ export default function DiscordOAuthCallback() {
 
     window.opener.postMessage(
       { code: discordCode },
-      'http://localhost:3000/quest'
+      `${window.location.origin}/quest`
     );
     window.close();
   }, []);
