@@ -1,6 +1,7 @@
 import { Box, Button } from 'grommet';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
+import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
+import TimerButton from './TimerButton';
 
 export default function FollowTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
@@ -10,7 +11,7 @@ export default function FollowTwitter({ step, status, nextStep }: any) {
   };
 
   const handleVerifyButton = () => {
-    nextStep()
+    nextStep();
   };
 
   if (!mounted) {
@@ -27,12 +28,7 @@ export default function FollowTwitter({ step, status, nextStep }: any) {
             onClick={handleFollowButton}
             style={{ boxShadow: '3px 4px 0px 0px #000' }}
           />
-          <Button
-            secondary
-            label="Verify"
-            onClick={handleVerifyButton}
-            style={{ boxShadow: '3px 4px 0px 0px #000' }}
-          />
+          <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
       )}
     </ClaimStep>
