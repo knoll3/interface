@@ -3,12 +3,15 @@ import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
 import ClaimStep from './ClaimStep';
 import { useEffect } from 'react';
+import useQuest from '../hooks/useQuest';
 
 export default function ConnectWallet({ step, status, nextStep }: any) {
   const { address } = useAccount();
   const { connectAsync, connectors } = useConnect();
   const { publicKey, userToken } = userDataHook();
   const mounted = useIsMounted();
+  const { setQuestInfo, getQuestInfo } = useQuest();
+  const {activeStep} = getQuestInfo()
 
   const handleConnectButton = async () => {
     if (!address) {
@@ -19,18 +22,20 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
   };
 
   const fetchLogin = async () => {
+    const payload = {
+      auth_key: publicKey,
+      wallet: (address as string).toLocaleLowerCase(),
+    };
     const response = await fetch('/api/quest/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${userToken}`,
       },
-      body: JSON.stringify({
-        auth_key: publicKey,
-        wallet: (address as string).toLocaleLowerCase(),
-      }),
+      body: JSON.stringify(payload),
     });
     if (response.status === 200) {
+      setQuestInfo({ userToken, ...payload });
       nextStep();
     } else {
       // TODO - show error toaster
@@ -39,7 +44,7 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
   };
 
   useEffect(() => {
-    if (address && publicKey) {
+    if (address && publicKey && activeStep === step) {
       fetchLogin();
     }
   }, [address, publicKey]);
