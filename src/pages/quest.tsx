@@ -8,6 +8,7 @@ import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
 import { useState } from 'react';
 import QuestDivider from '../components/QuestDivider';
+import Toaster from '../components/Toaster';
 
 export default function QuestPage() {
   const [activeStep, setActiveStep] = useState(1);
@@ -34,8 +35,9 @@ export default function QuestPage() {
         align="center"
         justify="evenly"
         pad={{ vertical: 'large', horizontal: 'xlarge' }}
-        background="#FFFFFF"
+        background="white"
       >
+        <Toaster type="success" title="teste" message="teste2" />
         <Box gap="large">
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
@@ -43,7 +45,7 @@ export default function QuestPage() {
           </Box>
         </Box>
 
-        <Box gap="small">
+        <Box gap="small" style={{ position: 'relative' }}>
           <Text color="#000000" weight={600} margin={{ left: 'medium' }}>
             Complete the tasks to claim $FLC
           </Text>

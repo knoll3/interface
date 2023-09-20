@@ -84,6 +84,8 @@ const flockTheme = {
       black: '#000000',
       white: '#FFFFFF',
       disabled: '#879095',
+      error: '#B8482B',
+      success: '#54875D'
     },
   },
   button: {
