@@ -38,6 +38,7 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
     if (response.status === 201) {
       nextStep();
     } else {
+      nextStep();
       // TODO - show error toaster
       console.log({ response });
     }

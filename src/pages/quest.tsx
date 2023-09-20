@@ -6,18 +6,17 @@ import JoinDiscord from '../components/JoinDiscord';
 import ConnectTwitter from '../components/ConnectTwitter';
 import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
-import styled from 'styled-components';
-import { useState } from 'react';
-
-const Divider = styled.span`
-  border-left: 2px solid #6c94ec;
-  width: 1px;
-  height: 20px;
-  margin-left: 26px;
-`;
+import { useEffect, useState } from 'react';
+import useQuest from '../hooks/useQuest';
+import QuestDivider from '../components/QuestDivider';
 
 export default function QuestPage() {
-  const [activeStep, setActiveStep] = useState(1);
+  const { setQuestInfo, getQuestInfo } = useQuest();
+  const [activeStep, setActiveStep] = useState(getQuestInfo().activeStep || 1);
+
+  useEffect(() => {
+    setQuestInfo({ activeStep });
+  }, []);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -30,7 +29,9 @@ export default function QuestPage() {
   };
 
   const onNext = () => {
-    setActiveStep(activeStep + 1);
+    const nextStep = activeStep + 1;
+    setActiveStep(nextStep);
+    setQuestInfo({ activeStep: nextStep });
   };
 
   return (
@@ -55,16 +56,20 @@ export default function QuestPage() {
           </Text>
           <Box gap="xsmall">
             <ConnectWallet step={1} status={stepStatus(1)} nextStep={onNext} />
-            <Divider />
+            <QuestDivider />
             <ConnectDiscord step={2} status={stepStatus(2)} nextStep={onNext} />
-            <Divider />
-            <JoinDiscord step={3} status={stepStatus(3)} nextStep={onNext}  />
-            <Divider />
-            <ConnectTwitter step={4} status={stepStatus(4)} nextStep={onNext}  />
-            <Divider />
-            <FollowTwitter step={5} status={stepStatus(5)} nextStep={onNext}  />
-            <Divider />
-            <BroadcastTwitter step={6} status={stepStatus(6)} nextStep={onNext}  />
+            <QuestDivider />
+            <JoinDiscord step={3} status={stepStatus(3)} nextStep={onNext} />
+            <QuestDivider />
+            <ConnectTwitter step={4} status={stepStatus(4)} nextStep={onNext} />
+            <QuestDivider />
+            <FollowTwitter step={5} status={stepStatus(5)} nextStep={onNext} />
+            <QuestDivider />
+            <BroadcastTwitter
+              step={6}
+              status={stepStatus(6)}
+              nextStep={onNext}
+            />
           </Box>
         </Box>
       </Box>
