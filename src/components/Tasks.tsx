@@ -1,10 +1,10 @@
 import { useContractRead } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text, ResponsiveContext, Button } from 'grommet';
-import { useEffect, useState, useContext } from 'react';
+import { Avatar, Box, Heading, Layer, Meter, Text, Button } from 'grommet';
+import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
-import { Chat, CreditCard, Favorite, Group, Scorecard, UserFemale, View, Image } from 'grommet-icons';
+import { Favorite, Group, UserFemale, View,  } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 import download from 'downloadjs';
 
@@ -29,45 +29,27 @@ export interface Task {
   sampleData: any;
   sampleDataContent: string;
   numberOfParticipants: number;
+  currentRound: number;
 }
 
-type CardColors = {
-  [key: string]: TaskCardProps;
-}
-
-interface TaskCardProps {
-  cardColor: string;
-  cardIcon: JSX.Element;
-}
-
-const cardColors: CardColors = {
-  "Large Language Model Finetuning": {
-    cardColor: "#A4C0FF", cardIcon: <Chat color="black" size="20px" />
-  },
-  "NLP": {
-    cardColor: "#E69FBD", cardIcon: <Scorecard color="black" size="20px" />
-  },
-  "Time series prediction": {
-    cardColor: "#D9D9D9", cardIcon: <CreditCard color="black" size="20px" />
-  },
-  "Classification": {
-    cardColor: "#BDD4DA", cardIcon: <Image color="black" size="20px" />
-  },
+interface TasksProps {
+  setNumberOfTasks: (numberOfTasks: number) => void;
+  filterItems: {
+    taskTypes: string[];
+    progressStatus: string[];
+  };
+  updateFilterType: (selectedTypes: string[]) => void;
+  updateFilterProgressStatus: (selectedStatuses: string[]) => void;
 }
 
 export const Tasks = ({
-  setNumberOfTasks,
-  filterItems,
-}: {
-  setNumberOfTasks: (numberOfTasks: number) => void;
-  filterItems: string[];
-}) => {
+    setNumberOfTasks,
+    filterItems,
+  }: TasksProps) => {
   const [tasks, setTasks] = useState<Task[]>([] as Task[]);
   const [showTask, setShowTask] = useState(false);
 
   const [taskToShow, setTaskToShow] = useState<Task>({} as Task);
-
-  const size = useContext(ResponsiveContext);
 
   const { data, isError, isLoading, refetch } = useContractRead({
     address: process.env
@@ -103,6 +85,7 @@ export const Tasks = ({
             address: item,
             ...JSON.parse(metadata),
             numberOfParticipants,
+            currentRound,
           } as Task;
         })
       );
@@ -152,6 +135,46 @@ export const Tasks = ({
     window.location.assign('flock://test');
   }
 
+  function filterProgress(task: Task): string {
+    if (task.minParticipants > Number(task.numberOfParticipants)) {
+      return "available";
+    } else if (Number(task.currentRound) < Number(task.rounds)-1) {
+      return "inProcess";
+    } return "completed";
+  }
+
+  const getProgressColor = (progress: string) => {
+    switch (progress) {
+      case 'available':
+        return '#FBC756'; 
+      case 'inProcess':
+        return '#76CA66'; 
+      case 'completed':
+        return '#70A4FF';
+      default:
+        return ''; 
+    }
+  };
+
+  const getProgressText = (progress: string) => {
+    switch (progress) {
+      case 'available':
+        return 'Available to join'; 
+      case 'inProcess':
+        return 'In process'; 
+      case 'completed':
+        return 'Completed';
+      default:
+        return ''; 
+    }
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    const taskTypeMatch = filterItems.taskTypes?.length === 0 || filterItems.taskTypes?.includes(task.taskType);
+    const progressStatusMatch = filterItems.progressStatus?.length === 0 || filterItems.progressStatus?.includes(filterProgress(task));
+    return taskTypeMatch && progressStatusMatch;
+  });
+  
   return (
     <>
       <Box
@@ -162,9 +185,7 @@ export const Tasks = ({
         justify="center"
         gap="small"
       >
-        {tasks
-          ?.filter((task) => filterItems.length === 0 || filterItems.includes(task.taskType))
-          .map((task: Task, index: number) => {
+        {filteredTasks.map((task: Task, index: number) => {
           return (
             <Box
               background="#FFFFFF"
@@ -179,10 +200,40 @@ export const Tasks = ({
               width="400px"
               border={{ color: 'black', size: 'small' }}
             >
+          <Box direction="row" gap="small">
+            <Box
+              border={{ color: 'black', size: 'small' }}
+              round="medium"
+              pad="xsmall"
+              background="#F2F6FF"
+              direction="row"
+              gap="small"
+              justify="center"
+              width="xsmall"
+            >
+              <Text size="xsmall" margin="xsmall">
+                {task.taskType}
+              </Text>
+            </Box>
+            <Box
+              border={{ color: 'black', size: 'small' }}
+              round="medium"
+              pad="xsmall"
+              background={getProgressColor(filterProgress(task))}
+              direction="row"
+              gap="small"
+              align="center"
+              width={{ max: '60%' }}
+            >
+              <Text size="xsmall" margin="xsmall">
+                {getProgressText(filterProgress(task))}
+              </Text>
+            </Box>
+          </Box>
               <Heading level="3" margin="none">
                   {task.name}
               </Heading>
-              <Text>{task.description}</Text>
+              <Text size="small" truncate={true}>{task.description}</Text>
               <Text margin={{ top: 'xsmall', bottom: 'xsmall' }} size="small">Updated 0 days ago</Text>
               <Box 
                   direction="row" 
@@ -191,18 +242,6 @@ export const Tasks = ({
                   align="center" 
                   pad={{ bottom: 'xsmall' }}
                   >
-                  <Box
-                      border={{ color: 'black', size: 'small' }}
-                      round="small"
-                      pad="xsmall"
-                      background={cardColors[task.taskType]?.cardColor}
-                      direction="row"
-                      gap="small"
-                      align="center"
-                      width={{ max: '70%'}}
-                  >
-                      {cardColors[task.taskType]?.cardIcon}<Text weight="bold" truncate={true}>{task.taskType === "Large Language Model Finetuning" ? "LLM Finetuning" : task.taskType}</Text>
-                  </Box>
                   <Box direction="row" gap="small">
                       <Box direction="row" gap="1px"><Favorite color="black" /> {}</Box>
                       <Box direction="row" gap="1px"><View color="black" /> {}</Box>
@@ -328,35 +367,6 @@ export const Tasks = ({
                         </Text>
                       </Box>
                       <Box direction="row" align="center">
-                        {/* <Stack anchor="right">
-                          {Array.from(
-                            {
-                              length: Math.min(
-                                Number(taskToShow.numberOfParticipants),
-                                4
-                              ),
-                            },
-                            (_, i) => (
-                              <Box key={i} direction="row">
-                                <Avatar background="brand" size="small">
-                                  <UserFemale size="small" />
-                                </Avatar>
-                                {Array.from(
-                                  {
-                                    length:
-                                      Number(taskToShow.numberOfParticipants) - (i + 1),
-                                  },
-                                  (_, j) => (
-                                    <Box key={j} pad="xsmall" />
-                                  )
-                                )}
-                              </Box>
-                            )
-                          )}
-                        </Stack>
-                        {Number(taskToShow.numberOfParticipants) > 4 && (
-                          <Text>+{Number(taskToShow.numberOfParticipants) - 4}</Text>
-                        )} */}
                         <Avatar background="brand" size="small">
                           <UserFemale size="small" />
                         </Avatar>

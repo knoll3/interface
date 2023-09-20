@@ -1,46 +1,76 @@
 import {
   Box,
-  Button,
   Heading,
   Layer,
   Menu,
-  Paragraph,
   TextInput,
   Text,
   ResponsiveContext,
 } from 'grommet';
 import { CreateTask, Layout, PrimaryButton, Tasks } from '../components';
 import { useState, useContext } from 'react';
-import { Chat, CreditCard, Scorecard, Search, Image } from 'grommet-icons';
+import { AppsRounded, Money, Java, Image, Gamepad, CheckboxSelected, Search } from 'grommet-icons';
 import { useAccount } from 'wagmi';
 
-const cardColors = {
-  "Large Language Model Finetuning": "#A4C0FF",
-  "NLP": "#E69FBD",
-  "Time series prediction": "#D9D9D9",
-  "Classification": "#BDD4DA",
-}
+const defaultCardColor = "#6C94EC";
 
 export default function TrainPage() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [numberOfTasks, setNumberOfTasks] = useState(0);
-  const [filter, setFilter] = useState<string[]>([]);
-  const { isDisconnected } = useAccount();
   const size = useContext(ResponsiveContext);
+  const [filterType, setFilterType] = useState<string[]>([]);
+  const [filterProgressStatus, setFilterProgressStatus] = useState<string[]>([]);
 
-  const filterAction = (item: string) => {
-    if (filter.find((f) => f === item)) {
-      setFilter(filter.filter((f) => f !== item));
+  const updateFilterType = (selectedTypes: string[]) => {
+    setFilterType(selectedTypes);
+  };
+  
+  const updateFilterProgressStatus = (selectedStatuses: string[]) => {
+    setFilterProgressStatus(selectedStatuses);
+  };
+
+  const handleFilterTypeClick = (item: string) => {
+
+    let updatedFilterType: string[];
+  
+    if (item === 'All') {
+      updatedFilterType = [];
+    } else if (filterType.includes(item)) {
+      updatedFilterType = filterType.filter((f) => f !== item);
     } else {
-      setFilter([...filter, item]);
+      updatedFilterType = [...filterType, item];
     }
-  }
+  
+    updateFilterType(updatedFilterType);
+  };
+
+  const handleFilterProgressStatusClick = (item: string) => {
+
+    let updatedFilterProgressStatus: string[];
+  
+    if (item === 'All') {
+      updatedFilterProgressStatus = [];
+    } else if (filterProgressStatus.includes(item)) {
+      updatedFilterProgressStatus = filterProgressStatus.filter((f) => f !== item);
+    } else {
+      updatedFilterProgressStatus = [...filterProgressStatus, item];
+    }
+  
+    updateFilterProgressStatus(updatedFilterProgressStatus);
+  };
+
+  const isAllTypesSelected = filterType.length === 0;
+
+  const isAllStatusSelected = filterProgressStatus.length === 0;
+
+  const { isDisconnected } = useAccount();
 
   return (
     <Layout>
       <Box direction="row-responsive" width="100%">
         <Box basis="1/4" background="#EEEEEE" pad={{ horizontal: size === 'large' ? 'xlarge' : 'medium', bottom: 'large' }}>
-          <Box margin={{ vertical: 'small'}}>
+          <Box gap="small">
+              <Box margin={{ vertical: 'small'}}>
               <PrimaryButton
                 onClick={() => setShowCreateTask(true)}
                 disabled={isDisconnected}
@@ -49,74 +79,117 @@ export default function TrainPage() {
                 size="medium"
                 pad={{ vertical: 'small', horizontal: 'large' }}
               />
-          </Box>
-          <Box gap="small">
-              <Heading level="3">NLP</Heading>
+            </Box>
+            <Heading level="3">Theme</Heading>
               <Box
                   border={{ color: 'black', size: 'small' }}
                   round="small"
                   pad="xsmall"
-                  background={ filter.includes('NLP') ? cardColors["NLP"] : ''}
+                  background={isAllTypesSelected ? defaultCardColor : ''}
                   direction="row"
                   gap="small"
                   align="center"
-                  onClick={() => filterAction('NLP')}
-              >
-                  <Scorecard color="black" size="20px" /><Text weight="bold">NLP</Text>
+                  onClick={() => handleFilterTypeClick('All')}
+                >
+                <AppsRounded color="black" size="20px" /><Text weight="bold">All</Text>
               </Box>
               <Box
                   border={{ color: 'black', size: 'small' }}
                   round="small"
                   pad="xsmall"
-                  background={ filter.includes('Large Language Model Finetuning') ? cardColors["Large Language Model Finetuning"] : ''}
+                  background={ filterType.includes('DeFi') ? defaultCardColor : ''}
                   direction="row"
                   gap="small"
                   align="center"
-                  onClick={() => filterAction('Large Language Model Finetuning')}
-              >
-                  <Chat color="black" size="20px" /><Text weight="bold">LLM Finetuning</Text>
-              </Box>
-          </Box>
-          <Box gap="small">
-              <Heading level="3">Finance</Heading>
-              <Box
-                  border={{ color: 'black', size: 'small' }}
-                  round="small"
-                  pad="xsmall"
-                  direction="row"
-                  gap="small"
-                  align="center"
-                  onClick={() => filterAction('Credit Card Fraud Detection')}
-              >
-                  <CreditCard color="black" size="20px" /><Text weight="bold">Credit Card Fraud Detection</Text>
+                  onClick={() => handleFilterTypeClick('DeFi')}
+                >
+                <Money color="black" size="20px" /><Text weight="bold">DeFi</Text>
               </Box>
               <Box
                   border={{ color: 'black', size: 'small' }}
                   round="small"
                   pad="xsmall"
-                  background={ filter.includes('Time series prediction') ? cardColors["Time series prediction"] : ''}
+                  background={ filterType.includes('Social') ? defaultCardColor : ''}
                   direction="row"
                   gap="small"
                   align="center"
-                  onClick={() => filterAction('Time series prediction')}
-              >
-                  <CreditCard color="black" size="20px" /><Text weight="bold">Time series prediction</Text>
+                  onClick={() => handleFilterTypeClick('Social')}
+                >
+                <Java color="black" size="20px" /><Text weight="bold">Social</Text>
               </Box>
-          </Box>
-          <Box gap="small">
-              <Heading level="3">Computer Vision</Heading>
               <Box
                   border={{ color: 'black', size: 'small' }}
                   round="small"
                   pad="xsmall"
-                  background={ filter.includes('Classification') ? cardColors["Classification"] : ''}
+                  background={ filterType.includes('NFT') ? defaultCardColor : ''}
                   direction="row"
                   gap="small"
                   align="center"
-                  onClick={() => filterAction('Classification')}
-              >
-                  <Image color="black" size="20px" /><Text weight="bold">Classification</Text>
+                  onClick={() => handleFilterTypeClick('NFT')}
+                >
+                <Image color="black" size="20px" /><Text weight="bold">NFT</Text>
               </Box>
+              <Box
+                  border={{ color: 'black', size: 'small' }}
+                  round="small"
+                  pad="xsmall"
+                  background={ filterType.includes('Gaming') ? defaultCardColor : ''}
+                  direction="row"
+                  gap="small"
+                  align="center"
+                  onClick={() => handleFilterTypeClick('Gaming')}
+                >
+                <Gamepad color="black" size="20px" /><Text weight="bold">Gaming</Text>
+              </Box>
+            <Heading level="3">Status</Heading>
+              <Box
+                    border={{ color: 'black', size: 'small' }}
+                    round="small"
+                    pad="xsmall"
+                    background={isAllStatusSelected ? defaultCardColor : ''}
+                    direction="row"
+                    gap="small"
+                    align="center"
+                    onClick={() => handleFilterProgressStatusClick('All')}
+                  >
+                  <CheckboxSelected color="black" size="20px" /><Text weight="bold">All</Text>
+                </Box>
+                <Box
+                    border={{ color: 'black', size: 'small' }}
+                    round="small"
+                    pad="xsmall"
+                    background={ filterProgressStatus.includes('available') ? defaultCardColor : ''}
+                    direction="row"
+                    gap="small"
+                    align="center"
+                    onClick={() => handleFilterProgressStatusClick('available')}
+                  >
+                  <CheckboxSelected color="black" size="20px" /><Text weight="bold">Available to join</Text>
+                </Box>
+                <Box
+                    border={{ color: 'black', size: 'small' }}
+                    round="small"
+                    pad="xsmall"
+                    background={ filterProgressStatus.includes('inProcess') ? defaultCardColor : ''}
+                    direction="row"
+                    gap="small"
+                    align="center"
+                    onClick={() => handleFilterProgressStatusClick('inProcess')}
+                  >
+                  <CheckboxSelected color="black" size="20px" /><Text weight="bold">In process</Text>
+                </Box>
+                <Box
+                    border={{ color: 'black', size: 'small' }}
+                    round="small"
+                    pad="xsmall"
+                    background={ filterProgressStatus.includes('completed') ? defaultCardColor : ''}
+                    direction="row"
+                    gap="small"
+                    align="center"
+                    onClick={() => handleFilterProgressStatusClick('completed')}
+                  >
+                  <CheckboxSelected color="black" size="20px" /><Text weight="bold">Completed</Text>
+                </Box>
           </Box>
         </Box>
         <Box basis="3/4">
@@ -127,7 +200,7 @@ export default function TrainPage() {
               pad={{ top: 'large', bottom: 'small', horizontal: 'large'}}
           >
               <Box direction="row-responsive" gap="large">
-                  <Box direction="row" alignSelf="end" gap="xsmall"><Text>Tasks</Text>{numberOfTasks}</Box>
+                  <Box direction="row" alignSelf="end" gap="xsmall"><Text weight='bold'>Models</Text>{numberOfTasks}</Box>
                   <TextInput
                   placeholder="Search"
                   icon={<Search />}
@@ -140,7 +213,15 @@ export default function TrainPage() {
               </Box>
           </Box>
           <Box pad={{ horizontal: 'large'}} align="center">
-            <Tasks setNumberOfTasks={setNumberOfTasks} filterItems={filter} />
+          <Tasks
+            setNumberOfTasks={setNumberOfTasks}
+            filterItems={{
+              taskTypes: filterType,
+              progressStatus: filterProgressStatus,
+            }}
+            updateFilterType={updateFilterType}
+            updateFilterProgressStatus={updateFilterProgressStatus}
+          />
           </Box>
         </Box>
       </Box>
