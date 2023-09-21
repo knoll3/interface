@@ -46,7 +46,16 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
       setDiscordUser(discordName);
       onSubmit({ toast: toasts.discordConnectionSuccess });
     } else {
-      onSubmit({ error: true, toast: toasts.discordConnectionFailed });
+      if (response.status === 409) {
+        onSubmit({
+          error: true,
+          toast: toasts.discordConnectionAlreadyAssociated,
+        });
+      } else {
+        if (code) {
+          onSubmit({ error: true, toast: toasts.discordConnectionFailed });
+        }
+      }
     }
   };
 

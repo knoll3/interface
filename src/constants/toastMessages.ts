@@ -12,6 +12,11 @@ export const toasts = {
   discordConnectionFailed: {
     type: 'error',
     title: 'Connection Failed',
+    message: 'This Discord account is not connected.',
+  },
+  discordConnectionAlreadyAssociated: {
+    type: 'error',
+    title: 'Connection Failed',
     message: 'This Discord account is already associated with another address.',
   },
   discordConnectionSuccess: {
