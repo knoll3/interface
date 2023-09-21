@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import querystring from 'querystring';
-import { Code } from 'grommet-icons';
-import { get } from 'http';
 
 type Response = {};
 
