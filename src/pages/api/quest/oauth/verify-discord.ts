@@ -6,11 +6,11 @@ type Response = {};
 
 async function hasUserGuildAndRole(
   code: string,
-  userDiscordId: string | undefined
+  userDiscordId: string | undefined,
+  redirectUri: string
 ) {
   const clientId = process.env.DISCORD_CLIENT_ID;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI;
   const guildId = process.env.DISCORD_GUILD_ID;
 
   const requestData = {
@@ -74,11 +74,12 @@ export default async function handler(
   const prismaDB = new PrismaClient();
   await prismaDB.$connect();
 
+  const { wallet, redirect_uri } = req.query;
   try {
     // check if user already has completed the task
     const getUser = await prismaDB.user.findUnique({
       where: {
-        wallet: req.body.wallet,
+        wallet: wallet as string,
       },
     });
     if (!getUser) {
@@ -112,7 +113,8 @@ export default async function handler(
     });
     const userGuildsResult = await hasUserGuildAndRole(
       req.body.code,
-      userDiscord?.discordId
+      userDiscord?.discordId,
+      redirect_uri as string
     );
     if (userGuildsResult) {
       const createTask = await prismaDB.userQuestTask.create({

@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import querystring from 'querystring';
+import { Code } from 'grommet-icons';
+import { get } from 'http';
 
 type Response = {};
 
@@ -83,7 +85,6 @@ async function prismaGetUserDiscordData(
       userId: userId,
     },
   });
-
   return userDiscordData;
 }
 
@@ -155,10 +156,15 @@ export default async function handler(
       resp.id,
       resp.username
     );
-    if (!result.error) {
-      await createUserTask(prismaDB, getUser.id);
+    if (result.error) {
+      return res.status(result.status).json({ data: result.data });
     }
-    return res.status(result.status).json({ data: result.data });
+
+    const userTask = await createUserTask(prismaDB, getUser.id);
+    console.log(userTask);
+    return res
+      .status(userTask.status)
+      .json({ data: { message: userTask.message } });
   }
 
   return res.status(404).json({ data: { message: 'Not Found' } });
