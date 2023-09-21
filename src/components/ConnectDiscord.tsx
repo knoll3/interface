@@ -6,7 +6,6 @@ import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
-import { WalletContext } from '../context/walletContext';
 
 export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
