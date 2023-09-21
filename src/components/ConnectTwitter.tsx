@@ -5,7 +5,6 @@ import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
-import { WalletContext } from '../context/walletContext';
 
 export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
