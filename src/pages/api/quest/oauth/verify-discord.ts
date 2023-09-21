@@ -52,21 +52,6 @@ async function hasUserGuildAndRole(
   return false;
 }
 
-async function findTask(prismaDB: PrismaClient, taskName: string) {
-  try {
-    const task = await prismaDB.questTask.findUnique({
-      where: {
-        taskName: taskName,
-        active: true,
-      },
-    });
-    return task;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
