@@ -18,7 +18,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   const handleConnectButton = () => {
     const params =
       'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
-    const url = `https://discord.com/api/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/discord&response_type=code&scope=identify%20guilds%20guilds.join`;
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/discord&response_type=code&scope=identify%20guilds.members.read`;
     const popup = window.open(url, 'Discord Auth', params);
     popup?.postMessage('message', window.location.href);
   };

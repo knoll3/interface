@@ -46,6 +46,7 @@ async function getDiscordUserInfo(code: string, redirectUri: string) {
   }
 
   const userInfo = await responseGetUserInfo.json();
+  userInfo.accessToken = tokenData.access_token;
   return userInfo;
 }
 
@@ -90,7 +91,8 @@ async function prismaInsertUserDiscordData(
   prismaDB: PrismaClient,
   userId: string,
   discordId: string,
-  discordUserName: string
+  discordUserName: string,
+  discordAccessToken: string
 ) {
   try {
     const userDiscordData = await prismaDB.userDiscordData.create({
@@ -98,6 +100,7 @@ async function prismaInsertUserDiscordData(
         userId: userId,
         discordId: discordId,
         discordName: discordUserName,
+        discordAccessToken,
       },
     });
     return { error: false, status: 201, message: 'OK', data: userDiscordData };
@@ -154,7 +157,8 @@ export default async function handler(
           prismaDB,
           getUser.id,
           resp.id,
-          resp.username
+          resp.username,
+          resp.accessToken
         );
         if (result.error) {
           return res

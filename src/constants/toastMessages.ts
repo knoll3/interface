@@ -29,6 +29,11 @@ export const toasts = {
     title: 'Verification Failed',
     message: 'To proceed, please join the FLock Discord server.',
   },
+  discordVerifySuccess: {
+    type: 'success',
+    title: 'Verification Success',
+    message: 'Your Discord account has got the "FLocker" role.',
+  },
   discordVerifyFailed: {
     type: 'error',
     title: 'Verification Failed',

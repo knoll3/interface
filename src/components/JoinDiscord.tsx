@@ -4,12 +4,33 @@ import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
+import { useContext } from 'react';
+import { WalletContext } from '../context/walletContext';
+import { useAccount } from 'wagmi';
 
 export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
+  const { publicKey, userToken } = useContext(WalletContext);
+  const { address } = useAccount();
 
-  const handleVerifyButton = () => {
-    onSubmit({ toast: toasts.discordConnectionSuccess });
+  const handleVerifyButton = async () => {
+    const response = await fetch('/api/quest/oauth/verify-discord', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+      }),
+    });
+
+    if (response.status === 200) {
+      onSubmit({ toast: toasts.discordVerifySuccess });
+    } else {
+      onSubmit({ toast: toasts.discordVerifyFailed });
+    }
   };
 
   if (!mounted) {

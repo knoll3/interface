@@ -1,34 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Prisma, PrismaClient } from '@prisma/client';
-import querystring from 'querystring';
+import { PrismaClient } from '@prisma/client';
 
 type Response = {};
 
-async function hasUserGuildAndRole(
-  code: string,
-  userDiscordId: string | undefined,
-  redirectUri: string
-) {
-  const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
-  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+async function hasUserGuildAndRole(userDiscordAccessToken: string | undefined) {
   const guildId = process.env.DISCORD_GUILD_ID;
 
-  const requestData = {
-    client_id: clientId,
-    client_secret: clientSecret,
-    grant_type: 'authorization_code',
-    code: code,
-    redirect_uri: redirectUri,
-  };
-
-  const requestBody = querystring.stringify(requestData);
-
   const memberResponse = await fetch(
-    `https://discord.com/api/v10/guilds/${guildId}/members/${userDiscordId}`,
+    `https://discord.com/api/v10/users/@me/guilds/${guildId}/member`,
     {
       method: 'GET',
       headers: {
-        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+        Authorization: `Bearer ${userDiscordAccessToken}`,
       },
     }
   );
@@ -59,7 +42,7 @@ export default async function handler(
   const prismaDB = new PrismaClient();
   await prismaDB.$connect();
 
-  const { wallet, redirect_uri } = req.query;
+  const { wallet } = req.body;
   try {
     // check if user already has completed the task
     const getUser = await prismaDB.user.findUnique({
@@ -82,8 +65,10 @@ export default async function handler(
 
     const userHasTask = await prismaDB.userQuestTask.findUnique({
       where: {
-        userId: getUser.id,
-        taskId: getQuestTask.id,
+        userId_taskId: {
+          userId: getUser.id,
+          taskId: getQuestTask.id,
+        },
       },
     });
     if (userHasTask) {
@@ -97,9 +82,7 @@ export default async function handler(
       },
     });
     const userGuildsResult = await hasUserGuildAndRole(
-      req.body.code,
-      userDiscord?.discordId,
-      redirect_uri as string
+      userDiscord?.discordAccessToken
     );
     if (userGuildsResult) {
       const createTask = await prismaDB.userQuestTask.create({
