@@ -4,8 +4,10 @@ import { useAccount, useConnect } from 'wagmi';
 import ClaimStep from './ClaimStep';
 import { useContext, useEffect } from 'react';
 import { WalletContext } from '../context/walletContext';
+import { toasts } from '../constants/toastMessages';
+import { IStepProps } from '../pages/quest';
 
-export default function ConnectWallet({ step, status, nextStep }: any) {
+export default function ConnectWallet({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
   const { connectAsync, connectors } = useConnect();
   const { publicKey, userToken } = useContext(WalletContext);
@@ -33,10 +35,9 @@ export default function ConnectWallet({ step, status, nextStep }: any) {
       body: JSON.stringify(payload),
     });
     if (response.status === 200) {
-      nextStep();
+      onSubmit({ toast: toasts.walletConnectionSuccess });
     } else {
-      // TODO - show error toaster
-      console.log({ response });
+      onSubmit({ error: true, toast: toasts.walletConnectionFailed });
     }
   };
 

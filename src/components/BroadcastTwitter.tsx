@@ -1,9 +1,11 @@
 import { Box, Button } from 'grommet';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
+import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
+import { toasts } from '../constants/toastMessages';
+import { IStepProps } from '../pages/quest';
 
-export default function BroadcastTwitter({ step, status, nextStep }: any) {
+export default function BroadcastTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
 
   const handleBroadcastButton = () => {
@@ -11,7 +13,7 @@ export default function BroadcastTwitter({ step, status, nextStep }: any) {
   };
 
   const handleVerifyButton = () => {
-    nextStep();
+    onSubmit({ toast: toasts.twitterConnectionSuccess });
   };
 
   if (!mounted) {
@@ -32,7 +34,7 @@ export default function BroadcastTwitter({ step, status, nextStep }: any) {
             onClick={handleBroadcastButton}
             style={{ boxShadow: '3px 4px 0px 0px #000' }}
           />
-          <TimerButton label='Verify' onClick={handleVerifyButton} />
+          <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
       )}
     </ClaimStep>

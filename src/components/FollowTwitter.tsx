@@ -2,8 +2,10 @@ import { Box, Button } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
+import { toasts } from '../constants/toastMessages';
+import { IStepProps } from '../pages/quest';
 
-export default function FollowTwitter({ step, status, nextStep }: any) {
+export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
 
   const handleFollowButton = () => {
@@ -11,7 +13,7 @@ export default function FollowTwitter({ step, status, nextStep }: any) {
   };
 
   const handleVerifyButton = () => {
-    nextStep();
+    onSubmit({ toast: toasts.twitterConnectionSuccess });
   };
 
   if (!mounted) {

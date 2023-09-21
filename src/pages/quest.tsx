@@ -8,9 +8,24 @@ import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
 import { useState } from 'react';
 import QuestDivider from '../components/QuestDivider';
+import ToasterList from '../components/ToasterList';
+import useToaster, { IToastContent } from '../hooks/useToaster';
+import { ClaimStatus } from '../components/ClaimStep';
+
+interface IOnSubmitProps {
+  error?: boolean;
+  toast: IToastContent;
+}
+
+export interface IStepProps {
+  step: number;
+  status: ClaimStatus;
+  onSubmit(props: IOnSubmitProps): void;
+}
 
 export default function QuestPage() {
-  const [activeStep, setActiveStep] = useState(1);
+  const { toasts, addToast } = useToaster();
+  const [activeStep, setActiveStep] = useState<number>(1);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -22,9 +37,12 @@ export default function QuestPage() {
     return 'disabled';
   };
 
-  const onNext = () => {
-    const nextStep = activeStep + 1;
-    setActiveStep(nextStep);
+  const onSubmit = ({ error, toast }: IOnSubmitProps) => {
+    addToast(toast);
+    if (!error) {
+      const nextStep = activeStep + 1;
+      setActiveStep(nextStep);
+    }
   };
 
   return (
@@ -34,8 +52,9 @@ export default function QuestPage() {
         align="center"
         justify="evenly"
         pad={{ vertical: 'large', horizontal: 'xlarge' }}
-        background="#FFFFFF"
+        background="white"
       >
+        <ToasterList toasts={toasts} />
         <Box gap="large">
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
@@ -43,25 +62,41 @@ export default function QuestPage() {
           </Box>
         </Box>
 
-        <Box gap="small">
+        <Box gap="small" style={{ position: 'relative' }}>
           <Text color="#000000" weight={600} margin={{ left: 'medium' }}>
             Complete the tasks to claim $FLC
           </Text>
           <Box gap="xsmall">
-            <ConnectWallet step={1} status={stepStatus(1)} nextStep={onNext} />
+            <ConnectWallet
+              step={1}
+              status={stepStatus(1)}
+              onSubmit={onSubmit}
+            />
             <QuestDivider />
-            <ConnectDiscord step={2} status={stepStatus(2)} nextStep={onNext} />
+            <ConnectDiscord
+              step={2}
+              status={stepStatus(2)}
+              onSubmit={onSubmit}
+            />
             <QuestDivider />
-            <JoinDiscord step={3} status={stepStatus(3)} nextStep={onNext} />
+            <JoinDiscord step={3} status={stepStatus(3)} onSubmit={onSubmit} />
             <QuestDivider />
-            <ConnectTwitter step={4} status={stepStatus(4)} nextStep={onNext} />
+            <ConnectTwitter
+              step={4}
+              status={stepStatus(4)}
+              onSubmit={onSubmit}
+            />
             <QuestDivider />
-            <FollowTwitter step={5} status={stepStatus(5)} nextStep={onNext} />
+            <FollowTwitter
+              step={5}
+              status={stepStatus(5)}
+              onSubmit={onSubmit}
+            />
             <QuestDivider />
             <BroadcastTwitter
               step={6}
               status={stepStatus(6)}
-              nextStep={onNext}
+              onSubmit={onSubmit}
             />
           </Box>
         </Box>

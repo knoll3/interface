@@ -4,8 +4,9 @@ import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
+import { IStepProps } from '../pages/quest';
 
-export default function ConnectTwitter({ step, status, nextStep }: any) {
+export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
@@ -23,6 +24,8 @@ export default function ConnectTwitter({ step, status, nextStep }: any) {
   const checkTwitterAuth = async (code: string) => {
     // TODO - check twitter auth on backend
     console.log({ code });
+
+    // onSubmit({ toast: toasts.twitterConnectionSuccess });
   };
 
   useEffect(() => {
