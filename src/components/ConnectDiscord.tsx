@@ -1,13 +1,14 @@
 import { Button } from 'grommet';
 import ClaimStep from './ClaimStep';
-import { useIsMounted, userDataHook } from '../hooks';
-import { useEffect, useState } from 'react';
+import { useIsMounted } from '../hooks';
+import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
+import { WalletContext } from '../context/walletContext';
 
 export default function ConnectDiscord({ step, status, nextStep }: any) {
   const { address } = useAccount();
   const mounted = useIsMounted();
-  const { publicKey, userToken } = userDataHook();
+  const { publicKey, userToken } = useContext(WalletContext);
 
   const [discordCode, setDiscordCode] = useState<string>('');
   const [discordUser, setDiscordUser] = useState<any>('');

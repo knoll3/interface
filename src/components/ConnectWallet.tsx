@@ -1,13 +1,14 @@
-import { useIsMounted, userDataHook } from '@/src/hooks';
+import { useIsMounted } from '@/src/hooks';
 import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
 import ClaimStep from './ClaimStep';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
+import { WalletContext } from '../context/walletContext';
 
 export default function ConnectWallet({ step, status, nextStep }: any) {
   const { address } = useAccount();
   const { connectAsync, connectors } = useConnect();
-  const { publicKey, userToken } = userDataHook();
+  const { publicKey, userToken } = useContext(WalletContext);
   const mounted = useIsMounted();
 
   const handleConnectButton = async () => {
