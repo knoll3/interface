@@ -4,7 +4,7 @@ import { Avatar, Box, Heading, Layer, Meter, Text, Button } from 'grommet';
 import { useEffect, useState } from 'react';
 import { FLOCK_TASK_ABI } from '../contracts/flockTask';
 import { readContract } from '@wagmi/core';
-import { Favorite, Group, UserFemale, View,  } from 'grommet-icons';
+import { Favorite, Group, View,  } from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
 import download from 'downloadjs';
 
@@ -293,7 +293,8 @@ export const Tasks = ({
               </Box>
               <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
                 <Box direction="row" gap="small" alignSelf="end">
-                      <UserFemale color='brand' />
+                      <Avatar src="emoji1.png" background="brand" size="medium">
+                      </Avatar>
                       <Text>Creator Name</Text>
                 </Box>
                 <Box align="center">
@@ -367,8 +368,9 @@ export const Tasks = ({
                         </Text>
                       </Box>
                       <Box direction="row" align="center">
-                        <Avatar background="brand" size="small">
-                          <UserFemale size="small" />
+                        <Avatar src="emoji1.png" background="brand" size="small">
+                        </Avatar>
+                        <Avatar src="emoji2.png" background="brand" size="small">
                         </Avatar>
                       </Box>
                     </Box>
