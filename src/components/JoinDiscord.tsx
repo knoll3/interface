@@ -6,10 +6,6 @@ import TimerButton from './TimerButton';
 export default function JoinDiscord({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
 
-  const handleJoinButton = () => {
-    // open invite modal
-  };
-
   const handleVerifyButton = () => {};
 
   if (!mounted) {
@@ -27,8 +23,9 @@ export default function JoinDiscord({ step, status, nextStep }: any) {
           <Button
             primary
             label="Join Now"
-            onClick={handleJoinButton}
+            href={process.env.NEXT_PUBLIC_DISCORD_CHANNEL_LINK}
             style={{ boxShadow: '3px 4px 0px 0px #000' }}
+            target="_blank"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>

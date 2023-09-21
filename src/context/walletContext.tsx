@@ -1,5 +1,14 @@
-import { ReactNode, createContext, useMemo } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useAccount, useBalance } from 'wagmi';
+import { web3AuthInstance } from '@/src/hooks/web3AuthInstance';
+import { getPublicCompressed } from '@toruslabs/eccrypto';
 
 interface WalletContextProviderProps {
   children: ReactNode;
@@ -8,6 +17,8 @@ interface WalletContextProviderProps {
 interface IWalletContext {
   flockTokenBalance: any;
   nativeTokenBalance: any;
+  userToken: string;
+  publicKey: string;
 }
 
 export const WalletContext = createContext<IWalletContext>(
@@ -17,6 +28,8 @@ export const WalletContext = createContext<IWalletContext>(
 export function WalletContextProvider({
   children,
 }: WalletContextProviderProps) {
+  const [userToken, setUserToken] = useState<string>('');
+  const [publicKey, setPublicKey] = useState<string>('');
   const { address } = useAccount();
 
   const { data: nativeTokenBalance } = useBalance({
@@ -30,13 +43,48 @@ export function WalletContextProvider({
     watch: true,
   });
 
+  const loadUserData = useCallback(async () => {
+    console.log('loadUserData', address);
+    if (web3AuthInstance.connectedAdapterName === 'openlogin') {
+      const user = await web3AuthInstance.getUserInfo();
+      const privateKey = (await web3AuthInstance.provider?.request({
+        method: 'eth_private_key',
+      })) as string;
+
+      const publicKey = getPublicCompressed(
+        Buffer.from(privateKey.padStart(64, '0'), 'hex')
+      ).toString('hex');
+
+      setUserToken(user.idToken!);
+      setPublicKey(publicKey);
+    } else {
+      try {
+        const authenticateUser = await web3AuthInstance.authenticateUser();
+        const idToken = authenticateUser.idToken;
+
+        setUserToken(idToken);
+        setPublicKey(address!.toLocaleLowerCase());
+      } catch (error) {
+        setUserToken('');
+        setPublicKey('');
+        console.log('error', error);
+      }
+    }
+  }, [web3AuthInstance.connected]);
+
   const value = useMemo(
     () => ({
       nativeTokenBalance,
       flockTokenBalance,
+      userToken,
+      publicKey,
     }),
-    [nativeTokenBalance, flockTokenBalance]
+    [nativeTokenBalance, flockTokenBalance, userToken, publicKey]
   );
+
+  useEffect(() => {
+    if (web3AuthInstance.connected) loadUserData();
+  }, [web3AuthInstance.connected]);
 
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

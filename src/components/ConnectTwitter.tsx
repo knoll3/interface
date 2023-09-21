@@ -1,13 +1,14 @@
 import { Button } from 'grommet';
-import ClaimStep, { ClaimStatus } from './ClaimStep';
-import { useIsMounted, userDataHook } from '../hooks';
-import { useEffect, useState } from 'react';
+import ClaimStep from './ClaimStep';
+import { useIsMounted } from '../hooks';
+import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
+import { WalletContext } from '../context/walletContext';
 
 export default function ConnectTwitter({ step, status, nextStep }: any) {
   const mounted = useIsMounted();
   const { address } = useAccount();
-  const { publicKey, userToken } = userDataHook();
+  const { publicKey, userToken } = useContext(WalletContext);
 
   const [twitterCode, setTwitterCode] = useState('');
 
