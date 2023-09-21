@@ -9,9 +9,9 @@ import { WalletContext } from '../context/walletContext';
 import { useAccount } from 'wagmi';
 
 export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
+  const { address } = useAccount();
   const mounted = useIsMounted();
   const { publicKey, userToken } = useContext(WalletContext);
-  const { address } = useAccount();
 
   const handleVerifyButton = async () => {
     const response = await fetch('/api/quest/oauth/verify-discord', {

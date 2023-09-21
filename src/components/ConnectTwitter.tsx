@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
+import { toasts } from '../constants/toastMessages';
 
 export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
@@ -12,6 +13,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);
 
   const [twitterCode, setTwitterCode] = useState('');
+  const [twitterUser, setTwitterUser] = useState('');
 
   const handleConnectButton = () => {
     const params =
@@ -22,10 +24,31 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const checkTwitterAuth = async (code: string) => {
-    // TODO - check twitter auth on backend
     console.log({ code });
+    const response = await fetch('/api/quest/oauth/twitter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        redirectUri: `${window.location.origin}/oauth/twitter`,
+        code,
+      }),
+    });
 
-    // onSubmit({ toast: toasts.twitterConnectionSuccess });
+    if (response.status === 200) {
+      const {
+        data: { twitterName },
+      } = await response.json();
+
+      setTwitterUser(twitterName);
+      onSubmit({ toast: toasts.twitterConnectionSuccess });
+    } else {
+      onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
+    }
   };
 
   useEffect(() => {
@@ -60,7 +83,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
         style={{ boxShadow: '3px 4px 0px 0px #000' }}
       />
     ),
-    complete: <Button primary label="@BrunoSouto" />,
+    complete: <Button primary label={`@${twitterUser}`} />,
   };
 
   return (

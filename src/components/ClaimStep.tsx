@@ -78,9 +78,11 @@ export default function ClaimStep({
           </Text>
         </Box>
       )}
-      <Text weight={600} color={colors.content[status]}>
-        {label}
-      </Text>
+      <Box>
+        <Text weight={600} color={colors.content[status]}>
+          {label}
+        </Text>
+      </Box>
       <Box margin={{ left: 'auto' }} gap="small">
         {children}
       </Box>
