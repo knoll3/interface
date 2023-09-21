@@ -97,7 +97,7 @@ async function prismaInsertUserDiscordData(
     const userDiscordData = await prismaDB.userDiscordData.create({
       data: {
         userId: userId,
-        discordId: 'teste id 123',
+        discordId: discordId,
         discordName: discordUserName,
       },
     });
