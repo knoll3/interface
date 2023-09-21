@@ -27,7 +27,9 @@ async function getDiscordUserInfo(code: string, redirectUri: string) {
   });
 
   if (!responseGetToken.ok) {
-    return { error: true, data: responseGetToken.body };
+    await responseGetToken.text().then((res) => console.log(res));
+
+    return { error: true, status: 401, message: 'Unauthorized' };
   }
 
   const tokenData = await responseGetToken.json();
@@ -40,11 +42,36 @@ async function getDiscordUserInfo(code: string, redirectUri: string) {
   });
 
   if (!responseGetUserInfo.ok) {
-    return { error: true, data: responseGetUserInfo.body };
+    return { error: true, status: 401, message: 'Unauthorized' };
   }
 
   const userInfo = await responseGetUserInfo.json();
   return userInfo;
+}
+
+async function createUserTask(prismaDB: PrismaClient, userId: string) {
+  try {
+    const task = await prismaDB.questTask.findUnique({
+      where: {
+        taskName: 'discord_connect',
+        active: true,
+      },
+    });
+    if (task) {
+      const userTask = await prismaDB.userQuestTask.create({
+        data: {
+          userId: userId,
+          taskId: task.id,
+        },
+      });
+      console.log(userTask);
+      return { error: false, status: 201, message: 'OK' };
+    }
+    return { error: true, status: 404, message: 'Not Found' };
+  } catch (error) {
+    console.log(error);
+    return { error: true, status: 503, message: 'Internal Server Error' };
+  }
 }
 
 async function prismaGetUserDiscordData(
@@ -70,7 +97,7 @@ async function prismaInsertUserDiscordData(
     const userDiscordData = await prismaDB.userDiscordData.create({
       data: {
         userId: userId,
-        discordId: discordId,
+        discordId: 'teste id 123',
         discordName: discordUserName,
       },
     });
@@ -93,14 +120,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  const { wallet, redirectUri, code: discord_code } = req.body;
+  const { wallet, code: discord_code, redirect_uri } = req.query;
 
   const prismaDB = new PrismaClient();
   await prismaDB.$connect();
 
   const getUser = await prismaDB.user.findUnique({
     where: {
-      wallet: wallet,
+      wallet: wallet as string,
     },
   });
 
@@ -114,17 +141,23 @@ export default async function handler(
       return res.status(201).json({ data: userDiscordData });
     }
 
-    const resp = await getDiscordUserInfo(discord_code as string, redirectUri);
+    const resp = await getDiscordUserInfo(
+      discord_code as string,
+      redirect_uri as string
+    );
     if (resp.error) {
-      return res.status(404).json({ data: { message: 'Not Found' } });
+      return res.status(resp.status).json({ data: { message: resp.message } });
     }
 
-    const result = await prismaInsertUserDiscordData(
+    let result = await prismaInsertUserDiscordData(
       prismaDB,
       getUser.id,
       resp.id,
       resp.username
     );
+    if (!result.error) {
+      await createUserTask(prismaDB, getUser.id);
+    }
     return res.status(result.status).json({ data: result.data });
   }
 

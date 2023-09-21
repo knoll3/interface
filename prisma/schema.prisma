@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["jsonProtocol"]
@@ -7,83 +5,76 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
-  wallet    String   @unique
-  email     String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userQuestTask UserQuestTask[]
+  id              String           @id @default(cuid())
+  wallet          String           @unique
+  email           String           @default("")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   userDiscordData UserDiscordData?
   userTwitterData UserTwitterData?
+  userQuestTask   UserQuestTask[]
 }
 
-model UserDiscordData{
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
-
-  discordId String @unique @default("")
-  discordName String @default("")
-  discordRole String @default("")
-  discordVerified Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+model UserDiscordData {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  discordId       String   @unique @default("")
+  discordName     String   @default("")
+  discordRole     String   @default("")
+  discordVerified Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
 }
 
-model UserTwitterData{
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
-
-  twitterIdstr String @unique @default("")
-  twitterName String @default("")
-  twitterFollowingVerified Boolean @default(false)
-  twitterPostVerified Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+model UserTwitterData {
+  id                       String   @id @default(cuid())
+  userId                   String   @unique
+  twitterIdstr             String   @unique @default("")
+  twitterName              String   @default("")
+  twitterFollowingVerified Boolean  @default(false)
+  twitterPostVerified      Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  user                     User     @relation(fields: [userId], references: [id])
 }
 
-model TabQuestTask {
-  id String @id @default(cuid())
-  taskName String @unique
-  userQuestTask UserQuestTask[]
-  active Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+model QuestTask {
+  id            String          @id @default(cuid())
+  taskName      String          @unique
+  active        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  UserQuestTask UserQuestTask[]
 }
 
 model UserQuestTask {
-  id String @id @default(cuid())
-  userId String @unique
-  taskId String 
-  taskStatusCompleted Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-  
-  task TabQuestTask @relation(fields: [taskId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  taskId    String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  questTask QuestTask @relation(fields: [taskId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model MarketplaceModel {
-  id        String   @id @default(cuid())
-  name      String   @db.VarChar(255)
-  type      String   @db.VarChar(255)
-  creator   String   @db.VarChar(255)
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(255)
+  type        String   @db.VarChar(255)
+  creator     String   @db.VarChar(255)
   description String?
-  price     Float    @db.DoublePrecision 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-  views     Int      @default(0)
-  likes     Int      @default(0)
-  shares    Int      @default(0)
-  link      String   @db.VarChar(255)
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  shares      Int      @default(0)
+  link        String   @db.VarChar(255)
 }
 
 model MarketplaceModelLikes {
@@ -91,7 +82,7 @@ model MarketplaceModelLikes {
   modelId   String   @db.VarChar(255)
   userEmail String   @db.VarChar(255)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 }
 
 model MarketplaceModelViews {
@@ -99,7 +90,7 @@ model MarketplaceModelViews {
   modelId   String   @db.VarChar(255)
   userEmail String   @db.VarChar(255)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 }
 
 model MarketplaceModelLikesV2 {
@@ -107,7 +98,7 @@ model MarketplaceModelLikesV2 {
   modelId   String   @db.VarChar(255)
   wallet    String   @db.VarChar(255)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 }
 
 model MarketplaceModelViewsV2 {
@@ -115,12 +106,12 @@ model MarketplaceModelViewsV2 {
   modelId   String   @db.VarChar(255)
   wallet    String   @db.VarChar(255)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 }
 
 model ClaimedRewards {
   id        String   @id @default(cuid())
   wallet    String   @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 }

@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 type Response = {
   data: {
     message: string;
+    user: any;
   };
 };
 
@@ -15,32 +16,43 @@ export default async function handler(
   await prismaDB.$connect();
 
   try {
-    let user = await prismaDB.user.findUnique({
+    let getUser = await prismaDB.user.findUnique({
       where: {
         wallet: req.body.wallet,
       },
       select: {
         wallet: true,
-        userQuestTask: true,
+        userQuestTask: {
+          select: {
+            taskId: true,
+            questTask: {
+              select: {
+                taskName: true,
+              },
+            },
+          },
+        },
       },
     });
-    console.log(user);
-
-    if (!user) {
-      user = await prismaDB.user.create({
-        data: {
-          wallet: req.body.wallet,
-        },
-        select: {
-          wallet: true,
-          userQuestTask: true,
-        },
-      });
-      console.log(user);
+    console.log(getUser);
+    if (getUser) {
+      return res.status(200).json({ data: { message: 'OK', user: getUser } });
     }
-    res.status(200).json({ data: { message: 'OK' } });
+
+    const createUser = await prismaDB.user.create({
+      data: {
+        wallet: req.body.wallet,
+      },
+      select: {
+        wallet: true,
+      },
+    });
+    console.log(createUser);
+    return res.status(200).json({ data: { message: 'OK', user: createUser } });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ data: { message: 'Internal Server Error' } });
+    return res
+      .status(503)
+      .json({ data: { message: 'Internal Server Error', user: null } });
   }
 }
