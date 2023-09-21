@@ -27,13 +27,10 @@ const toasterTypes: IToasterTypes = {
 };
 
 const Toast = styled.div`
-  position: absolute;
+  display: flex;
   width: 100%;
   max-width: 292px;
   max-height: 100px;
-  top: 80px;
-  right: 24px;
-  z-index: 2;
   animation: move 250ms;
   transition: transform 250ms, opacity 250ms, box-shadow 250ms ease-in-out;
 

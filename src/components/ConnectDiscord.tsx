@@ -4,8 +4,10 @@ import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
+import { toasts } from '../constants/toastMessages';
+import { IStepProps } from '../pages/quest';
 
-export default function ConnectDiscord({ step, status, nextStep }: any) {
+export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const { publicKey, userToken } = useContext(WalletContext);
@@ -42,9 +44,9 @@ export default function ConnectDiscord({ step, status, nextStep }: any) {
       } = await response.json();
 
       setDiscordUser(discordName);
-      nextStep();
+      onSubmit({ toast: toasts.discordConnectionSuccess });
     } else {
-      console.log({ response });
+      onSubmit({ error: true, toast: toasts.discordConnectionFailed });
     }
   };
 
