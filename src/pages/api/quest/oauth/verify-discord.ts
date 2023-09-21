@@ -9,7 +9,7 @@ async function hasUserGuildAndRole(
   userDiscordId: string | undefined,
   redirectUri: string
 ) {
-  const clientId = process.env.DISCORD_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
   const guildId = process.env.DISCORD_GUILD_ID;
 
