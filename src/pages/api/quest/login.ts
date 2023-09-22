@@ -22,6 +22,16 @@ export default async function handler(
       },
       select: {
         wallet: true,
+        userDiscordData: {
+          select: {
+            discordName: true,
+          },
+        },
+        userTwitterData: {
+          select: {
+            twitterName: true,
+          },
+        },
         userQuestTask: {
           select: {
             questTask: {

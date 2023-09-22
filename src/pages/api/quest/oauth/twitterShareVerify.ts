@@ -1,11 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import Client from 'twitter-api-sdk';
-type Response = {};
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Response>
+  res: NextApiResponse
 ) {
   const prismaDB = new PrismaClient();
   await prismaDB.$connect();
@@ -65,5 +64,6 @@ export default async function handler(
     }
   } catch (error) {
     console.log(error);
+    res.status(200).json({ data: { message: 'OK' } });
   }
 }
