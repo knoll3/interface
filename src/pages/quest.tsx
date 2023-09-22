@@ -39,7 +39,7 @@ const QuestWrapper = styled.div<{ size: string }>`
 export default function QuestPage() {
   const size = useContext(ResponsiveContext);
   const { toasts, addToast } = useToaster();
-  const [activeStep, setActiveStep] = useState<number>(6);
+  const [activeStep, setActiveStep] = useState<number>(1);
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
 

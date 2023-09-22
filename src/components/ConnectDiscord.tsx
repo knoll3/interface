@@ -88,7 +88,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
     active: (
       <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: <Tag label={discordUser} />,
+    complete: discordUser && <Tag label={discordUser} />,
   };
 
   return (
