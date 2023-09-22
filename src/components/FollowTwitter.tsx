@@ -4,16 +4,38 @@ import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
+import { useAccount } from 'wagmi';
+import { useContext } from 'react';
+import { WalletContext } from '../context/walletContext';
 
 export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
+  const { address } = useAccount();
   const mounted = useIsMounted();
+  const { publicKey, userToken } = useContext(WalletContext);
 
   const handleFollowButton = () => {
-    // open invite modal
+    window.open(process.env.NEXT_PUBLIC_TWITTER_FOLLOW_LINK, '_blank');
   };
 
-  const handleVerifyButton = () => {
-    onSubmit({ toast: toasts.twitterConnectionSuccess });
+  const handleVerifyButton = async () => {
+    const response = await fetch('/api/quest/oauth/verify-twitter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        redirectUri: `${window.location.origin}/oauth/twitter`,
+      }),
+    });
+
+    if (response.status === 200) {
+      onSubmit({ toast: toasts.twitterConnectionSuccess });
+    } else {
+      onSubmit({ error: true, toast: toasts.twitterFollowFailed });
+    }
   };
 
   if (!mounted) {
