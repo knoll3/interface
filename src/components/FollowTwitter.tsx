@@ -42,7 +42,12 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   }
 
   return (
-    <ClaimStep label="Follow @flock_io on Twitter" step={step} status={status}>
+    <ClaimStep
+      label="Follow @flock_io on Twitter"
+      step={step}
+      status={status}
+      minWidth="160px"
+    >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <Button
@@ -50,6 +55,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
             label="Follow Now"
             onClick={handleFollowButton}
             style={{ boxShadow: '3px 4px 0px 0px #000' }}
+            size="questButton"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>

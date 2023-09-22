@@ -85,7 +85,7 @@ const flockTheme = {
       white: '#FFFFFF',
       disabled: '#879095',
       error: '#B8482B',
-      success: '#54875D'
+      success: '#54875D',
     },
   },
   button: {
@@ -94,22 +94,36 @@ const flockTheme = {
       border: { color: '#000000' },
     },
     color: '#FFFFFF',
-    border: { width: '2px', radius: '8px', color: '#000000' },
+    border: { width: '2px', radius: '50px', color: '#000000' },
     primary: {
-      border: { width: '2px', radius: '30px', color: '#000000' },
+      border: { width: '2px', radius: '50px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#FFFFFF',
       background: {
         color: '#6C94EC',
       },
+      padding: {
+        horizontal: '12px',
+        vertical: '8px',
+      },
     },
     secondary: {
-      border: { width: '2px', radius: '30px', color: '#000000' },
+      border: { width: '2px', radius: '50px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#000000',
       background: {
         color: '#EEEEEE',
       },
+      padding: {
+        horizontal: '12px',
+        vertical: '8px',
+      },
+    },
+  },
+  text: {
+    questButton: {
+      size: '12px',
+      height: '16px',
     },
   },
   formField: { label: { requiredIndicator: true } },
