@@ -17,13 +17,34 @@ export default async function handler(
       where: {
         wallet: wallet as string,
       },
-    });
-
-    const useTwitterData = await prismaDB.userTwitterData.findUnique({
-      where: {
-        userId: getUser?.id,
+      include: {
+        userQuestTask: true,
+        userTwitterData: true,
       },
     });
+    if (!getUser) {
+      return res.status(404).json({ data: { message: 'Not Found' } });
+    }
+
+    const useTwitterData = getUser.userTwitterData;
+    const getQuestTask = await prismaDB.questTask.findUnique({
+      where: {
+        taskName: 'twitter_follow',
+      },
+    });
+
+    if (!getQuestTask) {
+      return res
+        .status(503)
+        .json({ data: { message: 'Internal Server Error' } });
+    }
+
+    const userHasTask = getUser.userQuestTask.filter(
+      (usertask) => usertask.taskId == getQuestTask.id
+    );
+    if (userHasTask) {
+      return res.status(200).json({ data: 'OK' });
+    }
 
     console.log(useTwitterData?.twitterAccessToken);
     const twitterClient = new Client(useTwitterData?.twitterAccessToken!);
@@ -36,6 +57,12 @@ export default async function handler(
     // console.log(followers.data);
 
     if (myUser) {
+      const userQuestTask = await prismaDB.userQuestTask.create({
+        data: {
+          userId: getUser.id,
+          taskId: getQuestTask.id,
+        },
+      });
       return res.status(200).json({ data: { message: 'OK' } });
     } else {
       return res.status(404).json({ data: { message: 'Not Found' } });
