@@ -32,7 +32,7 @@ export default function BroadcastTwitter({
   };
 
   const handleVerifyButton = async () => {
-    const response = await fetch('/api/quest/oauth/verify-twitter', {
+    const response = await fetch('/api/quest/oauth/twitterShareVerify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

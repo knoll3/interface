@@ -19,7 +19,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const handleVerifyButton = async () => {
-    const response = await fetch('/api/quest/oauth/twitterVerify', {
+    const response = await fetch('/api/quest/oauth/twitterFollowVerify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
