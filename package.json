@@ -34,6 +34,7 @@
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.11",
     "truncate-eth-address": "^1.0.2",
+    "twitter-api-sdk": "^1.2.1",
     "viem": "^0.3.37",
     "wagmi": "^1.0.7"
   },

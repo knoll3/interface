@@ -12,40 +12,41 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
 
-  const [twitterCode, setTwitterCode] = useState('');
+  const [twitterAccessToken, setTwitterAccessToken] = useState('');
   const [twitterUser, setTwitterUser] = useState('');
 
   const handleConnectButton = () => {
     const params =
       'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
-    const url = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/twitter&scope=tweet.write%20follows.read&state=state&code_challenge=challenge&code_challenge_method=plain`;
+    const url = `${window.location.origin}/api/quest/oauth/twitterLogin`;
     const popup = window.open(url, 'Twitter Auth', params);
     popup?.postMessage('message', window.location.href);
   };
 
-  const checkTwitterAuth = async (code: string) => {
-    console.log({ code });
-    const response = await fetch('/api/quest/oauth/twitter', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: JSON.stringify({
-        auth_key: publicKey,
-        wallet: (address as string)?.toLocaleLowerCase(),
-        redirectUri: `${window.location.origin}/oauth/twitter`,
-        code,
-      }),
-    });
+  const checkTwitterAuth = async (accessToken: string) => {
+    if (accessToken) {
+      const response = await fetch('/api/quest/oauth/twitter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({
+          auth_key: publicKey,
+          wallet: (address as string)?.toLocaleLowerCase(),
+          accessToken,
+        }),
+      });
 
-    if (response.status === 200) {
-      const {
-        data: { twitterName },
-      } = await response.json();
-
-      setTwitterUser(twitterName);
-      onSubmit({ toast: toasts.twitterConnectionSuccess });
+      if (response.status === 201) {
+        const {
+          data: { name },
+        } = await response.json();
+        setTwitterUser(name);
+        onSubmit({ toast: toasts.twitterConnectionSuccess });
+      } else {
+        onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
+      }
     } else {
       onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
     }
@@ -54,9 +55,9 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   useEffect(() => {
     const bc = new BroadcastChannel('twitterChannel');
     bc.onmessage = (event) => {
-      const code = event?.data?.code;
-      if (code) {
-        setTwitterCode(code);
+      const accessToken = event?.data?.accessToken;
+      if (accessToken) {
+        setTwitterAccessToken(accessToken);
       }
     };
 
@@ -64,10 +65,10 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (twitterCode && publicKey && userToken && address) {
-      checkTwitterAuth(twitterCode);
+    if (twitterAccessToken && publicKey && userToken && address) {
+      checkTwitterAuth(twitterAccessToken);
     }
-  }, [twitterCode, publicKey, userToken, address]);
+  }, [twitterAccessToken, publicKey, userToken, address]);
 
   if (!mounted) {
     return <></>;
