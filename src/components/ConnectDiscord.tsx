@@ -38,7 +38,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
       }),
     });
 
-    if (response.status === 201) {
+    if (response.status === 200) {
       const {
         data: { discordName },
       } = await response.json();

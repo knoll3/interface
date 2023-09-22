@@ -24,31 +24,29 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const checkTwitterAuth = async (accessToken: string) => {
-    if (accessToken) {
-      const response = await fetch('/api/quest/oauth/twitter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
-          auth_key: publicKey,
-          wallet: (address as string)?.toLocaleLowerCase(),
-          accessToken,
-        }),
-      });
+    const response = await fetch('/api/quest/oauth/twitter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        accessToken,
+      }),
+    });
 
-      if (response.status === 201) {
-        const {
-          data: { name },
-        } = await response.json();
-        setTwitterUser(name);
-        onSubmit({ toast: toasts.twitterConnectionSuccess });
-      } else {
+    if (response.status === 200) {
+      const {
+        data: { name },
+      } = await response.json();
+      setTwitterUser(name);
+      onSubmit({ toast: toasts.twitterConnectionSuccess });
+    } else {
+      if (accessToken) {
         onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
       }
-    } else {
-      onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
     }
   };
 
@@ -65,10 +63,10 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (twitterAccessToken && publicKey && userToken && address) {
+    if (publicKey && userToken && address && status === 'active') {
       checkTwitterAuth(twitterAccessToken);
     }
-  }, [twitterAccessToken, publicKey, userToken, address]);
+  }, [twitterAccessToken, publicKey, userToken, address, status]);
 
   if (!mounted) {
     return <></>;
