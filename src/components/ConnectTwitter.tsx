@@ -38,7 +38,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
         }),
       });
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         const {
           data: { name },
         } = await response.json();
