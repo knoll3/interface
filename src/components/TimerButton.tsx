@@ -1,5 +1,6 @@
 import { Box, Button } from 'grommet';
 import { useEffect, useState } from 'react';
+import Tag from './Tag';
 
 interface ITimerButtonProps {
   label: string;
@@ -44,15 +45,7 @@ export default function TimerButton({ label, onClick }: ITimerButtonProps) {
   } else {
     return (
       <Box>
-        <Button
-          size="small"
-          label={`${timer}`}
-          style={{
-            backgroundImage: "url('timer.png')",
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-          }}
-        />
+        <Tag label={`${timer}`} type="black" timer />
       </Box>
     );
   }

@@ -1,4 +1,3 @@
-import { Button } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
@@ -6,6 +5,8 @@ import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
+import PressableButton from './PressableButton';
+import Tag from './Tag';
 
 export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const mounted = useIsMounted();
@@ -77,15 +78,10 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const content: any = {
     disabled: <></>,
     active: (
-      <Button
-        primary
-        label="Connect Now"
-        onClick={handleConnectButton}
-        size="small"
-      />
+      <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
     complete: twitterUser && (
-      <Button primary label={`@${twitterUser}`} size="small" />
+      <Tag label={`@${twitterUser}`} />
     ),
   };
 

@@ -14,6 +14,8 @@ import { ClaimStatus } from '../components/ClaimStep';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import styled from 'styled-components';
+import Tag from '../components/Tag';
+import PressableButton from '../components/PressableButton';
 
 interface IOnSubmitProps {
   error?: boolean;
@@ -37,7 +39,7 @@ const QuestWrapper = styled.div<{ size: string }>`
 export default function QuestPage() {
   const size = useContext(ResponsiveContext);
   const { toasts, addToast } = useToaster();
-  const [activeStep, setActiveStep] = useState<number>(1);
+  const [activeStep, setActiveStep] = useState<number>(6);
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
 
@@ -95,12 +97,14 @@ export default function QuestPage() {
         <Box gap="large" width={isMobile ? '300px' : undefined}>
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
-            <Button
-              secondary
-              label="Claim $MATIC & $FLC"
-              size="small"
-              onClick={handleClaim}
-            />
+            {activeStep < 7 ? (
+              <Tag label="Claim $MATIC & $FLC" type="disabled" />
+            ) : (
+              <PressableButton
+                label="Claim $MATIC & $FLC"
+                onClick={handleClaim}
+              />
+            )}
           </Box>
         </Box>
 
