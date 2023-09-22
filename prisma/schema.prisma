@@ -15,8 +15,8 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   userDiscordData UserDiscordData?
-  userTwitterData UserTwitterData?
   userQuestTask   UserQuestTask[]
+  userTwitterData UserTwitterData?
 }
 
 model UserDiscordData {
@@ -26,9 +26,9 @@ model UserDiscordData {
   discordName        String   @default("")
   discordRole        String   @default("")
   discordVerified    Boolean  @default(false)
-  discordAccessToken String   @default("")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  discordAccessToken String   @default("")
   user               User     @relation(fields: [userId], references: [id])
 }
 
@@ -37,10 +37,10 @@ model UserTwitterData {
   userId             String   @unique
   twitterIdstr       String   @unique @default("")
   twitterName        String   @default("")
-  twitterTweetId     String   @default("")
-  twitterAccessToken String   @default("")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  twitterAccessToken String   @default("")
+  twitterTweetId     String   @default("")
   user               User     @relation(fields: [userId], references: [id])
 }
 

@@ -24,7 +24,6 @@ export default async function handler(
         wallet: true,
         userQuestTask: {
           select: {
-            taskId: true,
             questTask: {
               select: {
                 taskName: true,
