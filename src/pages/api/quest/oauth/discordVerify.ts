@@ -49,6 +49,10 @@ export default async function handler(
       where: {
         wallet: wallet as string,
       },
+      include: {
+        userQuestTask: true,
+        userDiscordData: true,
+      },
     });
     if (!getUser) {
       return res.status(404).json({ data: { message: 'Not Found' } });
@@ -63,24 +67,15 @@ export default async function handler(
       return res.status(404).json({ data: { message: 'Not Found' } });
     }
 
-    const userHasTask = await prismaDB.userQuestTask.findUnique({
-      where: {
-        userId_taskId: {
-          userId: getUser.id,
-          taskId: getQuestTask.id,
-        },
-      },
-    });
+    const userHasTask = getUser.userQuestTask.filter(
+      (usertask) => usertask.taskId == getQuestTask.id
+    );
     if (userHasTask) {
       return res.status(200).json({ data: { message: 'OK' } });
     }
 
     // if not completed, create a new one
-    const userDiscord = await prismaDB.userDiscordData.findUnique({
-      where: {
-        userId: getUser.id,
-      },
-    });
+    const userDiscord = getUser.userDiscordData;
     const userGuildsResult = await hasUserGuildAndRole(
       userDiscord?.discordAccessToken
     );

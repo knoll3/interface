@@ -131,17 +131,40 @@ export default async function handler(
     where: {
       wallet: wallet as string,
     },
+    include: {
+      userDiscordData: {
+        select: {
+          discordName: true,
+        },
+      },
+      userQuestTask: true,
+    },
   });
 
   if (getUser) {
-    const userDiscordData = await prismaGetUserDiscordData(
-      prismaDB,
-      getUser.id
-    );
-
+    const userDiscordData = getUser.userDiscordData;
     if (userDiscordData) {
-      return res.status(201).json({ data: userDiscordData });
+      const getQuestTask = await prismaDB.questTask.findUnique({
+        where: {
+          taskName: 'discord_connect',
+        },
+      });
+
+      if (!getQuestTask) {
+        return res
+          .status(503)
+          .json({ data: { message: 'Internal Server Error' } });
+      }
+
+      const userHasTask = getUser.userQuestTask.filter(
+        (usertask) => usertask.taskId == getQuestTask.id
+      );
+      if (!userHasTask) {
+        const userTask = await createUserTask(prismaDB, getUser.id);
+      }
+      return res.status(200).json({ data: userDiscordData });
     } else {
+      // if the user has not yer completed the task
       if (discord_code) {
         const resp = await getDiscordUserInfo(
           discord_code as string,
