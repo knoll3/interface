@@ -31,6 +31,9 @@ export default function BroadcastTwitter({
   };
 
   const handleVerifyButton = async () => {
+    // * - bypassing verify to test flow
+    onSubmit({ toast: toasts.twitterPostFailed });
+
     const response = await fetch('/api/quest/oauth/verify-twitter', {
       method: 'POST',
       headers: {
@@ -60,6 +63,7 @@ export default function BroadcastTwitter({
       label="Broadcast your Journey to your mate"
       step={step}
       status={status}
+      minWidth="180px"
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
@@ -67,7 +71,7 @@ export default function BroadcastTwitter({
             primary
             label="Broadcast Now"
             onClick={handleBroadcastButton}
-            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+            size="small"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>

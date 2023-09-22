@@ -42,6 +42,7 @@ export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
       label="Join our Discord and acquire a role"
       step={step}
       status={status}
+      minWidth='160px'
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
@@ -49,10 +50,13 @@ export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
             primary
             label="Join Now"
             href={process.env.NEXT_PUBLIC_DISCORD_CHANNEL_LINK}
-            style={{ boxShadow: '3px 4px 0px 0px #000' }}
             target="_blank"
+            size="small"
           />
-          <TimerButton label="Verify" onClick={handleVerifyButton} />
+          <TimerButton
+            label="Verify"
+            onClick={handleVerifyButton}
+          />
         </Box>
       )}
     </ClaimStep>

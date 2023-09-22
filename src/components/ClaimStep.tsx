@@ -10,6 +10,7 @@ export type ClaimStepProps = {
   status: ClaimStatus;
   children?: ReactNode;
   actions?: JSX.Element | JSX.Element[];
+  minWidth?: string;
 };
 
 const colors = {
@@ -35,6 +36,7 @@ export default function ClaimStep({
   label,
   status,
   children,
+  minWidth,
 }: ClaimStepProps) {
   return (
     <Box
@@ -42,10 +44,11 @@ export default function ClaimStep({
       align="center"
       gap="small"
       border={{ color: colors.wrapperBorder[status], size: 'small' }}
-      pad="small"
+      pad={{ vertical: '9px', horizontal: '15px' }}
       round="large"
       key={`step-${step}`}
       background={colors.wrapperBg[status]}
+      style={{ minHeight: '58px' }}
     >
       {status === 'complete' ? (
         <Box
@@ -53,9 +56,10 @@ export default function ClaimStep({
           justify="center"
           border={{ color: colors.content[status], size: 'small' }}
           round="large"
+          background="brand"
           width="24px"
           height="24px"
-          background="brand"
+          style={{ minWidth: '24px', minHeight: '24px' }}
         >
           <Checkmark color="white" size="small" />
         </Box>
@@ -67,6 +71,7 @@ export default function ClaimStep({
           round="large"
           width="24px"
           height="24px"
+          style={{ minWidth: '24px', minHeight: '24px' }}
         >
           <Text
             weight={600}
@@ -78,14 +83,22 @@ export default function ClaimStep({
           </Text>
         </Box>
       )}
-      <Box>
-        <Text weight={600} color={colors.content[status]}>
+      <Box flex={!children ? 'grow' : undefined}>
+        <Text weight={600} color={colors.content[status]} size="16px">
           {label}
         </Text>
       </Box>
-      <Box margin={{ left: 'auto' }} gap="small">
-        {children}
-      </Box>
+      {children && (
+        <Box
+          margin={{ left: 'auto' }}
+          width={{ min: minWidth || '110px' }}
+          justify="end"
+        >
+          <Box gap="small" margin={{ left: 'auto' }}>
+            {children}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { Box, Image, Button, Text } from 'grommet';
+import { Box, Image, Button, Text, ResponsiveContext } from 'grommet';
 import { Layout } from '../components';
 import ConnectWallet from '../components/ConnectWallet';
 import ConnectDiscord from '../components/ConnectDiscord';
@@ -6,11 +6,12 @@ import JoinDiscord from '../components/JoinDiscord';
 import ConnectTwitter from '../components/ConnectTwitter';
 import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import QuestDivider from '../components/QuestDivider';
 import ToasterList from '../components/ToasterList';
 import useToaster, { IToastContent } from '../hooks/useToaster';
 import { ClaimStatus } from '../components/ClaimStep';
+import styled from 'styled-components';
 
 interface IOnSubmitProps {
   error?: boolean;
@@ -23,9 +24,24 @@ export interface IStepProps {
   onSubmit(props: IOnSubmitProps): void;
 }
 
+const QuestWrapper = styled.div<{ size: string }>`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: ${(props) => (props.size === 'small' ? '100%' : '518px')};
+  min-width: ${(props) => (props.size === 'small' ? 'none' : '350px')};
+`;
+
 export default function QuestPage() {
+  const size = useContext(ResponsiveContext);
   const { toasts, addToast } = useToaster();
-  const [activeStep, setActiveStep] = useState<number>(1);
+  const [activeStep, setActiveStep] = useState<number>(2);
+
+  const isMobile = size === 'small';
+
+  useEffect(() => {
+    console.log({ size });
+  }, [size]);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -48,24 +64,36 @@ export default function QuestPage() {
   return (
     <Layout>
       <Box
-        direction="row"
+        direction={isMobile ? 'column' : 'row'}
         align="center"
         justify="evenly"
         pad={{ vertical: 'large', horizontal: 'xlarge' }}
         background="white"
+        gap="30px"
       >
         <ToasterList toasts={toasts} />
-        <Box gap="large">
+        <Box gap="large" width={isMobile ? '300px' : undefined}>
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
-            <Button secondary size="large" label="Claim $MATIC & $FLC" />
+            <Button
+              secondary
+              label="Claim $MATIC & $FLC"
+              size="small"
+            />
           </Box>
         </Box>
 
-        <Box gap="small" style={{ position: 'relative' }}>
-          <Text color="#000000" weight={600} margin={{ left: 'medium' }}>
-            Complete the tasks to claim $FLC
-          </Text>
+        <QuestWrapper size={size}>
+          <Box>
+            <Text
+              color="#000000"
+              weight={600}
+              margin={{ left: 'medium' }}
+              size="16px"
+            >
+              Complete the tasks to claim $FLC
+            </Text>
+          </Box>
           <Box gap="xsmall">
             <ConnectWallet
               step={1}
@@ -99,7 +127,7 @@ export default function QuestPage() {
               onSubmit={onSubmit}
             />
           </Box>
-        </Box>
+        </QuestWrapper>
       </Box>
     </Layout>
   );

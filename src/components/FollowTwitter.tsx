@@ -18,6 +18,10 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const handleVerifyButton = async () => {
+    // * - bypassing verify to test flow
+    onSubmit({ toast: toasts.discordJoinFailed });
+    return;
+
     const response = await fetch('/api/quest/oauth/verify-twitter', {
       method: 'POST',
       headers: {
@@ -43,14 +47,19 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   }
 
   return (
-    <ClaimStep label="Follow @flock_io on Twitter" step={step} status={status}>
+    <ClaimStep
+      label="Follow @flock_io on Twitter"
+      step={step}
+      status={status}
+      minWidth="160px"
+    >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <Button
             primary
             label="Follow Now"
             onClick={handleFollowButton}
-            style={{ boxShadow: '3px 4px 0px 0px #000' }}
+            size="small"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>

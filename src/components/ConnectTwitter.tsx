@@ -16,6 +16,10 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const [twitterUser, setTwitterUser] = useState('');
 
   const handleConnectButton = () => {
+    // * - bypassing connection to test flow
+    onSubmit({ toast: toasts.twitterConnectionFailed });
+    return;
+
     const params =
       'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
     const url = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/twitter&scope=tweet.write%20follows.read&state=state&code_challenge=challenge&code_challenge_method=plain`;
@@ -24,7 +28,6 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const checkTwitterAuth = async (code: string) => {
-    console.log({ code });
     const response = await fetch('/api/quest/oauth/twitter', {
       method: 'POST',
       headers: {
@@ -80,10 +83,12 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
         primary
         label="Connect Now"
         onClick={handleConnectButton}
-        style={{ boxShadow: '3px 4px 0px 0px #000' }}
+        size="small"
       />
     ),
-    complete: <Button primary label={`@${twitterUser}`} />,
+    complete: twitterUser && (
+      <Button primary label={`@${twitterUser}`} size="small" />
+    ),
   };
 
   return (
