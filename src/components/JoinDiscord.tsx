@@ -14,7 +14,7 @@ export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);
 
   const handleVerifyButton = async () => {
-    const response = await fetch('/api/quest/oauth/verify-discord', {
+    const response = await fetch('/api/quest/oauth/discordVerify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

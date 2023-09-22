@@ -73,7 +73,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/api/quest/oauth/discord',
-    '/api/quest/oauth/verify-discord',
+    '/api/quest/oauth/discordVerify',
     '/api/quest/oauth/twitterVerify',
     '/api/quest/login',
   ],
