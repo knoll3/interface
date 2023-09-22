@@ -98,8 +98,8 @@ export default function QuestPage() {
             <Button
               secondary
               label="Claim $MATIC & $FLC"
+              size="small"
               onClick={handleClaim}
-              size="12px"
             />
           </Box>
         </Box>

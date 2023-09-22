@@ -12,6 +12,7 @@ import { OpenloginAdapter } from '@web3auth/openlogin-adapter';
 import { Web3AuthConnector } from '@web3auth/web3auth-wagmi-connector';
 import { WalletContextProvider } from '../context/walletContext';
 import { web3AuthInstance } from '../hooks/web3AuthInstance';
+import { css } from 'styled-components';
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai],
@@ -89,9 +90,26 @@ const flockTheme = {
     },
   },
   button: {
+    hover: {
+      primary: {
+        extend: css`
+          box-shadow: none;
+          translate: 2px 2px;
+        `,
+      },
+      secondary: {
+        extend: css`
+          box-shadow: none;
+          translate: 2px 2px;
+        `,
+      },
+    },
     default: {
+      border: { width: '2px', radius: '50px', color: '#000000' },
+      font: { weight: 'bold' },
+      color: '#FFFFFF',
+      padding: { horizontal: '12px', vertical: '8px' },
       background: { color: '#6C94EC' },
-      border: { color: '#000000' },
     },
     color: '#FFFFFF',
     border: { width: '2px', radius: '50px', color: '#000000' },
@@ -99,33 +117,30 @@ const flockTheme = {
       border: { width: '2px', radius: '50px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#FFFFFF',
-      background: {
-        color: '#6C94EC',
-      },
-      padding: {
-        horizontal: '12px',
-        vertical: '8px',
-      },
+      padding: { horizontal: '12px', vertical: '8px' },
+      background: { color: '#6C94EC' },
+      extend: css`
+        box-shadow: 2px 2px 0px 0px #000000;
+      `,
     },
     secondary: {
       border: { width: '2px', radius: '50px', color: '#000000' },
       font: { weight: 'bold' },
       color: '#000000',
-      background: {
-        color: '#EEEEEE',
-      },
-      padding: {
-        horizontal: '12px',
-        vertical: '8px',
-      },
+      background: { color: '#EEEEEE' },
+      padding: { horizontal: '12px', vertical: '8px' },
+      extend: css`
+        box-shadow: 2px 2px 0px 0px #000000;
+      `,
     },
   },
-  // text: {
-  //   questButton: {
-  //     size: '12px',
-  //     height: '16px',
-  //   },
-  // },
+  text: {
+    small: {
+      size: '12px',
+      height: '16px',
+      background: { color: '#EEEEEE' },
+    },
+  },
   formField: { label: { requiredIndicator: true } },
 };
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {

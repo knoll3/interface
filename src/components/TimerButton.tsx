@@ -32,27 +32,25 @@ export default function TimerButton({ label, onClick }: ITimerButtonProps) {
 
   if (!isLoading) {
     return (
-      <Button
-        primary
-        label={label}
-        onClick={handleButtonClick}
-        style={{ boxShadow: '3px 4px 0px 0px #000' }}
-        size="questButton"
-      />
+      <Box>
+        <Button
+          primary
+          label={label}
+          onClick={handleButtonClick}
+          size="small"
+        />
+      </Box>
     );
   } else {
     return (
       <Box>
         <Button
-          primary
-          size="questButton"
+          size="small"
           label={`${timer}`}
-          fill
           style={{
             backgroundImage: "url('timer.png')",
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
-            boxShadow: '3px 4px 0px 0px #000',
           }}
         />
       </Box>

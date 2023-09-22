@@ -54,8 +54,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
             primary
             label="Follow Now"
             onClick={handleFollowButton}
-            style={{ boxShadow: '3px 4px 0px 0px #000' }}
-            size="questButton"
+            size="small"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
