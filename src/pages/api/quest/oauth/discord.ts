@@ -55,7 +55,6 @@ async function createUserTask(prismaDB: PrismaClient, userId: string) {
     const task = await prismaDB.questTask.findUnique({
       where: {
         taskName: 'discord_connect',
-        active: true,
       },
     });
     if (task) {
@@ -159,7 +158,7 @@ export default async function handler(
       const userHasTask = getUser.userQuestTask.filter(
         (usertask) => usertask.taskId == getQuestTask.id
       );
-      if (!userHasTask) {
+      if (!userHasTask.length) {
         const userTask = await createUserTask(prismaDB, getUser.id);
       }
       return res.status(200).json({ data: userDiscordData });

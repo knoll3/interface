@@ -70,7 +70,7 @@ export default async function handler(
     const userHasTask = getUser.userQuestTask.filter(
       (usertask) => usertask.taskId == getQuestTask.id
     );
-    if (userHasTask) {
+    if (userHasTask.length) {
       return res.status(200).json({ data: { message: 'OK' } });
     }
 
