@@ -59,6 +59,7 @@ export default function ConnectWallet({ step, status, onSubmit }: IStepProps) {
           label="Connect Now"
           onClick={handleConnectButton}
           style={{ boxShadow: '3px 4px 0px 0px #000' }}
+          size='questButton'
         />
       )}
     </ClaimStep>

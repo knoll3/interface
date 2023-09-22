@@ -1,4 +1,4 @@
-import { Button } from 'grommet';
+import { Box, Button } from 'grommet';
 import { useEffect, useState } from 'react';
 
 interface ITimerButtonProps {
@@ -37,22 +37,25 @@ export default function TimerButton({ label, onClick }: ITimerButtonProps) {
         label={label}
         onClick={handleButtonClick}
         style={{ boxShadow: '3px 4px 0px 0px #000' }}
+        size="questButton"
       />
     );
   } else {
     return (
-      <Button
-        secondary
-        size="small"
-        pad="medium"
-        label={`${timer}`}
-        style={{
-          backgroundImage: "url('timer.png')",
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          boxShadow: '3px 4px 0px 0px #000',
-        }}
-      />
+      <Box>
+        <Button
+          primary
+          size="questButton"
+          label={`${timer}`}
+          fill
+          style={{
+            backgroundImage: "url('timer.png')",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            boxShadow: '3px 4px 0px 0px #000',
+          }}
+        />
+      </Box>
     );
   }
 }
