@@ -6,11 +6,13 @@ import JoinDiscord from '../components/JoinDiscord';
 import ConnectTwitter from '../components/ConnectTwitter';
 import FollowTwitter from '../components/FollowTwitter';
 import BroadcastTwitter from '../components/BroadcastTwitter';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import QuestDivider from '../components/QuestDivider';
 import ToasterList from '../components/ToasterList';
 import useToaster, { IToastContent } from '../hooks/useToaster';
 import { ClaimStatus } from '../components/ClaimStep';
+import { useAccount } from 'wagmi';
+import { WalletContext } from '../context/walletContext';
 
 interface IOnSubmitProps {
   error?: boolean;
@@ -26,6 +28,8 @@ export interface IStepProps {
 export default function QuestPage() {
   const { toasts, addToast } = useToaster();
   const [activeStep, setActiveStep] = useState<number>(1);
+  const { address } = useAccount();
+  const { publicKey, userToken } = useContext(WalletContext);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -45,6 +49,22 @@ export default function QuestPage() {
     }
   };
 
+  const handleClaim = async () => {
+    const response = await fetch('/api/quest/claimReward', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        walletAddress: (address as string)?.toLocaleLowerCase(),
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <Layout>
       <Box
@@ -58,7 +78,12 @@ export default function QuestPage() {
         <Box gap="large">
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
-            <Button secondary size="large" label="Claim $MATIC & $FLC" />
+            <Button
+              secondary
+              size="large"
+              label="Claim $MATIC & $FLC"
+              onClick={handleClaim}
+            />
           </Box>
         </Box>
 
