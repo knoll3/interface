@@ -73,13 +73,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (
-      publicKey &&
-      userToken &&
-      address &&
-      discordCode &&
-      status === 'active'
-    ) {
+    if (publicKey && userToken && address && status === 'active') {
       checkDiscordAuth(discordCode);
     }
   }, [discordCode, publicKey, userToken, address, status]);
@@ -98,9 +92,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
         size="small"
       />
     ),
-    complete: discordUser && (
-      <Button label={discordUser} size="small" />
-    ),
+    complete: discordUser && <Button label={discordUser} size="small" />,
   };
 
   return (
