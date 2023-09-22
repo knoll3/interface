@@ -120,15 +120,14 @@ const flockTheme = {
       },
     },
   },
-  text: {
-    questButton: {
-      size: '12px',
-      height: '16px',
-    },
-  },
+  // text: {
+  //   questButton: {
+  //     size: '12px',
+  //     height: '16px',
+  //   },
+  // },
   formField: { label: { requiredIndicator: true } },
 };
-
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   return (
     <Grommet theme={flockTheme}>
