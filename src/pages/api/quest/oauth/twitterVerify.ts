@@ -28,12 +28,18 @@ export default async function handler(
     console.log(useTwitterData?.twitterAccessToken);
     const twitterClient = new Client(useTwitterData?.twitterAccessToken!);
 
-    const followers = await twitterClient.users.usersIdFollowers(
-      useTwitterData?.twitterIdstr as string
-    );
-    console.log(followers.data);
+    const myUser = await twitterClient.users.findMyUser();
+    // const followers = await twitterClient.users.usersIdFollowers(
+    //   useTwitterData?.twitterIdstr as string
+    // );
+    //
+    // console.log(followers.data);
 
-    return res.status(200).json({ data: { message: 'OK' } });
+    if (myUser) {
+      return res.status(200).json({ data: { message: 'OK' } });
+    } else {
+      return res.status(404).json({ data: { message: 'Not Found' } });
+    }
   } catch (error) {
     console.log(error);
   }
