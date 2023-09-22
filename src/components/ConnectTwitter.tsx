@@ -16,10 +16,6 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   const [twitterUser, setTwitterUser] = useState('');
 
   const handleConnectButton = () => {
-    // * - bypassing connection to test flow
-    onSubmit({ toast: toasts.twitterConnectionFailed });
-    return;
-
     const params =
       'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=700,height=800,left=50%,top=50%';
     const url = `${window.location.origin}/api/quest/oauth/twitterLogin`;

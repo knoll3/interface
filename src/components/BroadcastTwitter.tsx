@@ -31,9 +31,6 @@ export default function BroadcastTwitter({
   };
 
   const handleVerifyButton = async () => {
-    // * - bypassing verify to test flow
-    onSubmit({ toast: toasts.twitterPostFailed });
-
     const response = await fetch('/api/quest/oauth/verify-twitter', {
       method: 'POST',
       headers: {
