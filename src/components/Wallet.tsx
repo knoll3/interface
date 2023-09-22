@@ -12,7 +12,6 @@ export function Wallet() {
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { nativeTokenBalance, flockTokenBalance } = useContext(WalletContext);
   const mounted = useIsMounted();
-  const [isClaiming, setIsClaiming] = useState(false);
 
   const handleConnect = async () => {
     await connectAsync({
@@ -22,20 +21,6 @@ export function Wallet() {
 
   const handleDisconnect = async () => {
     wagmiDisconnect();
-  };
-
-  const handleClaim = async () => {
-    setIsClaiming(true);
-    const result = await fetch('/api/claimReward', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ walletAddress: address }),
-    });
-    const data = await result.json();
-    console.log(data);
-    setIsClaiming(false);
   };
 
   const roundedFLCBalance = flockTokenBalance
@@ -81,12 +66,6 @@ export function Wallet() {
                 handleDisconnect();
                 setShowWalletSettings(false);
               }}
-            />
-            <Button
-              secondary
-              disabled={isClaiming}
-              label={isClaiming ? 'Claiming...' : 'Claim Rewards'}
-              onClick={handleClaim}
             />
           </Box>
         </Box>

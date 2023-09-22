@@ -11,6 +11,8 @@ import QuestDivider from '../components/QuestDivider';
 import ToasterList from '../components/ToasterList';
 import useToaster, { IToastContent } from '../hooks/useToaster';
 import { ClaimStatus } from '../components/ClaimStep';
+import { useAccount } from 'wagmi';
+import { WalletContext } from '../context/walletContext';
 import styled from 'styled-components';
 
 interface IOnSubmitProps {
@@ -35,7 +37,9 @@ const QuestWrapper = styled.div<{ size: string }>`
 export default function QuestPage() {
   const size = useContext(ResponsiveContext);
   const { toasts, addToast } = useToaster();
-  const [activeStep, setActiveStep] = useState<number>(2);
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const { address } = useAccount();
+  const { publicKey, userToken } = useContext(WalletContext);
 
   const isMobile = size === 'small';
 
@@ -61,6 +65,22 @@ export default function QuestPage() {
     }
   };
 
+  const handleClaim = async () => {
+    const response = await fetch('/api/quest/claimReward', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        walletAddress: (address as string)?.toLocaleLowerCase(),
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <Layout>
       <Box
@@ -79,6 +99,7 @@ export default function QuestPage() {
               secondary
               label="Claim $MATIC & $FLC"
               size="small"
+              onClick={handleClaim}
             />
           </Box>
         </Box>

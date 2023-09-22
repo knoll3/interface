@@ -18,11 +18,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const handleVerifyButton = async () => {
-    // * - bypassing verify to test flow
-    onSubmit({ toast: toasts.discordJoinFailed });
-    return;
-
-    const response = await fetch('/api/quest/oauth/verify-twitter', {
+    const response = await fetch('/api/quest/oauth/twitterVerify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +27,6 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
       body: JSON.stringify({
         auth_key: publicKey,
         wallet: (address as string)?.toLocaleLowerCase(),
-        redirectUri: `${window.location.origin}/oauth/twitter`,
       }),
     });
 
