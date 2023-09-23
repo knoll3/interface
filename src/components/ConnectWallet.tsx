@@ -6,6 +6,7 @@ import { useContext, useEffect } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
+import PressableButton from './PressableButton';
 
 export default function ConnectWallet({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
@@ -54,12 +55,7 @@ export default function ConnectWallet({ step, status, onSubmit }: IStepProps) {
   return (
     <ClaimStep label="Get your Wallet Ready" status={status} step={step}>
       {status !== 'complete' && (
-        <Button
-          primary
-          label="Connect Now"
-          onClick={handleConnectButton}
-          size="small"
-        />
+        <PressableButton label="Connect Now" onClick={handleConnectButton} />
       )}
     </ClaimStep>
   );

@@ -1,19 +1,23 @@
-import { Box, Image, Button, Text, ResponsiveContext } from 'grommet';
-import { Layout } from '../components';
-import ConnectWallet from '../components/ConnectWallet';
-import ConnectDiscord from '../components/ConnectDiscord';
-import JoinDiscord from '../components/JoinDiscord';
-import ConnectTwitter from '../components/ConnectTwitter';
-import FollowTwitter from '../components/FollowTwitter';
-import BroadcastTwitter from '../components/BroadcastTwitter';
-import { useContext, useEffect, useState } from 'react';
-import QuestDivider from '../components/QuestDivider';
-import ToasterList from '../components/ToasterList';
-import useToaster, { IToastContent } from '../hooks/useToaster';
-import { ClaimStatus } from '../components/ClaimStep';
+import { useContext, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { WalletContext } from '../context/walletContext';
+import { Box, Image, Text, ResponsiveContext } from 'grommet';
 import styled from 'styled-components';
+
+import { WalletContext } from '../context/walletContext';
+import useToaster, { IToastContent } from '../hooks/useToaster';
+
+import { ClaimStatus } from '../components/ClaimStep';
+import { Layout } from '../components';
+import BroadcastTwitter from '../components/BroadcastTwitter';
+import ConnectDiscord from '../components/ConnectDiscord';
+import ConnectTwitter from '../components/ConnectTwitter';
+import ConnectWallet from '../components/ConnectWallet';
+import FollowTwitter from '../components/FollowTwitter';
+import JoinDiscord from '../components/JoinDiscord';
+import PressableButton from '../components/PressableButton';
+import QuestDivider from '../components/QuestDivider';
+import Tag from '../components/Tag';
+import ToasterList from '../components/ToasterList';
 
 interface IOnSubmitProps {
   error?: boolean;
@@ -42,10 +46,6 @@ export default function QuestPage() {
   const { publicKey, userToken } = useContext(WalletContext);
 
   const isMobile = size === 'small';
-
-  useEffect(() => {
-    console.log({ size });
-  }, [size]);
 
   const stepStatus = (step: number) => {
     if (step === activeStep) {
@@ -95,12 +95,14 @@ export default function QuestPage() {
         <Box gap="large" width={isMobile ? '300px' : undefined}>
           <Image src="quest.jpg" alt="quest" />
           <Box align="center" gap="small">
-            <Button
-              secondary
-              label="Claim $MATIC & $FLC"
-              size="small"
-              onClick={handleClaim}
-            />
+            {activeStep < 7 ? (
+              <Tag label="Claim $MATIC & $FLC" type="disabled" />
+            ) : (
+              <PressableButton
+                label="Claim $MATIC & $FLC"
+                onClick={handleClaim}
+              />
+            )}
           </Box>
         </Box>
 

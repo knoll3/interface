@@ -1,4 +1,4 @@
-import { Box, Button } from 'grommet';
+import { Box } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
@@ -7,6 +7,7 @@ import { IStepProps } from '../pages/quest';
 import { useAccount } from 'wagmi';
 import { useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
+import PressableButton from './PressableButton';
 
 export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   const { address } = useAccount();
@@ -50,12 +51,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
-          <Button
-            primary
-            label="Follow Now"
-            onClick={handleFollowButton}
-            size="small"
-          />
+          <PressableButton label="Follow Now" onClick={handleFollowButton} />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
       )}
