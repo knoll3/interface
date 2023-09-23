@@ -61,27 +61,34 @@ export default async function handler(
     }
 
     const userTwitterData = getUser.userTwitterData;
-    const getCurrentUserData = await twitterClient.users.findMyUser();
+    let getCurrentUserData;
     if (userTwitterData) {
-      const updateTwitter = await prismaDB.userTwitterData.update({
-        where: {
-          userId: getUser.id,
-        },
-        data: {
-          twitterAccessToken: accessToken,
-        },
-        select: {
-          twitterName: true,
-        },
-      });
+      if (accessToken) {
+        await prismaDB.userTwitterData.update({
+          where: {
+            userId: getUser.id,
+          },
+          data: {
+            twitterAccessToken: accessToken,
+          },
+          select: {
+            twitterName: true,
+          },
+        });
+      }
     } else {
-      const createUserTwitter = await prismaInsertUserTwitterData(
-        prismaDB,
-        getUser?.id as string,
-        getCurrentUserData.data?.id as string,
-        getCurrentUserData.data?.name as string,
-        accessToken
-      );
+      if (accessToken) {
+        getCurrentUserData = await twitterClient.users.findMyUser();
+        await prismaInsertUserTwitterData(
+          prismaDB,
+          getUser?.id as string,
+          getCurrentUserData.data?.id as string,
+          getCurrentUserData.data?.name as string,
+          accessToken
+        );
+      } else {
+        return res.status(404).json({ data: { message: 'Not Found' } });
+      }
     }
 
     const getQuestTask = await prismaDB.questTask.findUnique({
@@ -102,7 +109,7 @@ export default async function handler(
     if (userHasTask)
       return res
         .status(200)
-        .json({ data: { twitterName: getCurrentUserData.data?.name } });
+        .json({ data: { twitterName: getCurrentUserData?.data?.name } });
     else {
       const userQuestTask = await prismaDB.userQuestTask.create({
         data: {
