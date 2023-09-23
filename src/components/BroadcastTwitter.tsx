@@ -21,28 +21,18 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
 
   const STEP_NAME = 'twitter_share';
   const { step, status } = getStepInfo(STEP_NAME);
+  const twitterBaseUrl = 'https://twitter.com/intent/tweet';
+  const tweetText = 'Check out this awesome post!'; // Replace with your desired tweet text
+  const hashtags = 'FLockQuest,WebDevelopment'; // Replace with your desired hashtags
+  const twitterUsername = 'yourTwitterUsername'; // Replace with your Twitter username
+
+  const twitterShareLink = `${twitterBaseUrl}?text=${encodeURIComponent(
+    tweetText
+  )}&hashtags=${encodeURIComponent(hashtags)}&via=${twitterUsername}`;
 
   const handleBroadcastButton = async () => {
     setIsLoadingPost(true);
-    const response = await fetch('/api/quest/oauth/twitterShare', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: JSON.stringify({
-        auth_key: publicKey,
-        wallet: (address as string)?.toLocaleLowerCase(),
-        redirectUri: `${window.location.origin}/oauth/twitter`,
-      }),
-    });
-    if (response.status === 201) {
-      // TODO - create an error message for this toaster
-      showToaster({ toast: toasts.twitterConnectionSuccess });
-    } else {
-      // TODO - create an error message for this toaster
-      showToaster({ toast: toasts.twitterPostFailed });
-    }
+    window.open(twitterShareLink, '_blank');
     setIsLoadingPost(false);
   };
 

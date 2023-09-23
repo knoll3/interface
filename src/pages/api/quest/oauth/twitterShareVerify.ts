@@ -41,17 +41,21 @@ export default async function handler(
     const userHasTask = getUser.userQuestTask.filter(
       (usertask) => usertask.taskId == getQuestTask.id
     );
+
     if (userHasTask.length) {
       return res.status(200).json({ data: 'OK' });
     }
 
-    console.log(useTwitterData?.twitterAccessToken);
     const twitterClient = new Client(useTwitterData?.twitterAccessToken!);
-    const tweet = await twitterClient.tweets.findTweetById(
-      useTwitterData?.twitterTweetId!
+    const usersTweets = await twitterClient.tweets.usersIdTweets(
+      useTwitterData?.twitterIdstr!
     );
 
-    if (tweet.data) {
+    const tweeted = usersTweets.data?.find((tweet) =>
+      tweet.text.includes('FLockQuest')
+    );
+
+    if (tweeted?.id) {
       const userQuestTask = await prismaDB.userQuestTask.create({
         data: {
           userId: getUser.id,
@@ -64,6 +68,6 @@ export default async function handler(
     }
   } catch (error) {
     console.log(error);
-    res.status(200).json({ data: { message: 'OK' } });
+    res.status(500).json({ data: { message: 'Internal Server Error' } });
   }
 }
