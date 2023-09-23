@@ -38,7 +38,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
       }),
     });
 
-    if (response.status === 200) {
+    if (response.status === 201 || response.status === 200) {
       const {
         data: { name },
       } = await response.json();
@@ -78,9 +78,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
     active: (
       <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: twitterUser && (
-      <Tag label={`@${twitterUser}`} />
-    ),
+    complete: twitterUser && <Tag label={`@${twitterUser}`} />,
   };
 
   return (
