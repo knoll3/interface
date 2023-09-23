@@ -1,4 +1,4 @@
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -85,8 +85,8 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   };
 
   return (
-    <ClaimStep label="Connect your Twitter account" step={step} status={status}>
+    <QuestStep label="Connect your Twitter account" step={step} status={status}>
       {isLoading ? <Tag label="Connect Now" type="black" /> : content[status]}
-    </ClaimStep>
+    </QuestStep>
   );
 }

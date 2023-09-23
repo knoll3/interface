@@ -1,5 +1,5 @@
 import { Box } from 'grommet';
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
@@ -75,7 +75,7 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
   }
 
   return (
-    <ClaimStep
+    <QuestStep
       label="Broadcast your Journey to your mate"
       step={step}
       status={status}
@@ -98,6 +98,6 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
           />
         </Box>
       )}
-    </ClaimStep>
+    </QuestStep>
   );
 }

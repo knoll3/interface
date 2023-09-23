@@ -30,6 +30,11 @@ const tagColors: ITagColors = {
     border: 'disabled',
     background: 'white',
   },
+  ghost: {
+    color: 'disabled',
+    border: 'ghost',
+    background: 'ghost',
+  }
 };
 
 const StyledTag = styled.div<{ type: any; timer: any }>`

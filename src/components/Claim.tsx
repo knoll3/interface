@@ -1,15 +1,25 @@
 import { Box, Button } from 'grommet';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
+import Tag from './Tag';
+import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
+import QuestStep from './QuestStep';
 
 export default function Claim({ showToaster }: IStepProps) {
-  const handleClaim = async () => {
-    const { address } = useAccount();
-    const { publicKey, userToken } = useContext(WalletContext);
+  const { publicKey, userToken } = useContext(WalletContext);
+  const { address } = useAccount();
+  const { getStepInfo, nextStep } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const STEP_NAME = 'claim_reward';
+  const { status, step } = getStepInfo(STEP_NAME);
+
+  const handleClaim = async () => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/claimReward', {
       method: 'POST',
       headers: {
@@ -21,24 +31,36 @@ export default function Claim({ showToaster }: IStepProps) {
         walletAddress: (address as string)?.toLocaleLowerCase(),
       }),
     });
+
+    setIsLoading(false);
     const data = await response.json();
     console.log({ data });
 
     if (response.status === 200) {
+      nextStep(STEP_NAME);
       showToaster({ toast: toasts.claimSuccess });
     } else {
       showToaster({ toast: toasts.claimFailed });
     }
   };
 
+  const content: any = {
+    disabled: <Tag label="Claim $MATIC & $FLC" type="ghost" />,
+    active: (
+      <PressableButton label="Claim $MATIC & $FLC" onClick={handleClaim} />
+    ),
+    complete: (
+      <QuestStep step={step} status={status} label="Claim $MATIC & $FLC" />
+    ),
+  };
+
   return (
     <Box align="center" gap="small">
-      <Button
-        secondary
-        label="Claim $MATIC & $FLC"
-        size="small"
-        onClick={handleClaim}
-      />
+      {isLoading ? (
+        <Tag label="Claim $MATIC & $FLC" type="black" />
+      ) : (
+        content[status]
+      )}
     </Box>
   );
 }

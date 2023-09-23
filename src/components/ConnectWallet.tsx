@@ -1,6 +1,6 @@
 import { useIsMounted } from '@/src/hooks';
 import { useAccount, useConnect } from 'wagmi';
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
@@ -71,7 +71,7 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
   }
 
   return (
-    <ClaimStep label="Get your Wallet Ready" status={status} step={step}>
+    <QuestStep label="Get your Wallet Ready" status={status} step={step}>
       {status !== 'complete' ? (
         isLoading ? (
           <Tag label="Connect Now" type="black" />
@@ -81,6 +81,6 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
       ) : (
         <></>
       )}
-    </ClaimStep>
+    </QuestStep>
   );
 }

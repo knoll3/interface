@@ -1,5 +1,5 @@
 import { Box } from 'grommet';
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
@@ -52,7 +52,7 @@ export default function FollowTwitter({ showToaster }: IStepProps) {
   }
 
   return (
-    <ClaimStep
+    <QuestStep
       label="Follow @flock_io on Twitter"
       step={step}
       status={status}
@@ -68,6 +68,6 @@ export default function FollowTwitter({ showToaster }: IStepProps) {
           />
         </Box>
       )}
-    </ClaimStep>
+    </QuestStep>
   );
 }

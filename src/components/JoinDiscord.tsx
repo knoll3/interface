@@ -1,5 +1,5 @@
 import { Box } from 'grommet';
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
@@ -48,7 +48,7 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
   }
 
   return (
-    <ClaimStep
+    <QuestStep
       label="Join our Discord and acquire a role"
       step={step}
       status={status}
@@ -68,6 +68,6 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
           <TimerButton label="Verify" onClick={handleVerifyButton} isLoading={isLoading} />
         </Box>
       )}
-    </ClaimStep>
+    </QuestStep>
   );
 }
