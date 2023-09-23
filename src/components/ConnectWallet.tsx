@@ -1,13 +1,13 @@
 import { useIsMounted } from '@/src/hooks';
-import { Button } from 'grommet';
 import { useAccount, useConnect } from 'wagmi';
 import ClaimStep from './ClaimStep';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
 import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
+import Tag from './Tag';
 
 export default function ConnectWallet({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
@@ -15,6 +15,7 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
   const { connectAsync, connectors } = useConnect();
   const { publicKey, userToken } = useContext(WalletContext);
   const { saveQuestProgress, getStepInfo } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { step, status } = getStepInfo('wallet_connect');
 
@@ -27,6 +28,7 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
   };
 
   const fetchLogin = async () => {
+    setIsLoading(true);
     const payload = {
       auth_key: publicKey,
       wallet: (address as string).toLocaleLowerCase(),
@@ -51,11 +53,11 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
         ) || [];
 
       saveQuestProgress(tasks, user);
-      // nextStep();
       showToaster({ toast: toasts.walletConnectionSuccess });
     } else {
       showToaster({ error: true, toast: toasts.walletConnectionFailed });
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -70,8 +72,14 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
 
   return (
     <ClaimStep label="Get your Wallet Ready" status={status} step={step}>
-      {status !== 'complete' && (
-        <PressableButton label="Connect Now" onClick={handleConnectButton} />
+      {status !== 'complete' ? (
+        isLoading ? (
+          <Tag label="Connect Now" type="black" />
+        ) : (
+          <PressableButton label="Connect Now" onClick={handleConnectButton} />
+        )
+      ) : (
+        <></>
       )}
     </ClaimStep>
   );

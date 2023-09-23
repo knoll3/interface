@@ -15,6 +15,7 @@ export default function ConnectDiscord({ showToaster }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);
   const { getStepInfo, nextStep, user } = useContext(QuestContext);
   const [discordCode, setDiscordCode] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const STEP_NAME = 'discord_connect';
   const { step, status } = getStepInfo(STEP_NAME);
@@ -29,6 +30,7 @@ export default function ConnectDiscord({ showToaster }: IStepProps) {
   };
 
   const checkDiscordAuth = async (code: string) => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/oauth/discord', {
       method: 'POST',
       headers: {
@@ -62,6 +64,7 @@ export default function ConnectDiscord({ showToaster }: IStepProps) {
         }
       }
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -95,7 +98,7 @@ export default function ConnectDiscord({ showToaster }: IStepProps) {
 
   return (
     <ClaimStep label="Connect your Discord account" step={step} status={status}>
-      {content[status]}
+      {isLoading ? <Tag label="Connect Now" type="black" /> : content[status]}
     </ClaimStep>
   );
 }

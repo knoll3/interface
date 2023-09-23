@@ -15,6 +15,7 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);
   const [twitterAccessToken, setTwitterAccessToken] = useState('');
   const { getStepInfo, user, nextStep } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const STEP_NAME = 'twitter_connect';
   const { step, status } = getStepInfo(STEP_NAME);
@@ -29,6 +30,7 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   };
 
   const checkTwitterAuth = async (accessToken: string) => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/oauth/twitter', {
       method: 'POST',
       headers: {
@@ -51,6 +53,7 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
     } else {
       showToaster({ error: true, toast: toasts.twitterConnectionFailed });
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
 
   return (
     <ClaimStep label="Connect your Twitter account" step={step} status={status}>
-      {content[status]}
+      {isLoading ? <Tag label="Connect Now" type="black" /> : content[status]}
     </ClaimStep>
   );
 }

@@ -5,34 +5,49 @@ import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
 import { useAccount } from 'wagmi';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
+import Tag from './Tag';
 
 export default function BroadcastTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
   const { getStepInfo, nextStep } = useContext(QuestContext);
+  const [isLoadingPost, setIsLoadingPost] = useState<boolean>(false);
+  const [isLoadingVerify, setIsLoadingVerify] = useState<boolean>(false);
 
   const STEP_NAME = 'twitter_share';
   const { step, status } = getStepInfo(STEP_NAME);
 
-  const twitterBaseUrl = 'https://twitter.com/intent/tweet';
-  const tweetText = 'Check out this awesome post!'; // Replace with your desired tweet text
-  const hashtags = 'ReactJS,WebDevelopment'; // Replace with your desired hashtags
-  const twitterUsername = 'yourTwitterUsername'; // Replace with your Twitter username
-
-  const twitterShareLink = `${twitterBaseUrl}?text=${encodeURIComponent(
-    tweetText
-  )}&hashtags=${encodeURIComponent(hashtags)}&via=${twitterUsername}`;
-
-  const handleBroadcastButton = () => {
-    window.open(twitterShareLink, '_blank');
+  const handleBroadcastButton = async () => {
+    setIsLoadingPost(true);
+    const response = await fetch('/api/quest/oauth/twitterShare', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        redirectUri: `${window.location.origin}/oauth/twitter`,
+      }),
+    });
+    if (response.status === 201) {
+      // TODO - create an error message for this toaster
+      showToaster({ toast: toasts.twitterConnectionSuccess });
+    } else {
+      // TODO - create an error message for this toaster
+      showToaster({ toast: toasts.twitterPostFailed });
+    }
+    setIsLoadingPost(false);
   };
 
   const handleVerifyButton = async () => {
+    setIsLoadingVerify(true);
     const response = await fetch('/api/quest/oauth/twitterShareVerify', {
       method: 'POST',
       headers: {
@@ -52,6 +67,7 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
     } else {
       showToaster({ error: true, toast: toasts.twitterPostFailed });
     }
+    setIsLoadingVerify(false);
   };
 
   if (!mounted) {
@@ -67,11 +83,19 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
-          <PressableButton
-            label="Broadcast Now"
-            onClick={handleBroadcastButton}
+          {isLoadingPost ? (
+            <Tag label="Broadcast Now" type="black" />
+          ) : (
+            <PressableButton
+              label="Broadcast Now"
+              onClick={handleBroadcastButton}
+            />
+          )}
+          <TimerButton
+            label="Verify"
+            onClick={handleVerifyButton}
+            isLoading={isLoadingVerify}
           />
-          <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
       )}
     </ClaimStep>

@@ -4,7 +4,7 @@ import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { useAccount } from 'wagmi';
 import { QuestContext } from '../context/questContext';
@@ -15,11 +15,13 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { publicKey, userToken } = useContext(WalletContext);
   const { getStepInfo, nextStep } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const STEP_NAME = 'discord_join_get_role'
   const { step, status } = getStepInfo(STEP_NAME);
 
   const handleVerifyButton = async () => {
+    setIsLoading(true)
     const response = await fetch('/api/quest/oauth/discordVerify', {
       method: 'POST',
       headers: {
@@ -38,6 +40,7 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
     } else {
       showToaster({ toast: toasts.discordVerifyFailed });
     }
+    setIsLoading(false)
   };
 
   if (!mounted) {
@@ -62,7 +65,7 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
               )
             }
           />
-          <TimerButton label="Verify" onClick={handleVerifyButton} />
+          <TimerButton label="Verify" onClick={handleVerifyButton} isLoading={isLoading} />
         </Box>
       )}
     </ClaimStep>
