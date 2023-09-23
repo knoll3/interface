@@ -6,14 +6,18 @@ import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
+import { QuestContext } from '../context/questContext';
 
-export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
+export default function ConnectTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
-
   const [twitterAccessToken, setTwitterAccessToken] = useState('');
-  const [twitterUser, setTwitterUser] = useState('');
+  const { getStepInfo, user, nextStep } = useContext(QuestContext);
+
+  const STEP_NAME = 'twitter_connect';
+  const { step, status } = getStepInfo(STEP_NAME);
+  const { twitterName } = user;
 
   const handleConnectButton = () => {
     const params =
@@ -42,13 +46,13 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
         const {
           data: { name },
         } = await response.json();
-        setTwitterUser(name);
-        onSubmit({ toast: toasts.twitterConnectionSuccess });
+        nextStep(STEP_NAME, { twitterName: name });
+        showToaster({ toast: toasts.twitterConnectionSuccess });
       } else {
-        onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
+        showToaster({ error: true, toast: toasts.twitterConnectionFailed });
       }
     } else {
-      onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
+      showToaster({ error: true, toast: toasts.twitterConnectionFailed });
     }
   };
 
@@ -65,10 +69,8 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (twitterAccessToken && publicKey && userToken && address) {
-      checkTwitterAuth(twitterAccessToken);
-    }
-  }, [twitterAccessToken, publicKey, userToken, address]);
+    twitterAccessToken && checkTwitterAuth(twitterAccessToken);
+  }, [twitterAccessToken]);
 
   if (!mounted) {
     return <></>;
@@ -84,8 +86,8 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
         size="small"
       />
     ),
-    complete: twitterUser && (
-      <Button primary label={`@${twitterUser}`} size="small" />
+    complete: twitterName && (
+      <Button primary label={`@${twitterName}`} size="small" />
     ),
   };
 

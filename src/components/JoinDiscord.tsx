@@ -7,11 +7,16 @@ import { IStepProps } from '../pages/quest';
 import { useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { useAccount } from 'wagmi';
+import { QuestContext } from '../context/questContext';
 
-export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
+export default function JoinDiscord({ showToaster }: IStepProps) {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const { publicKey, userToken } = useContext(WalletContext);
+  const { getStepInfo, nextStep } = useContext(QuestContext);
+
+  const STEP_NAME = 'discord_join_get_role'
+  const { step, status } = getStepInfo(STEP_NAME);
 
   const handleVerifyButton = async () => {
     const response = await fetch('/api/quest/oauth/discordVerify', {
@@ -27,9 +32,10 @@ export default function JoinDiscord({ step, status, onSubmit }: IStepProps) {
     });
 
     if (response.status === 200) {
-      onSubmit({ toast: toasts.discordVerifySuccess });
+      nextStep(STEP_NAME);
+      showToaster({ toast: toasts.discordVerifySuccess });
     } else {
-      onSubmit({ toast: toasts.discordVerifyFailed });
+      showToaster({ toast: toasts.discordVerifyFailed });
     }
   };
 

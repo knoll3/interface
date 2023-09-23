@@ -7,15 +7,16 @@ import { IStepProps } from '../pages/quest';
 import { useAccount } from 'wagmi';
 import { useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
+import { QuestContext } from '../context/questContext';
 
-export default function BroadcastTwitter({
-  step,
-  status,
-  onSubmit,
-}: IStepProps) {
+export default function BroadcastTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
+  const { getStepInfo, nextStep } = useContext(QuestContext);
+
+  const STEP_NAME = 'twitter_share';
+  const { step, status } = getStepInfo(STEP_NAME);
 
   const twitterBaseUrl = 'https://twitter.com/intent/tweet';
   const tweetText = 'Check out this awesome post!'; // Replace with your desired tweet text
@@ -45,9 +46,10 @@ export default function BroadcastTwitter({
     });
 
     if (response.status === 200) {
-      onSubmit({ toast: toasts.twitterConnectionSuccess });
+      nextStep(STEP_NAME);
+      showToaster({ toast: toasts.twitterConnectionSuccess });
     } else {
-      onSubmit({ error: true, toast: toasts.twitterPostFailed });
+      showToaster({ error: true, toast: toasts.twitterPostFailed });
     }
   };
 

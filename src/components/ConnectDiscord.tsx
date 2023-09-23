@@ -6,14 +6,18 @@ import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
+import { IUser, QuestContext } from '../context/questContext';
 
-export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
-  const { address } = useAccount();
+export default function ConnectDiscord({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
+  const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
-
+  const { getStepInfo, nextStep, user } = useContext(QuestContext);
   const [discordCode, setDiscordCode] = useState<string>('');
-  const [discordUser, setDiscordUser] = useState<any>('');
+
+  const STEP_NAME = 'discord_connect';
+  const { step, status } = getStepInfo(STEP_NAME);
+  const { discordName } = user;
 
   const handleConnectButton = () => {
     const params =
@@ -43,17 +47,17 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
         data: { discordName },
       } = await response.json();
 
-      setDiscordUser(discordName);
-      onSubmit({ toast: toasts.discordConnectionSuccess });
+      showToaster({ toast: toasts.discordConnectionSuccess });
+      nextStep(STEP_NAME, { discordName });
     } else {
       if (response.status === 409) {
-        onSubmit({
+        showToaster({
           error: true,
           toast: toasts.discordConnectionAlreadyAssociated,
         });
       } else {
         if (code) {
-          onSubmit({ error: true, toast: toasts.discordConnectionFailed });
+          showToaster({ error: true, toast: toasts.discordConnectionFailed });
         }
       }
     }
@@ -73,10 +77,8 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (publicKey && userToken && address && status === 'active') {
-      checkDiscordAuth(discordCode);
-    }
-  }, [discordCode, publicKey, userToken, address, status]);
+    discordCode && checkDiscordAuth(discordCode);
+  }, [discordCode]);
 
   if (!mounted) {
     return <></>;
@@ -92,7 +94,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
         size="small"
       />
     ),
-    complete: discordUser && <Button label={discordUser} size="small" />,
+    complete: discordName && <Button label={discordName} size="small" />,
   };
 
   return (

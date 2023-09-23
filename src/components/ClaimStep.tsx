@@ -1,13 +1,13 @@
 import { Box, Text } from 'grommet';
 import { Checkmark } from 'grommet-icons';
 import { ReactNode } from 'react';
+import { TClaimStatus } from '../context/questContext';
 
-export type ClaimStatus = 'active' | 'disabled' | 'complete';
 
 export type ClaimStepProps = {
   step: number;
   label: string;
-  status: ClaimStatus;
+  status: TClaimStatus;
   children?: ReactNode;
   actions?: JSX.Element | JSX.Element[];
   minWidth?: string;
