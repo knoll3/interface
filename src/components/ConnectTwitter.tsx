@@ -1,4 +1,3 @@
-import { Button } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
@@ -7,6 +6,8 @@ import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
 import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
+import Tag from './Tag';
 
 export default function ConnectTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
@@ -28,29 +29,25 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   };
 
   const checkTwitterAuth = async (accessToken: string) => {
-    if (accessToken) {
-      const response = await fetch('/api/quest/oauth/twitter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
-          auth_key: publicKey,
-          wallet: (address as string)?.toLocaleLowerCase(),
-          accessToken,
-        }),
-      });
+    const response = await fetch('/api/quest/oauth/twitter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        auth_key: publicKey,
+        wallet: (address as string)?.toLocaleLowerCase(),
+        accessToken,
+      }),
+    });
 
-      if (response.status === 201 || response.status === 200) {
-        const {
-          data: { name },
-        } = await response.json();
-        nextStep(STEP_NAME, { twitterName: name });
-        showToaster({ toast: toasts.twitterConnectionSuccess });
-      } else {
-        showToaster({ error: true, toast: toasts.twitterConnectionFailed });
-      }
+    if (response.status === 201 || response.status === 200) {
+      const {
+        data: { name },
+      } = await response.json();
+      nextStep(STEP_NAME, { twitterName: name });
+      showToaster({ toast: toasts.twitterConnectionSuccess });
     } else {
       showToaster({ error: true, toast: toasts.twitterConnectionFailed });
     }
@@ -79,16 +76,9 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   const content: any = {
     disabled: <></>,
     active: (
-      <Button
-        primary
-        label="Connect Now"
-        onClick={handleConnectButton}
-        size="small"
-      />
+      <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: twitterName && (
-      <Button primary label={`@${twitterName}`} size="small" />
-    ),
+    complete: twitterName && <Tag label={`@${twitterName}`} />,
   };
 
   return (

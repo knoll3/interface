@@ -79,6 +79,13 @@ export const BurgerMenu = ({
               text="Marketplace"
           />
           <MenuItem
+              href="/quest"
+              onClick={() => setSelected('/quest')}
+              hoverIndicator={false}
+              selected={selected === '/quest'}
+              text="Quest"
+          />
+          <MenuItem
               //href="/analytics"
               //onClick={() => setSelected('/analytics')}
               hoverIndicator={false}

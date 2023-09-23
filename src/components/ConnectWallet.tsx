@@ -7,6 +7,7 @@ import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
 import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
 
 export default function ConnectWallet({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
@@ -45,8 +46,9 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
       const wallet = data?.user?.wallet;
       const user = { discordName, twitterName, wallet };
       const tasks =
-        data?.user?.userQuestTask?.map((task: any) => task.questTask.taskName) ||
-        [];
+        data?.user?.userQuestTask?.map(
+          (task: any) => task.questTask.taskName
+        ) || [];
 
       saveQuestProgress(tasks, user);
       // nextStep();
@@ -68,13 +70,8 @@ export default function ConnectWallet({ showToaster }: IStepProps) {
 
   return (
     <ClaimStep label="Get your Wallet Ready" status={status} step={step}>
-      {status === 'active' && (
-        <Button
-          primary
-          label="Connect Now"
-          onClick={handleConnectButton}
-          size="small"
-        />
+      {status !== 'complete' && (
+        <PressableButton label="Connect Now" onClick={handleConnectButton} />
       )}
     </ClaimStep>
   );

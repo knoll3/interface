@@ -1,4 +1,4 @@
-import { Box, Button } from 'grommet';
+import { Box } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import { useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
 
 export default function BroadcastTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
@@ -66,11 +67,9 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
-          <Button
-            primary
+          <PressableButton
             label="Broadcast Now"
             onClick={handleBroadcastButton}
-            size="small"
           />
           <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>

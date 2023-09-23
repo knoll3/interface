@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { Box, Image, Text, ResponsiveContext } from 'grommet';
 import styled from 'styled-components';
 
-import QuestContextProvider from '../context/questContext';
 import useToaster, { IToastContent } from '../hooks/useToaster';
 
 import { Layout } from '../components';
@@ -13,6 +12,7 @@ import ConnectTwitter from '../components/ConnectTwitter';
 import ConnectWallet from '../components/ConnectWallet';
 import FollowTwitter from '../components/FollowTwitter';
 import JoinDiscord from '../components/JoinDiscord';
+import QuestContextProvider from '../context/questContext';
 import QuestDivider from '../components/QuestDivider';
 import ToasterList from '../components/ToasterList';
 

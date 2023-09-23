@@ -44,8 +44,8 @@ export default function ClaimStep({
       align="center"
       gap="small"
       border={{ color: colors.wrapperBorder[status], size: 'small' }}
-      pad={{ vertical: '9px', horizontal: '15px' }}
-      round="large"
+      pad={{ vertical: '7px', horizontal: '15px' }}
+      round="50px"
       key={`step-${step}`}
       background={colors.wrapperBg[status]}
       style={{ minHeight: '58px' }}
@@ -55,7 +55,7 @@ export default function ClaimStep({
           align="center"
           justify="center"
           border={{ color: colors.content[status], size: 'small' }}
-          round="large"
+          round="50px"
           background="brand"
           width="24px"
           height="24px"
@@ -68,7 +68,7 @@ export default function ClaimStep({
           align="center"
           justify="center"
           border={{ color: colors.content[status], size: 'small' }}
-          round="large"
+          round="50px"
           width="24px"
           height="24px"
           style={{ minWidth: '24px', minHeight: '24px' }}

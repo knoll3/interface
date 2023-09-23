@@ -1,4 +1,3 @@
-import { Button } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
@@ -6,7 +5,9 @@ import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
-import { IUser, QuestContext } from '../context/questContext';
+import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
+import Tag from './Tag';
 
 export default function ConnectDiscord({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
@@ -87,14 +88,9 @@ export default function ConnectDiscord({ showToaster }: IStepProps) {
   const content: any = {
     disabled: <></>,
     active: (
-      <Button
-        primary
-        label="Connect Now"
-        onClick={handleConnectButton}
-        size="small"
-      />
+      <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: discordName && <Button label={discordName} size="small" />,
+    complete: discordName && <Tag label={discordName} />,
   };
 
   return (

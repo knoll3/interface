@@ -145,7 +145,7 @@ const flockTheme = {
 };
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   return (
-    <Grommet theme={flockTheme}>
+    <Grommet theme={flockTheme} cssVars>
       <WagmiConfig config={configWagmi}>
         <WalletContextProvider>
           <GoogleAnalytics trackPageViews />

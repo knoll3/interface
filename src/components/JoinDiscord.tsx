@@ -1,4 +1,4 @@
-import { Box, Button } from 'grommet';
+import { Box } from 'grommet';
 import ClaimStep from './ClaimStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
@@ -8,6 +8,7 @@ import { useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
 import { useAccount } from 'wagmi';
 import { QuestContext } from '../context/questContext';
+import PressableButton from './PressableButton';
 
 export default function JoinDiscord({ showToaster }: IStepProps) {
   const { address } = useAccount();
@@ -48,21 +49,20 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
       label="Join our Discord and acquire a role"
       step={step}
       status={status}
-      minWidth='160px'
+      minWidth="160px"
     >
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
-          <Button
-            primary
+          <PressableButton
             label="Join Now"
-            href={process.env.NEXT_PUBLIC_DISCORD_CHANNEL_LINK}
-            target="_blank"
-            size="small"
+            onClick={() =>
+              window.open(
+                process.env.NEXT_PUBLIC_DISCORD_CHANNEL_LINK,
+                '_blank'
+              )
+            }
           />
-          <TimerButton
-            label="Verify"
-            onClick={handleVerifyButton}
-          />
+          <TimerButton label="Verify" onClick={handleVerifyButton} />
         </Box>
       )}
     </ClaimStep>
