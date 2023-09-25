@@ -6,7 +6,8 @@ interface WalletContextProviderProps {
 }
 
 interface IWalletContext {
-  flockTokenBalance: any;
+  FLCTokenBalance: any;
+  FLOTokenBalance: any;
   nativeTokenBalance: any;
 }
 
@@ -24,18 +25,25 @@ export function WalletContextProvider({
     watch: true,
   });
 
-  const { data: flockTokenBalance } = useBalance({
+  const { data: FLCTokenBalance } = useBalance({
     address: address as `0x${string}`,
     token: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
+    watch: true,
+  });
+
+  const { data: FLOTokenBalance } = useBalance({
+    address: address as `0x${string}`,
+    token: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
     watch: true,
   });
 
   const value = useMemo(
     () => ({
       nativeTokenBalance,
-      flockTokenBalance,
+      FLCTokenBalance,
+      FLOTokenBalance,
     }),
-    [nativeTokenBalance, flockTokenBalance]
+    [nativeTokenBalance, FLCTokenBalance, FLOTokenBalance]
   );
 
   return (
