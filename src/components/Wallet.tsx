@@ -10,7 +10,7 @@ export function Wallet() {
   const [showWalletSettings, setShowWalletSettings] = useState(false);
   const { connectAsync, connectors } = useConnect();
   const { disconnect: wagmiDisconnect } = useDisconnect();
-  const { nativeTokenBalance, flockTokenBalance } = useContext(WalletContext);
+  const { nativeTokenBalance, FLCTokenBalance, FLOTokenBalance } = useContext(WalletContext);
   const mounted = useIsMounted();
 
   const handleConnect = async () => {
@@ -23,8 +23,12 @@ export function Wallet() {
     wagmiDisconnect();
   };
 
-  const roundedFLCBalance = flockTokenBalance
-    ? Math.round(Number(flockTokenBalance.formatted) * 100) / 100
+  const roundedFLCBalance = FLCTokenBalance
+    ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
+    : 0;
+  
+  const roundedFLOBalance = FLOTokenBalance
+    ? Math.round(Number(FLOTokenBalance.formatted) * 100) / 100
     : 0;
 
   const roundedMaticBalance = nativeTokenBalance
@@ -43,6 +47,10 @@ export function Wallet() {
           <Box align="start" gap="xsmall">
             <Text>
               <b>Wallet Address:</b> {address}
+            </Text>
+            <Text>
+              <b>FLock(FLO) Balance: </b>
+              {roundedFLOBalance} $F
             </Text>
             <Text>
               <b>FLock(FLC) Balance: </b>
@@ -79,7 +87,7 @@ export function Wallet() {
       label={
         !address
           ? 'Connect Wallet'
-          : `(${roundedFLCBalance} $F) ${truncateEthAddress(address)}`
+          : `(${roundedFLOBalance} $F) ${truncateEthAddress(address)}`
       }
       pad="xsmall"
       onClick={
