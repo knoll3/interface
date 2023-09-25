@@ -1,7 +1,6 @@
 import { Box } from 'grommet';
 import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
-import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
 import { useAccount } from 'wagmi';
@@ -20,11 +19,7 @@ export default function FollowTwitter({ showToaster }: IStepProps) {
   const STEP_NAME = 'twitter_follow';
   const { step, status } = getStepInfo(STEP_NAME);
 
-  const handleFollowButton = () => {
-    window.open(process.env.NEXT_PUBLIC_TWITTER_FOLLOW_LINK, '_blank');
-  };
-
-  const handleVerifyButton = async () => {
+  const handleFollowButton = async () => {
     setIsLoading(true);
     const response = await fetch('/api/quest/oauth/twitterFollowVerify', {
       method: 'POST',
@@ -61,11 +56,6 @@ export default function FollowTwitter({ showToaster }: IStepProps) {
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <PressableButton label="Follow Now" onClick={handleFollowButton} />
-          <TimerButton
-            label="Verify"
-            onClick={handleVerifyButton}
-            isLoading={isLoading}
-          />
         </Box>
       )}
     </QuestStep>
