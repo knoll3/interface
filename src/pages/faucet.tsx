@@ -11,6 +11,7 @@ export default function FaucetPage() {
   const { address } = useAccount();
   const [errors, setErrors] = useState<any>({});
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { FLCTokenBalance, FLOTokenBalance } = useContext(WalletContext);
 
 
@@ -45,6 +46,7 @@ export default function FaucetPage() {
   // };
 
   const handleApprove = async () => {
+    setIsLoading(true);
     writeApprove?.({ args: [process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`, FLCTokenBalance.value] });
   }
 
@@ -52,13 +54,16 @@ export default function FaucetPage() {
     if (isSuccessApprove) {
       writeMigrate?.();
     }
-  }, [isSuccessApprove]);
-
+    if (isSuccessMigrate) {
+      setIsLoading(false);
+    } 
+  }, [isSuccessApprove, isSuccessMigrate]);
 
   const hasErrors = Object.keys(errors).length > 0;
+
   useEffect(() => {
-    setDisabled(!address || hasErrors || isLoadingApprove || isLoadingMigrate);
-  }, [address, isLoadingApprove, isLoadingMigrate]);
+    setDisabled(!address || hasErrors || isLoading);
+  }, [address, isLoading]);
 
   const roundedFLCBalance = FLCTokenBalance
   ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
@@ -100,7 +105,7 @@ export default function FaucetPage() {
               primary
               onClick={handleApprove}
               disabled={disabled || roundedFLCBalance === 0}
-              label={(isLoadingApprove || isLoadingMigrate) ? 'Migrating...' : 'Migrate'}
+              label={isLoading ? 'Migrating...' : 'Migrate'}
             />
           </Box>
         </Box>
