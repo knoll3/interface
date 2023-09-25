@@ -1,24 +1,31 @@
 import { Box } from 'grommet';
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import TimerButton from './TimerButton';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
 import { useAccount } from 'wagmi';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { WalletContext } from '../context/walletContext';
+import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
 
-export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
+export default function FollowTwitter({ showToaster }: IStepProps) {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const { publicKey, userToken } = useContext(WalletContext);
+  const { getStepInfo, nextStep } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const STEP_NAME = 'twitter_follow';
+  const { step, status } = getStepInfo(STEP_NAME);
 
   const handleFollowButton = () => {
     window.open(process.env.NEXT_PUBLIC_TWITTER_FOLLOW_LINK, '_blank');
   };
 
   const handleVerifyButton = async () => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/oauth/twitterFollowVerify', {
       method: 'POST',
       headers: {
@@ -32,10 +39,12 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
     });
 
     if (response.status === 200) {
-      onSubmit({ toast: toasts.twitterConnectionSuccess });
+      nextStep(STEP_NAME);
+      showToaster({ toast: toasts.twitterConnectionSuccess });
     } else {
-      onSubmit({ error: true, toast: toasts.twitterFollowFailed });
+      showToaster({ error: true, toast: toasts.twitterFollowFailed });
     }
+    setIsLoading(false);
   };
 
   if (!mounted) {
@@ -43,7 +52,7 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
   }
 
   return (
-    <ClaimStep
+    <QuestStep
       label="Follow @flock_io on Twitter"
       step={step}
       status={status}
@@ -52,9 +61,13 @@ export default function FollowTwitter({ step, status, onSubmit }: IStepProps) {
       {status === 'active' && (
         <Box direction="row" gap="xsmall">
           <PressableButton label="Follow Now" onClick={handleFollowButton} />
-          <TimerButton label="Verify" onClick={handleVerifyButton} />
+          <TimerButton
+            label="Verify"
+            onClick={handleVerifyButton}
+            isLoading={isLoading}
+          />
         </Box>
       )}
-    </ClaimStep>
+    </QuestStep>
   );
 }

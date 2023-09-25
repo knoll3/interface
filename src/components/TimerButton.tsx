@@ -5,14 +5,13 @@ import Tag from './Tag';
 interface ITimerButtonProps {
   label: string;
   onClick(): void;
+  isLoading: boolean;
 }
 
-export default function TimerButton({ label, onClick }: ITimerButtonProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export default function TimerButton({ label, onClick, isLoading }: ITimerButtonProps) {
   const [timer, setTimer] = useState<number>(10);
   const handleButtonClick = () => {
     setTimer(10);
-    setIsLoading(true);
     onClick();
   };
 
@@ -23,7 +22,6 @@ export default function TimerButton({ label, onClick }: ITimerButtonProps) {
           setTimer(timer - 1);
         } else {
           clearInterval(interval);
-          setIsLoading(false);
         }
       }, 1000);
 

@@ -1,20 +1,25 @@
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
+import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
 import Tag from './Tag';
 
-export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
+export default function ConnectTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
-
   const [twitterAccessToken, setTwitterAccessToken] = useState('');
-  const [twitterUser, setTwitterUser] = useState('');
+  const { getStepInfo, user, nextStep } = useContext(QuestContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const STEP_NAME = 'twitter_connect';
+  const { step, status } = getStepInfo(STEP_NAME);
+  const { twitterName } = user;
 
   const handleConnectButton = () => {
     const params =
@@ -25,6 +30,7 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   };
 
   const checkTwitterAuth = async (accessToken: string) => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/oauth/twitter', {
       method: 'POST',
       headers: {
@@ -42,13 +48,12 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
       const {
         data: { name },
       } = await response.json();
-      setTwitterUser(name);
-      onSubmit({ toast: toasts.twitterConnectionSuccess });
+      nextStep(STEP_NAME, { twitterName: name });
+      showToaster({ toast: toasts.twitterConnectionSuccess });
     } else {
-      if (accessToken) {
-        onSubmit({ error: true, toast: toasts.twitterConnectionFailed });
-      }
+      showToaster({ error: true, toast: toasts.twitterConnectionFailed });
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -64,10 +69,8 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (publicKey && userToken && address && status === 'active') {
-      checkTwitterAuth(twitterAccessToken);
-    }
-  }, [twitterAccessToken, publicKey, userToken, address, status]);
+    twitterAccessToken && checkTwitterAuth(twitterAccessToken);
+  }, [twitterAccessToken]);
 
   if (!mounted) {
     return <></>;
@@ -78,12 +81,12 @@ export default function ConnectTwitter({ step, status, onSubmit }: IStepProps) {
     active: (
       <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: twitterUser && <Tag label={`@${twitterUser}`} />,
+    complete: twitterName && <Tag label={`@${twitterName}`} />,
   };
 
   return (
-    <ClaimStep label="Connect your Twitter account" step={step} status={status}>
-      {content[status]}
-    </ClaimStep>
+    <QuestStep label="Connect your Twitter account" step={step} status={status}>
+      {isLoading ? <Tag label="Connect Now" type="black" /> : content[status]}
+    </QuestStep>
   );
 }

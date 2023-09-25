@@ -87,6 +87,7 @@ const flockTheme = {
       disabled: '#879095',
       error: '#B8482B',
       success: '#54875D',
+      ghost: '#F2F6FF'
     },
   },
   button: {

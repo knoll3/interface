@@ -1,20 +1,25 @@
-import ClaimStep from './ClaimStep';
+import QuestStep from './QuestStep';
 import { useIsMounted } from '../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { toasts } from '../constants/toastMessages';
 import { IStepProps } from '../pages/quest';
+import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
 import Tag from './Tag';
 
-export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
-  const { address } = useAccount();
+export default function ConnectDiscord({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
+  const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
-
+  const { getStepInfo, nextStep, user } = useContext(QuestContext);
   const [discordCode, setDiscordCode] = useState<string>('');
-  const [discordUser, setDiscordUser] = useState<any>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const STEP_NAME = 'discord_connect';
+  const { step, status } = getStepInfo(STEP_NAME);
+  const { discordName } = user;
 
   const handleConnectButton = () => {
     const params =
@@ -25,6 +30,7 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   };
 
   const checkDiscordAuth = async (code: string) => {
+    setIsLoading(true);
     const response = await fetch('/api/quest/oauth/discord', {
       method: 'POST',
       headers: {
@@ -44,20 +50,21 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
         data: { discordName },
       } = await response.json();
 
-      setDiscordUser(discordName);
-      onSubmit({ toast: toasts.discordConnectionSuccess });
+      showToaster({ toast: toasts.discordConnectionSuccess });
+      nextStep(STEP_NAME, { discordName });
     } else {
       if (response.status === 409) {
-        onSubmit({
+        showToaster({
           error: true,
           toast: toasts.discordConnectionAlreadyAssociated,
         });
       } else {
         if (code) {
-          onSubmit({ error: true, toast: toasts.discordConnectionFailed });
+          showToaster({ error: true, toast: toasts.discordConnectionFailed });
         }
       }
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -74,10 +81,8 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    if (publicKey && userToken && address && status === 'active') {
-      checkDiscordAuth(discordCode);
-    }
-  }, [discordCode, publicKey, userToken, address, status]);
+    discordCode && checkDiscordAuth(discordCode);
+  }, [discordCode]);
 
   if (!mounted) {
     return <></>;
@@ -88,12 +93,12 @@ export default function ConnectDiscord({ step, status, onSubmit }: IStepProps) {
     active: (
       <PressableButton label="Connect Now" onClick={handleConnectButton} />
     ),
-    complete: discordUser && <Tag label={discordUser} />,
+    complete: discordName && <Tag label={discordName} />,
   };
 
   return (
-    <ClaimStep label="Connect your Discord account" step={step} status={status}>
-      {content[status]}
-    </ClaimStep>
+    <QuestStep label="Connect your Discord account" step={step} status={status}>
+      {isLoading ? <Tag label="Connect Now" type="black" /> : content[status]}
+    </QuestStep>
   );
 }

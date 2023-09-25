@@ -1,17 +1,16 @@
 import { Box, Text } from 'grommet';
 import { Checkmark } from 'grommet-icons';
 import { ReactNode } from 'react';
+import { TClaimStatus } from '../context/questContext';
 
-export type ClaimStatus = 'active' | 'disabled' | 'complete';
-
-export type ClaimStepProps = {
+export interface IQuestStepProps {
   step: number;
   label: string;
-  status: ClaimStatus;
+  status: TClaimStatus;
   children?: ReactNode;
   actions?: JSX.Element | JSX.Element[];
   minWidth?: string;
-};
+}
 
 const colors = {
   content: {
@@ -31,13 +30,13 @@ const colors = {
   },
 };
 
-export default function ClaimStep({
+export default function QuestStep({
   step,
   label,
   status,
   children,
   minWidth,
-}: ClaimStepProps) {
+}: IQuestStepProps) {
   return (
     <Box
       direction="row"
@@ -79,7 +78,7 @@ export default function ClaimStep({
             textAlign="center"
             color={colors.content[status]}
           >
-            {step}
+            {step + 1}
           </Text>
         </Box>
       )}
