@@ -30,7 +30,45 @@ export default async function handler(
   );
 
   const wallet = new ethers.Wallet(process.env.CLAIM_PRIVATE_KEY!, provider);
+  
+  const questTaskNames = [
+    'discord_connect',
+    'twitter_follow',
+    'twitter_share',
+    'discord_join_get_role',
+    'twitter_connect',
+  ];
 
+  const questTasks = await client.questTask.findMany({
+    where: {
+      taskName: { in: questTaskNames },
+    },
+  });
+
+  const user = await client.user.findUnique({
+    where: { wallet: walletAddress as string },
+    include: { userQuestTask: true },
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  for (const questTaskName of questTaskNames) {
+    const questTask = questTasks.find((task) => task.taskName === questTaskName);
+    if (!questTask) {
+      return res.status(400).json({ message: `Quest task "${questTaskName}" not found` });
+    }
+
+    const userQuestTask = user.userQuestTask.find(
+      (task) => task.taskId === questTask.id
+    );
+
+    if (!userQuestTask) {
+      return res.status(400).json({ message: `User has not completed "${questTaskName}" task` });
+    }
+  }
+  
   const claimContract = new ethers.Contract(
     process.env.NEXT_PUBLIC_CLAIM_REWARDS_ADDRESS!,
     CLAIM_REWARDS_ABI,
