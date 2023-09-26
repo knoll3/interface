@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Next.js: debug server-side",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "yarn dev",
+            "cwd": "${workspaceFolder}/../interface"
+        }
+    ]
+}

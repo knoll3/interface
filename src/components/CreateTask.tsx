@@ -344,7 +344,7 @@ const TaskDefinitionForm = ({
           <Select
             id="taskType"
             name="taskType"
-            options={['NLP', 'Finance', 'Computer Vision']}
+            options={['DeFi', 'Social', 'NFT', 'Gaming']}
           />
         </FormField>
       </Box>
