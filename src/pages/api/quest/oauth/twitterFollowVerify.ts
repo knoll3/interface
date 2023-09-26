@@ -46,7 +46,6 @@ export default async function handler(
       return res.status(200).json({ data: 'OK' });
     }
 
-    console.log(useTwitterData?.twitterAccessToken);
     const twitterClient = new Client(useTwitterData?.twitterAccessToken!);
 
     const myUser = await twitterClient.users.findMyUser();
@@ -56,7 +55,16 @@ export default async function handler(
     //
     // console.log(followers.data);
 
-    if (myUser) {
+    const followUser = await twitterClient.users.usersIdFollow(
+      //The ID of the user that is requesting to follow the target user
+      useTwitterData?.twitterIdstr!,
+      {
+        //The ID of the user that the source user is requesting to follow
+        target_user_id: process.env.FLOCK_TWITTER_ID!,
+      }
+    );
+
+    if (followUser.data?.following) {
       const userQuestTask = await prismaDB.userQuestTask.create({
         data: {
           userId: getUser.id,

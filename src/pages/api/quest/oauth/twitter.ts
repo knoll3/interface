@@ -12,7 +12,7 @@ async function prismaInsertUserTwitterData(
   twitterAccessToken: string
 ) {
   try {
-    const userTwitterData = await prismaDB.userTwitterData.create({
+    await prismaDB.userTwitterData.create({
       data: {
         userId,
         twitterIdstr,
@@ -20,7 +20,7 @@ async function prismaInsertUserTwitterData(
         twitterAccessToken,
       },
     });
-    return { error: false, status: 201, message: 'OK', data: userTwitterData };
+    return { error: false, status: 200, message: 'OK' };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code == 'P2002') {
@@ -106,19 +106,23 @@ export default async function handler(
     const userHasTask = getUser.userQuestTask.filter(
       (usertask) => usertask.taskId == getQuestTask.id
     );
-    if (userHasTask.length)
-      return res
-        .status(200)
-        .json({ data: { twitterName: getCurrentUserData?.data?.name } });
-    else {
-      const userQuestTask = await prismaDB.userQuestTask.create({
+    if (!userHasTask.length) {
+      await prismaDB.userQuestTask.create({
         data: {
           userId: getUser.id,
           taskId: getQuestTask.id,
         },
       });
-      return res.status(200).json({ data: { message: 'OK' } });
     }
+    return res
+      .status(200)
+      .json({
+        data: {
+          twitterName: accessToken
+            ? getCurrentUserData?.data?.name
+            : userTwitterData?.twitterName,
+        },
+      });
   } catch (error) {
     console.log(error);
     return res.status(503).json({ data: { message: 'Internal Server Error' } });

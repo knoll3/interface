@@ -44,11 +44,11 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
       }),
     });
 
-    if (response.status === 201 || response.status === 200) {
+    if (response.status === 200) {
       const {
-        data: { name },
+        data: { twitterName },
       } = await response.json();
-      nextStep(STEP_NAME, { twitterName: name });
+      nextStep(STEP_NAME, { twitterName });
       showToaster({ toast: toasts.twitterConnectionSuccess });
     } else {
       showToaster({ error: true, toast: toasts.twitterConnectionFailed });
