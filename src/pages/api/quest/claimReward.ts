@@ -4,33 +4,43 @@ const client = new PrismaClient();
 import { ethers } from 'ethers';
 import { CLAIM_REWARDS_ABI } from '@/src/contracts/claimRewards';
 
-interface ClaimedReward {
-  message: string | unknown;
-}
+type Response = {};
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ClaimedReward>
+  res: NextApiResponse<Response>
 ) {
   const { walletAddress } = req.body;
 
-  const userView = await client.claimedRewards.findFirst({
+  const getUser = await client.user.findUnique({
     where: {
       wallet: walletAddress as string,
     },
+    include: {
+      userQuestTask: true,
+      userDiscordData: true,
+    },
   });
-
-  if (userView) {
-    res.status(200).json({ message: 'Already claimed' });
-    return;
+  if (!getUser) {
+    return res.status(404).json({ data: { message: 'Not Found' } });
   }
 
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_WEB3_AUTH_RPC
-  );
+  const getQuestTask = await client.questTask.findUnique({
+    where: {
+      taskName: 'claim_reward',
+    },
+  });
+  if (!getQuestTask) {
+    return res.status(404).json({ data: { message: 'Not Found' } });
+  }
 
-  const wallet = new ethers.Wallet(process.env.CLAIM_PRIVATE_KEY!, provider);
-  
+  const userHasTask = getUser.userQuestTask.filter(
+    (usertask) => usertask.taskId == getQuestTask.id
+  );
+  if (userHasTask.length) {
+    return res.status(200).json({ data: { message: 'OK' } });
+  }
+
   const questTaskNames = [
     'discord_connect',
     'twitter_follow',
@@ -45,30 +55,33 @@ export default async function handler(
     },
   });
 
-  const user = await client.user.findUnique({
-    where: { wallet: walletAddress as string },
-    include: { userQuestTask: true },
-  });
-
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
   for (const questTaskName of questTaskNames) {
-    const questTask = questTasks.find((task) => task.taskName === questTaskName);
+    const questTask = questTasks.find(
+      (task) => task.taskName === questTaskName
+    );
     if (!questTask) {
-      return res.status(400).json({ message: `Quest task "${questTaskName}" not found` });
+      return res
+        .status(400)
+        .json({ message: `Quest task "${questTaskName}" not found` });
     }
 
-    const userQuestTask = user.userQuestTask.find(
+    const userQuestTask = getUser.userQuestTask.find(
       (task) => task.taskId === questTask.id
     );
 
     if (!userQuestTask) {
-      return res.status(400).json({ message: `User has not completed "${questTaskName}" task` });
+      return res
+        .status(400)
+        .json({ message: `User has not completed "${questTaskName}" task` });
     }
   }
-  
+
+  const provider = new ethers.providers.JsonRpcProvider(
+    process.env.NEXT_PUBLIC_WEB3_AUTH_RPC
+  );
+
+  const wallet = new ethers.Wallet(process.env.CLAIM_PRIVATE_KEY!, provider);
+
   const claimContract = new ethers.Contract(
     process.env.NEXT_PUBLIC_CLAIM_REWARDS_ADDRESS!,
     CLAIM_REWARDS_ABI,
@@ -83,17 +96,13 @@ export default async function handler(
     return;
   }
 
-  await client.claimedRewards
-    .create({
-      data: {
-        wallet: walletAddress as string,
-      },
-    })
-    .then(() => {
-      res.status(200).json({ message: 'Claimed rewards' });
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({ message: 'Error posting data to db' });
-    });
+  const createTask = await client.userQuestTask.create({
+    data: {
+      userId: getUser.id,
+      taskId: getQuestTask.id,
+    },
+  });
+  if (createTask) {
+    return res.status(200).json({ data: { message: 'OK' } });
+  }
 }
