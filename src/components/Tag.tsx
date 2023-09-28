@@ -34,10 +34,10 @@ const tagColors: ITagColors = {
     color: 'disabled',
     border: 'ghost',
     background: 'ghost',
-  }
+  },
 };
 
-const StyledTag = styled.div<{ type: any; timer: any }>`
+const StyledTag = styled.div<{ type: any; timer?: any }>`
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -74,5 +74,20 @@ export default function Tag({ label, type, timer }: ITagProps) {
     <StyledTag type={tagColor} timer={timer}>
       {label}
     </StyledTag>
+  );
+}
+
+export const CustomStyledTag = styled(StyledTag)`
+  padding: 16px 20px;
+  font-size: 14px;
+`;
+
+export function ClaimTag({ label, type, timer }: ITagProps) {
+  const tagColor = tagColors[type || 'default'];
+
+  return (
+    <CustomStyledTag type={tagColor} timer={timer}>
+      {label}
+    </CustomStyledTag>
   );
 }

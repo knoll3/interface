@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Button = styled.div`
+const Button = styled.div<{ size?: any }>`
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -14,6 +14,12 @@ const Button = styled.div`
   border-radius: 50px;
   left: -2px;
   top: -2px;
+
+  ${({ size }) =>
+    size === 'large' &&
+    `
+    padding: 16px 20px;
+  `}
 `;
 
 const Container = styled.div`
@@ -35,7 +41,7 @@ const Text = styled.span`
   box-sizing: border-box;
   font-family: 'Gilroy';
   font-style: normal;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 16px;
   font-weight: 800;
   color: var(--white);
@@ -61,13 +67,18 @@ const Background = styled.span`
 interface IPressableButtonProps {
   label: string;
   onClick(): void;
+  size?: string;
 }
 
-export default function PressableButton({ label, onClick }: IPressableButtonProps) {
+export default function PressableButton({
+  label,
+  onClick,
+  size,
+}: IPressableButtonProps) {
   return (
-    <Container onClick={() => onClick()} typeof='button'>
+    <Container onClick={() => onClick()} typeof="button">
       <Content>
-        <Button>
+        <Button size={size}>
           <Text>{label}</Text>
         </Button>
         <Background />
