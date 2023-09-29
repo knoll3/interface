@@ -10,14 +10,18 @@ import {
     Select,
     Text,
     TextArea,
-    TextInput 
+    TextInput,
+    InfiniteScroll, 
 } from 'grommet';
-import { useState } from "react";
+import { Key, useState } from "react";
+import showdown from 'showdown';
 
 export default function GptResearcherPage() {
-
+    const [task, setTask] = useState<string>("");
+    const [reportType, setReportType] = useState<string>("Research Report");
     const [report, setReport] = useState<string>("");
-    const [agentOutput, setAgentOutput] = useState<string>("");
+    const [agentOutput, setAgentOutput] = useState<string[]>([]);
+    const [downloadLink, setDownloadLink] = useState<string>("");
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -27,11 +31,9 @@ export default function GptResearcherPage() {
         };
       
         const listenToSockEvents = () => {
-          const { protocol, host, pathname } = window.location;
-          const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
+          const ws_uri = 'ws://209.20.157.253:8080/ws';
           const converter = new showdown.Converter();
           const socket = new WebSocket(ws_uri);
-      
           socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'logs') {
@@ -44,69 +46,53 @@ export default function GptResearcherPage() {
           };
       
           socket.onopen = (event) => {
-            const task = document.querySelector('input[name="task"]').value;
-            const report_type = document.querySelector('select[name="report_type"]').value;
-            const agent = document.querySelector('input[name="agent"]:checked').value;
       
             const requestData = {
               task: task,
-              report_type: report_type,
-              agent: agent,
+              report_type: reportType,
+              agent: "Auto Agent",
             };
       
             socket.send(`start ${JSON.stringify(requestData)}`);
           };
         };
       
-        const addAgentResponse = (data) => {
-          const output = document.getElementById("output");
-          output.innerHTML += '<div class="agent_response">' + data.output + '</div>';
-          output.scrollTop = output.scrollHeight;
-          output.style.display = "block";
+        const addAgentResponse = (data: { output: any; }) => {
+          setAgentOutput((prev) => [...prev, data.output]);
           updateScroll();
         };
       
-        const writeReport = (data, converter) => {
-          const reportContainer = document.getElementById("reportContainer");
-          const markdownOutput = converter.makeHtml(data.output);
-          reportContainer.innerHTML += markdownOutput;
+        const writeReport = (data: { output: any; }, converter: { makeHtml: (arg0: any) => any; }) => {
+            console.log(data.output);
+            const markdownOutput = converter.makeHtml(data.output);
+            console.log(markdownOutput);
+          setReport((prev) => prev + ' ' + markdownOutput);
           updateScroll();
         };
       
-        const updateDownloadLink = (data) => {
-          const path = data.output;
-          const downloadLink = document.getElementById("downloadLink");
-          downloadLink.href = path;
+        const updateDownloadLink = (data: { output: any; }) => {
+          setDownloadLink(data.output);
         };
       
         const updateScroll = () => {
           window.scrollTo(0, document.body.scrollHeight);
         };
       
-        const copyToClipboard = () => {
-          const textarea = document.createElement('textarea');
-          textarea.id = 'temp_element';
-          textarea.style.height = 0;
-          document.body.appendChild(textarea);
-          textarea.value = document.getElementById('reportContainer').innerText;
-          const selector = document.querySelector('#temp_element');
-          selector.select();
-          document.execCommand('copy');
-          document.body.removeChild(textarea);
-        };
-      
         return {
           startResearch,
-          copyToClipboard,
         };
       })();
     
 
     const handleSubmit = () => {
         setReport("");
-        setAgentOutput("");
+        setAgentOutput([]);
         GPTResearcher.startResearch();
     };
+
+    const handleDownload = () => {
+        window.open(downloadLink, '_blank');
+    }
 
     return (
         <Layout>
@@ -138,11 +124,15 @@ export default function GptResearcherPage() {
                     </Box>
                     <Box width="100%">
                         <Text>What would you like me to research next?</Text>
-                        <TextInput />
+                        <TextInput onChange={(e) => setTask(e.target.value)} />
                     </Box>
                     <Box width="100%">
                         <Text>What type of report would you like me to generate?</Text>
-                        <Select options={['Research Report', 'Resource Report', 'Outline Report']} />
+                        <Select 
+                            options={['Research Report', 'Resource Report', 'Outline Report']}
+                            value={reportType} 
+                            onChange={({option}) => setReportType(option)} 
+                        />
                     </Box>
                     <Button
                         alignSelf="start"
@@ -155,8 +145,30 @@ export default function GptResearcherPage() {
                         <Text>
                             An agent tailored specifically to your task will be generated to provide the most precise and relevant research results.
                         </Text>
-                        <Box height="300px">
-                            <TextArea resize={false} fill value={agentOutput}/>
+                        <Box
+                            height="medium"
+                            overflow="auto" 
+                            width="100%"
+                            border 
+                            round="small"
+                            pad="small"
+                        >
+                            <InfiniteScroll items={agentOutput} show={agentOutput.length}>
+                                { (item: any, index: Key | null | undefined) => (
+                                    <Box 
+                                        width="100%" 
+                                        key={index} 
+                                        border 
+                                        round="small" 
+                                        flex={false}
+                                        margin={{ bottom: 'small' }}
+                                        pad="small"
+                                        background='#EEEEEE'
+                                    >
+                                        <Text>{item}</Text>
+                                    </Box>                                
+                                )}
+                            </InfiniteScroll>
                         </Box>
                     </Box>
                     <Box width="100%" margin={{ top: 'medium'}} gap="small">
@@ -168,13 +180,13 @@ export default function GptResearcherPage() {
                             <Button
                                 alignSelf="start"
                                 primary
-                                onClick={handleSubmit}
+                                onClick={() => navigator.clipboard.writeText(report)}
                                 label="Copy to clipboard"
                             />
                             <Button
                                 alignSelf="start"
                                 primary
-                                onClick={handleSubmit}
+                                onClick={handleDownload}
                                 label="Download as PDF"
                             />
                         </Box>
