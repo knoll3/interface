@@ -1,19 +1,20 @@
 import { Box, Button } from 'grommet';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { IStepProps } from '../pages/quest';
 import { toasts } from '../constants/toastMessages';
-import Tag from './Tag';
 import { QuestContext } from '../context/questContext';
 import PressableButton from './PressableButton';
 import QuestStep from './QuestStep';
+import { ClaimTag } from './Tag';
 
 export default function Claim({ showToaster }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);
   const { address } = useAccount();
   const { getStepInfo, nextStep } = useContext(QuestContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timer, setTimer] = useState<number>(30);
 
   const STEP_NAME = 'claim_reward';
   const { status, step } = getStepInfo(STEP_NAME);
@@ -44,10 +45,28 @@ export default function Claim({ showToaster }: IStepProps) {
     }
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        if (timer > 0) {
+          setTimer(timer - 1);
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoading, timer]);
+
   const content: any = {
-    disabled: <Tag label="Claim $MATIC & $FLC" type="ghost" />,
+    disabled: <ClaimTag label="Claim $MATIC & $FLC" type="ghost" />,
     active: (
-      <PressableButton label="Claim $MATIC & $FLC" onClick={handleClaim} />
+      <PressableButton
+        label="Claim $MATIC & $FLC"
+        onClick={handleClaim}
+        size="large"
+      />
     ),
     complete: (
       <QuestStep step={step} status={status} label="Claim $MATIC & $FLC" />
@@ -57,7 +76,7 @@ export default function Claim({ showToaster }: IStepProps) {
   return (
     <Box align="center" gap="small">
       {isLoading ? (
-        <Tag label="Claim $MATIC & $FLC" type="black" />
+        <ClaimTag label={`${timer}`} type="black" timer />
       ) : (
         content[status]
       )}
