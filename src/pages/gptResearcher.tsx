@@ -13,15 +13,26 @@ import {
     TextInput,
     InfiniteScroll, 
 } from 'grommet';
-import { Key, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import showdown from 'showdown';
+import { useAccount, useContractRead, useContractWrite } from "wagmi";
 
 export default function GptResearcherPage() {
+    const { address } = useAccount();
     const [task, setTask] = useState<string>("");
     const [reportType, setReportType] = useState<string>("Research Report");
     const [report, setReport] = useState<string>("");
     const [agentOutput, setAgentOutput] = useState<string[]>([]);
     const [downloadLink, setDownloadLink] = useState<string>("");
+    const [hasAccess, setHasAccess] = useState<boolean>(false);
+
+    // const { data: hasAccess } = useContractRead({
+    //     address: process.env.RESEARCH_CONTRACT_ADDRESS,
+    //     abi: RESEARCH_CONTRACT_ABI,
+    //     functionName: 'getTask',
+    //     args: [address ?? ''],
+    //     watch: true,
+    // }) as { data: boolean };
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -92,7 +103,18 @@ export default function GptResearcherPage() {
 
     const handleDownload = () => {
         window.open(downloadLink, '_blank');
-    }
+    };
+
+    // const { data: purchaseAccess, write: writePurchaseAccess, isLoading: purchaseLoading } = useContractWrite({
+    //     address: process.env.RESEARCH_CONTRACT_ADDRESS as `0x${string}`,
+    //     abi: RESEARCH_CONTRACT_ABI,
+    //     functionName: 'purchaseAccess',
+    // });
+
+    const handlePurchase = async () => {
+        console.log("Purchase");
+        //writePurchaseAccess?.({ args: [address as `0x${string}`]});
+    };
 
     return (
         <Layout>
@@ -122,75 +144,93 @@ export default function GptResearcherPage() {
                             We're inviting you to experience the next evolution in AI. Dive in, try out the FLock Researcher, and witness the future of multi-agent interactions
                         </Paragraph>
                     </Box>
-                    <Box width="100%">
-                        <Text>What would you like me to research next?</Text>
-                        <TextInput onChange={(e) => setTask(e.target.value)} />
-                    </Box>
-                    <Box width="100%">
-                        <Text>What type of report would you like me to generate?</Text>
-                        <Select 
-                            options={['Research Report', 'Resource Report', 'Outline Report']}
-                            value={reportType} 
-                            onChange={({option}) => setReportType(option)} 
-                        />
-                    </Box>
-                    <Button
-                        alignSelf="start"
-                        primary
-                        onClick={handleSubmit}
-                        label="Research"
-                    />
-                    <Box width="100%">
-                        <Heading level="2" margin="xsmall">Agents Output</Heading>
-                        <Text>
-                            An agent tailored specifically to your task will be generated to provide the most precise and relevant research results.
-                        </Text>
-                        <Box
-                            height="medium"
-                            overflow="auto" 
-                            width="100%"
-                            border 
-                            round="small"
-                            pad="small"
-                        >
-                            <InfiniteScroll items={agentOutput} show={agentOutput.length}>
-                                { (item: any, index: Key | null | undefined) => (
-                                    <Box 
-                                        width="100%" 
-                                        key={index} 
+                    <Box gap="medium" width="100%">
+                        <Box>
+                            <Text>What would you like me to research next?</Text>
+                            <TextInput onChange={(e) => setTask(e.target.value)} />
+                        </Box>
+                        <Box>
+                            <Text>What type of report would you like me to generate?</Text>
+                            <Select 
+                                options={['Research Report', 'Resource Report', 'Outline Report']}
+                                value={reportType} 
+                                onChange={({option}) => setReportType(option)} 
+                            />
+                        </Box>
+                        <Box>
+                            { !address ?
+                                <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
+                                :
+                                !hasAccess &&
+                                    <Heading level="2" margin="xsmall">Purchase access to GPT Researcher to continue</Heading>
+                            }
+                            { address &&
+                                <Button
+                                    alignSelf="start"
+                                    primary
+                                    disabled={purchaseLoading}
+                                    onClick={hasAccess ? handleSubmit : handlePurchase}
+                                    label={hasAccess ? "Research" : "Purchase for 1 FLO"}
+                                />
+                            }
+                        </Box>
+                        {
+                            address && hasAccess &&
+                            <Box>
+                                <Box width="100%">
+                                    <Heading level="2" margin="xsmall">Agents Output</Heading>
+                                    <Text>
+                                        An agent tailored specifically to your task will be generated to provide the most precise and relevant research results.
+                                    </Text>
+                                    <Box
+                                        height="medium"
+                                        overflow="auto" 
+                                        width="100%"
                                         border 
-                                        round="small" 
-                                        flex={false}
-                                        margin={{ bottom: 'small' }}
+                                        round="small"
                                         pad="small"
-                                        background='#EEEEEE'
                                     >
-                                        <Text>{item}</Text>
-                                    </Box>                                
-                                )}
-                            </InfiniteScroll>
-                        </Box>
+                                        <InfiniteScroll items={agentOutput} show={agentOutput.length}>
+                                            { (item: any, index: Key | null | undefined) => (
+                                                <Box 
+                                                    width="100%" 
+                                                    key={index} 
+                                                    border 
+                                                    round="small" 
+                                                    flex={false}
+                                                    margin={{ bottom: 'small' }}
+                                                    pad="small"
+                                                    background='#EEEEEE'
+                                                >
+                                                    <Text>{item}</Text>
+                                                </Box>                                
+                                            )}
+                                        </InfiniteScroll>
+                                    </Box>
+                                </Box>
+                                <Box width="100%" margin={{ top: 'medium'}} gap="small">
+                                    <Heading level="2" margin="xsmall">Research Report</Heading>
+                                    <Box width="100%" border height={{min: '30px'}} round="small">
+                                        <Text>{report}</Text>
+                                    </Box>
+                                    <Box direction="row-responsive" gap="small">
+                                        <Button
+                                            alignSelf="start"
+                                            primary
+                                            onClick={() => navigator.clipboard.writeText(report)}
+                                            label="Copy to clipboard"
+                                        />
+                                        <Button
+                                            alignSelf="start"
+                                            primary
+                                            onClick={handleDownload}
+                                            label="Download as PDF"
+                                        />
+                                    </Box>
+                                </Box>  
+                            </Box>
+                        }  
                     </Box>
-                    <Box width="100%" margin={{ top: 'medium'}} gap="small">
-                        <Heading level="2" margin="xsmall">Research Report</Heading>
-                        <Box width="100%" border height={{min: '30px'}} round="small">
-                            <Text>{report}</Text>
-                        </Box>
-                        <Box direction="row-responsive" gap="small">
-                            <Button
-                                alignSelf="start"
-                                primary
-                                onClick={() => navigator.clipboard.writeText(report)}
-                                label="Copy to clipboard"
-                            />
-                            <Button
-                                alignSelf="start"
-                                primary
-                                onClick={handleDownload}
-                                label="Download as PDF"
-                            />
-                        </Box>
-                    </Box>    
                 </Box>
             </Box>
         </Layout>
