@@ -25,7 +25,7 @@ const MenuItem = ({
 
 export const BurgerMenu = ({
   setShowSidebar,
-} : {
+}: {
   setShowSidebar: (show: boolean) => void;
 }) => {
   const { pathname } = useRouter();
@@ -36,71 +36,72 @@ export const BurgerMenu = ({
       setSelected(pathname);
     }
   }, [pathname]);
-  
+
   return (
     <Box pad="large">
-        <Box direction="row" gap="xlarge" align="center">
-          <Button onClick={() => setShowSidebar(false)}><Close /></Button>
-          <Box width="small">
-            <Image src="logo.png" alt="logo" />
-          </Box>
+      <Box direction="row" gap="xlarge" align="center">
+        <Button onClick={() => setShowSidebar(false)}>
+          <Close />
+        </Button>
+        <Box width="small">
+          <Image src="logo.png" alt="logo" />
         </Box>
-        <Box align="center" gap="large" margin={{ top: "xlarge" }}>
-          <Wallet />
-          <MenuItem
-              href="/"
-              onClick={() => setSelected('/')}
-              hoverIndicator={false}
-              selected={selected === '/'}
-              text="Home"
-          />
+      </Box>
+      <Box align="center" gap="large" margin={{ top: 'xlarge' }}>
+        <Wallet />
+        <MenuItem
+          href="/"
+          onClick={() => setSelected('/')}
+          hoverIndicator={false}
+          selected={selected === '/'}
+          text="Home"
+        />
+        <MenuItem
+          href="/quest"
+          onClick={() => setSelected('/quest')}
+          hoverIndicator={false}
+          selected={selected === '/quest'}
+          text="Quest"
+        />
+        <MenuItem
+          href="/train"
+          onClick={() => setSelected('/train')}
+          hoverIndicator={false}
+          selected={selected === '/train'}
+          text="Train"
+        />
 
-          <MenuItem
-              href="/train"
-              onClick={() => setSelected('/train')}
-              hoverIndicator={false}
-              selected={selected === '/train'}
-              text="Train"
-          />
+        <MenuItem
+          href="/faucet"
+          onClick={() => setSelected('/faucet')}
+          hoverIndicator={false}
+          selected={selected === '/faucet'}
+          text="Faucet"
+        />
 
-          <MenuItem
-              href="/faucet"
-              onClick={() => setSelected('/faucet')}
-              hoverIndicator={false}
-              selected={selected === '/faucet'}
-              text="Faucet"
-          />
-
-          <MenuItem
-              href="/marketplace"
-              onClick={() => setSelected('/marketplace')}
-              hoverIndicator={false}
-              selected={selected === '/marketplace'}
-              text="Marketplace"
-          />
-          <MenuItem
-              href="/quest"
-              onClick={() => setSelected('/quest')}
-              hoverIndicator={false}
-              selected={selected === '/quest'}
-              text="Quest"
-          />
-          <MenuItem
-              //href="/analytics"
-              //onClick={() => setSelected('/analytics')}
-              hoverIndicator={false}
-              selected={selected === '/analytics'}
-              text="Analytics"
-          />
-          <MenuItem
-              href="https://flock-io.gitbook.io/flock/"
-              target="_blank"
-              //onClick={() => setSelected('/aboutUs')}
-              hoverIndicator={false}
-              selected={selected === '/aboutUs'}
-              text="About Us"
-          />
-        </Box>
+        <MenuItem
+          href="/marketplace"
+          onClick={() => setSelected('/marketplace')}
+          hoverIndicator={false}
+          selected={selected === '/marketplace'}
+          text="Marketplace"
+        />
+        <MenuItem
+          //href="/analytics"
+          //onClick={() => setSelected('/analytics')}
+          hoverIndicator={false}
+          selected={selected === '/analytics'}
+          text="Analytics"
+        />
+        <MenuItem
+          href="https://flock-io.gitbook.io/flock/"
+          target="_blank"
+          //onClick={() => setSelected('/aboutUs')}
+          hoverIndicator={false}
+          selected={selected === '/aboutUs'}
+          text="About Us"
+        />
+      </Box>
     </Box>
   );
 };
