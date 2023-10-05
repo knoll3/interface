@@ -16,6 +16,16 @@ import {
 import { Key, useEffect, useState } from "react";
 import showdown from 'showdown';
 import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
+import { event } from "nextjs-google-analytics";
+
+
+type UserData = {
+    exists: boolean;
+    wallet: string;
+    NFTIssued: boolean;
+    balance: number;
+}
 
 export default function GptResearcherPage() {
     const { address } = useAccount();
@@ -24,15 +34,22 @@ export default function GptResearcherPage() {
     const [report, setReport] = useState<string>("");
     const [agentOutput, setAgentOutput] = useState<string[]>([]);
     const [downloadLink, setDownloadLink] = useState<string>("");
-    const [hasAccess, setHasAccess] = useState<boolean>(false);
+    const [amount, setAmount] = useState<number>(0);
 
-    // const { data: hasAccess } = useContractRead({
-    //     address: process.env.RESEARCH_CONTRACT_ADDRESS,
-    //     abi: RESEARCH_CONTRACT_ABI,
-    //     functionName: 'getTask',
-    //     args: [address ?? ''],
-    //     watch: true,
-    // }) as { data: boolean };
+    const { data: userData } = useContractRead({
+        address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+        abi: FLOCK_CREDITS_ABI,
+        functionName: 'users',
+        args: [address],
+        watch: true,
+    }) as { data: UserData };
+
+    const { data: price } = useContractRead({
+        address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+        abi: FLOCK_CREDITS_ABI,
+        functionName: 'FIXED_PRICE',
+        watch: true,
+    }) as { data: number };
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -105,15 +122,15 @@ export default function GptResearcherPage() {
         window.open(downloadLink, '_blank');
     };
 
-    // const { data: purchaseAccess, write: writePurchaseAccess, isLoading: purchaseLoading } = useContractWrite({
-    //     address: process.env.RESEARCH_CONTRACT_ADDRESS as `0x${string}`,
-    //     abi: RESEARCH_CONTRACT_ABI,
-    //     functionName: 'purchaseAccess',
-    // });
+    const { data: purchaseCredits, write: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
+        address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+        abi: FLOCK_CREDITS_ABI,
+        functionName: 'addCredits',
+    });
 
     const handlePurchase = async () => {
         console.log("Purchase");
-        //writePurchaseAccess?.({ args: [address as `0x${string}`]});
+        //writePurchaseCredits?.({ args: [amount]});
     };
 
     return (
@@ -161,21 +178,32 @@ export default function GptResearcherPage() {
                             { !address ?
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
                                 :
-                                !hasAccess &&
-                                    <Heading level="2" margin="xsmall">Purchase access to GPT Researcher to continue</Heading>
+                                (userData?.balance < price) &&
+                                    <Heading level="2" margin="xsmall">Purchase credits to access GPT Researcher</Heading>
                             }
                             { address &&
-                                <Button
-                                    alignSelf="start"
-                                    primary
-                                    disabled={purchaseLoading}
-                                    onClick={hasAccess ? handleSubmit : handlePurchase}
-                                    label={hasAccess ? "Research" : "Purchase for 1 FLO"}
-                                />
+                                <Box direction="row" justify="between" align="center">
+                                    <Box direction="row" align="center" gap="small">
+                                        <Button
+                                            primary
+                                            disabled={purchaseLoading || amount < price}
+                                            onClick={handlePurchase}
+                                            label={"Purchase credits"}
+                                        />
+                                        <TextInput placeholder={price} value={price} onChange={(event) => setAmount(Number(event.target.value))} />
+                                    </Box>
+                                    <Button
+                                        alignSelf="start"
+                                        primary
+                                        disabled={purchaseLoading}
+                                        onClick={(userData?.balance > price) ? handleSubmit : (() => {})}
+                                        label={"Research"}
+                                    />
+                                </Box>
                             }
                         </Box>
                         {
-                            address && hasAccess &&
+                            address && (userData?.balance > price) &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
@@ -208,7 +236,7 @@ export default function GptResearcherPage() {
                                         </InfiniteScroll>
                                     </Box>
                                 </Box>
-                                <Box width="100%" margin={{ top: 'medium'}} gap="small">
+                                <Box width="100%" margin={{ top: 'medium' }} gap="small">
                                     <Heading level="2" margin="xsmall">Research Report</Heading>
                                     <Box width="100%" border height={{min: '30px'}} round="small">
                                         <Text>{report}</Text>
