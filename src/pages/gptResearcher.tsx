@@ -72,6 +72,7 @@ export default function GptResearcherPage() {
               task: task,
               report_type: reportType,
               agent: "Auto Agent",
+              walletAddress: address,
             };
       
             socket.send(`start ${JSON.stringify(requestData)}`);
