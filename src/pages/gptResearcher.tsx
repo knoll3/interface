@@ -122,8 +122,7 @@ export default function GptResearcherPage() {
     });
 
     const handlePurchase = async () => {
-        console.log("Purchase");
-        //writePurchaseCredits?.({ args: [amount]});
+        writePurchaseCredits?.({ args: [amount]});
     };
 
     return (
