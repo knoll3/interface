@@ -2,30 +2,21 @@ import { Layout } from "../components";
 import {
     Box,
     Button,
-    Footer,
-    Form,
     Heading,
-    Main,
     Paragraph,
     Select,
     Text,
-    TextArea,
     TextInput,
     InfiniteScroll, 
 } from 'grommet';
-import { Key, useEffect, useState } from "react";
+import { Key, useEffect, useState, useContext, createContext } from "react";
 import showdown from 'showdown';
 import { useAccount, useContractRead, useContractWrite } from "wagmi";
 import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
+import { useCreditsData } from "../hooks/useCreditsData";
+import { formatUnits } from "viem";
 import { event } from "nextjs-google-analytics";
 
-
-type UserData = {
-    exists: boolean;
-    wallet: string;
-    NFTIssued: boolean;
-    balance: number;
-}
 
 export default function GptResearcherPage() {
     const { address } = useAccount();
@@ -36,20 +27,22 @@ export default function GptResearcherPage() {
     const [downloadLink, setDownloadLink] = useState<string>("");
     const [amount, setAmount] = useState<number>(0);
 
-    const { data: userData } = useContractRead({
-        address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-        abi: FLOCK_CREDITS_ABI,
-        functionName: 'users',
-        args: [address],
-        watch: true,
-    }) as { data: UserData };
+    const {
+        userData,
+        researchPrice,
+    } = useCreditsData({
+        userAddress: address
+    });
 
-    const { data: price } = useContractRead({
-        address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-        abi: FLOCK_CREDITS_ABI,
-        functionName: 'FIXED_PRICE',
-        watch: true,
-    }) as { data: number };
+    const userBalance = userData?.balance
+        ? Math.round(Number(formatUnits(userData?.balance, 18)) * 100) / 100
+        : 0;
+
+    const price = researchPrice
+        ? Number(researchPrice)
+        : 0;
+
+    const hasAccess = userBalance >= price;
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -178,7 +171,7 @@ export default function GptResearcherPage() {
                             { !address ?
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
                                 :
-                                (userData?.balance < price) &&
+                                !hasAccess &&
                                     <Heading level="2" margin="xsmall">Purchase credits to access GPT Researcher</Heading>
                             }
                             { address &&
@@ -196,14 +189,14 @@ export default function GptResearcherPage() {
                                         alignSelf="start"
                                         primary
                                         disabled={purchaseLoading}
-                                        onClick={(userData?.balance > price) ? handleSubmit : (() => {})}
+                                        onClick={hasAccess ? handleSubmit : (() => {})}
                                         label={"Research"}
                                     />
                                 </Box>
                             }
                         </Box>
                         {
-                            address && (userData?.balance > price) &&
+                            address && hasAccess &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
