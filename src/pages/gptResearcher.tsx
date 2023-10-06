@@ -7,7 +7,8 @@ import {
     Select,
     Text,
     TextInput,
-    InfiniteScroll, 
+    InfiniteScroll,
+    Layer, 
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
 import showdown from 'showdown';
@@ -26,6 +27,7 @@ export default function GptResearcherPage() {
     const [agentOutput, setAgentOutput] = useState<string[]>([]);
     const [downloadLink, setDownloadLink] = useState<string>("");
     const [amount, setAmount] = useState<number>(0);
+    const [showPurchase, setShowPurchase] = useState<boolean>(false);
 
     const {
         userData,
@@ -116,18 +118,46 @@ export default function GptResearcherPage() {
         window.open(downloadLink, '_blank');
     };
 
-    const { data: purchaseCredits, write: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
+    const { data: purchaseCredits, writeAsync: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
         address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
         abi: FLOCK_CREDITS_ABI,
         functionName: 'addCredits',
     });
 
     const handlePurchase = async () => {
-        writePurchaseCredits?.({ args: [amount]});
+        await writePurchaseCredits?.({ args: [amount]});
+        setShowPurchase(false);
     };
 
     return (
         <Layout>
+            { showPurchase &&
+                <Layer>
+                    <Box pad="large" align="center" gap="small" width="550px">
+                        <Heading level="2" margin="xsmall">Purchase Credits</Heading>
+                        <Text alignSelf="start">To use this model you have to deposit FLO as credits which will be used to pay for research.</Text>
+                        <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price} credits</Text>
+                        <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>
+                        <Box direction="row" align="center" gap="small">
+                            <Button
+                                primary
+                                disabled={purchaseLoading || amount < price}
+                                onClick={handlePurchase}
+                                label={purchaseLoading ? "Purchasing..." : "Purchase"}
+                            />
+                            <TextInput placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
+                        </Box>
+                        <Button
+                            margin={{ top: 'medium' }}
+                            alignSelf="end"
+                            secondary
+                            disabled={purchaseLoading}
+                            onClick={() => setShowPurchase(false)}
+                            label="Close"
+                        />
+                    </Box>
+                </Layer>
+            }
             <Box width="100%" gap="large" align="center">
                 <Box
                     background="#EEEEEE"
@@ -168,31 +198,15 @@ export default function GptResearcherPage() {
                             />
                         </Box>
                         <Box>
-                            { !address ?
-                                <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
+                            { address ?
+                                <Button
+                                    alignSelf="start"
+                                    primary
+                                    onClick={hasAccess ? handleSubmit : () => setShowPurchase(true)}
+                                    label={"Research"}
+                                />
                                 :
-                                !hasAccess &&
-                                    <Heading level="2" margin="xsmall">Purchase credits to access GPT Researcher</Heading>
-                            }
-                            { address &&
-                                <Box direction="row" justify="between" align="center">
-                                    <Box direction="row" align="center" gap="small">
-                                        <Button
-                                            primary
-                                            disabled={purchaseLoading || amount < price}
-                                            onClick={handlePurchase}
-                                            label={"Purchase credits"}
-                                        />
-                                        <TextInput placeholder={price} value={price} onChange={(event) => setAmount(Number(event.target.value))} />
-                                    </Box>
-                                    <Button
-                                        alignSelf="start"
-                                        primary
-                                        disabled={purchaseLoading}
-                                        onClick={hasAccess ? handleSubmit : (() => {})}
-                                        label={"Research"}
-                                    />
-                                </Box>
+                                <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
                             }
                         </Box>
                         {
