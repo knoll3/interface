@@ -1,4 +1,5 @@
 import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
+import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useContractRead } from 'wagmi';
 
 type UserDataType = {
@@ -20,7 +21,7 @@ export const useCreditsData = ({
     functionName: 'users',
     args: [userAddress],
     watch: true,
-  }) as { data: UserDataType };
+  }) as { data: any[] };
 
   const { data: researchPrice } = useContractRead({
     address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
@@ -29,9 +30,18 @@ export const useCreditsData = ({
     watch: true,
   }) as { data: number };
 
+  const { data: tokenAllowance } = useContractRead({
+    address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
+    abi: FLOCK_V2_ABI,
+    functionName: 'allowance',
+    args: [userAddress, process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`],
+    watch: true,
+  }) as { data: bigint };
+
   return {
     userData,
     researchPrice,
+    tokenAllowance,
   };
 };
 
