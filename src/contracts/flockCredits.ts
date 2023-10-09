@@ -102,6 +102,25 @@ export const FLOCK_CREDITS_ABI = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "checkIfWhiteListed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_userAddress",
         "type": "address"
       },
@@ -223,9 +242,27 @@ export const FLOCK_CREDITS_ABI = [
         "internalType": "uint256",
         "name": "balance",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isWhiteListed",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "whiteListUsers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
