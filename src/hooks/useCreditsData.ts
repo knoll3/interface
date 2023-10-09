@@ -38,10 +38,19 @@ export const useCreditsData = ({
     watch: true,
   }) as { data: bigint };
 
+  const { data: isWhitelisted } = useContractRead({
+    address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+    abi: FLOCK_CREDITS_ABI,
+    functionName: 'checkIfWhiteListed',
+    args: [userAddress],
+    watch: true,
+  }) as { data: boolean };
+
   return {
     userData,
     researchPrice,
     tokenAllowance,
+    isWhitelisted,
   };
 };
 

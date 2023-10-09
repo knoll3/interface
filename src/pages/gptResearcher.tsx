@@ -36,6 +36,7 @@ export default function GptResearcherPage() {
         userData,
         researchPrice,
         tokenAllowance,
+        isWhitelisted,
     } = useCreditsData({
         userAddress: address
     });
@@ -241,7 +242,7 @@ export default function GptResearcherPage() {
                                 <Button
                                     alignSelf="start"
                                     primary
-                                    onClick={hasAccess ? handleSubmit : () => setShowPurchase(true)}
+                                    onClick={(hasAccess || isWhitelisted) ? handleSubmit : () => setShowPurchase(true)}
                                     label={"Research"}
                                 />
                                 :
@@ -249,7 +250,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         {
-                            isConnected && hasAccess &&
+                            isConnected && (hasAccess || isWhitelisted) &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
