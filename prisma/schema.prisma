@@ -118,3 +118,12 @@ model ClaimedRewards {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model ResearcherReport {
+    id         String   @id @default(cuid())
+    wallet     String   @db.VarChar(255)
+    reportPath String   @db.VarChar(255)
+    report     String   @db.Text
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}

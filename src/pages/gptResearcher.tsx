@@ -31,6 +31,7 @@ export default function GptResearcherPage() {
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [reportData, setReportData] = useState<any>({});
 
     const {
         userData,
@@ -123,6 +124,30 @@ export default function GptResearcherPage() {
         };
       })();
     
+    const loadReports = async () => {
+        try {
+            const response = await fetch(`/api/getReport`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        walletAddress: address,
+                    }),
+                }
+            );
+            const data = await response.json();
+            if (data.error) {
+                console.log(data.error);
+                return;
+            }
+            setReportData(data);
+        } catch (e) {
+            console.log(e);
+        }
+    };   
+
 
     const handleSubmit = () => {
         setReport("");
