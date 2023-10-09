@@ -12,10 +12,11 @@ import {
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
 import showdown from 'showdown';
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
 import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
+import { FLOCK_V2_ABI } from "../contracts/flockV2";
 import { useCreditsData } from "../hooks/useCreditsData";
-import { formatUnits } from "viem";
+import { formatUnits, parseEther } from "viem";
 import { event } from "nextjs-google-analytics";
 
 
@@ -28,23 +29,36 @@ export default function GptResearcherPage() {
     const [downloadLink, setDownloadLink] = useState<string>("");
     const [amount, setAmount] = useState<number>(0);
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
+    const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const {
         userData,
         researchPrice,
+        tokenAllowance,
     } = useCreditsData({
         userAddress: address
     });
-
-    const userBalance = userData?.balance
-        ? Math.round(Number(formatUnits(userData?.balance, 18)) * 100) / 100
+    
+    const userBalance = userData
+        ? Math.round(Number(userData[3]) * 100) / 100
         : 0;
 
     const price = researchPrice
         ? Number(researchPrice)
         : 0;
 
+    const tokenAllowanceValue = tokenAllowance
+        ? Number(formatUnits(tokenAllowance, 18))
+        : 0;
+
     const hasAccess = userBalance >= price;
+
+    useEffect(() => {
+        if (address) {
+            setIsConnected(true);
+        }
+    }, [address]);
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -54,7 +68,8 @@ export default function GptResearcherPage() {
         };
       
         const listenToSockEvents = () => {
-          const ws_uri = 'ws://209.20.157.253:8080/ws';
+          // const ws_uri = 'ws://209.20.157.253:8080/ws';
+          const ws_uri = 'ws://0.0.0.0:8000/ws'
           const converter = new showdown.Converter();
           const socket = new WebSocket(ws_uri);
           socket.onmessage = (event) => {
@@ -124,10 +139,28 @@ export default function GptResearcherPage() {
         functionName: 'addCredits',
     });
 
+    const { data: approveTokens, writeAsync: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
+        address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
+        abi: FLOCK_V2_ABI,
+        functionName: 'approve',
+    });
+
+    const { isSuccess: isSuccessApprove } = useWaitForTransaction({
+        hash: approveTokens?.hash,
+    });
+
+    const { isSuccess: isSuccessPurchase } = useWaitForTransaction({
+        hash: purchaseCredits?.hash,
+    });
+
+    const handleApprove = async () => {
+        await writeApproveTokens?.({ args: [process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`, parseEther(`${amount}`)]});
+    }
+
     const handlePurchase = async () => {
         await writePurchaseCredits?.({ args: [amount]});
         setShowPurchase(false);
-    };
+    }  
 
     return (
         <Layout>
@@ -141,17 +174,23 @@ export default function GptResearcherPage() {
                         <Box direction="row" align="center" gap="small">
                             <Button
                                 primary
-                                disabled={purchaseLoading || amount < price}
-                                onClick={handlePurchase}
-                                label={purchaseLoading ? "Purchasing..." : "Purchase"}
+                                disabled={purchaseLoading || approveLoading || amount < price}
+                                onClick={(tokenAllowanceValue >= price) ? handlePurchase : handleApprove}
+                                label={
+                                    (purchaseLoading || approveLoading) ? 
+                                        (tokenAllowanceValue >= price) ? 
+                                            "Purchasing..." : "Approving..." 
+                                        : (tokenAllowanceValue >= price) ? 
+                                            "Purchase" : "Approve Tokens"
+                                    }
                             />
-                            <TextInput placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
+                            <TextInput type="number" placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
                         </Box>
                         <Button
                             margin={{ top: 'medium' }}
                             alignSelf="end"
                             secondary
-                            disabled={purchaseLoading}
+                            disabled={purchaseLoading || approveLoading}
                             onClick={() => setShowPurchase(false)}
                             label="Close"
                         />
@@ -198,7 +237,7 @@ export default function GptResearcherPage() {
                             />
                         </Box>
                         <Box>
-                            { address ?
+                            { isConnected ?
                                 <Button
                                     alignSelf="start"
                                     primary
@@ -210,7 +249,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         {
-                            address && hasAccess &&
+                            isConnected && hasAccess &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
@@ -269,5 +308,5 @@ export default function GptResearcherPage() {
                 </Box>
             </Box>
         </Layout>
-    )
+    );
 }
