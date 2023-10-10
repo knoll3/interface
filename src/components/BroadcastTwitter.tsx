@@ -22,13 +22,13 @@ export default function BroadcastTwitter({ showToaster }: IStepProps) {
   const STEP_NAME = 'twitter_share';
   const { step, status } = getStepInfo(STEP_NAME);
   const twitterBaseUrl = 'https://twitter.com/intent/tweet';
-  const tweetText = 'Check out this awesome post!'; // Replace with your desired tweet text
-  const hashtags = 'FLockQuest,WebDevelopment'; // Replace with your desired hashtags
-  const twitterUsername = 'yourTwitterUsername'; // Replace with your Twitter username
+  const tweetText =
+    "I've teamed up with the #FLock AI Model Training Campaign and secured 100 $FLO. \nSecure your $FLO and dive into model training! \nAll contributions will be recognized for future benefits. \n\nExplore the FLock landing page today: https://flock.io"; // Replace with your desired tweet text
+  const hashtags = 'FLockQuest'; // Replace with your desired hashtags
 
   const twitterShareLink = `${twitterBaseUrl}?text=${encodeURIComponent(
     tweetText
-  )}&hashtags=${encodeURIComponent(hashtags)}&via=${twitterUsername}`;
+  )}&hashtags=${encodeURIComponent(hashtags)}`;
 
   const handleBroadcastButton = async () => {
     setIsLoadingPost(true);

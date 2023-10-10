@@ -1,4 +1,13 @@
-import { Box, Button, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
+import {
+  Box,
+  Button,
+  Form,
+  FormField,
+  Heading,
+  Paragraph,
+  TextInput,
+  Text,
+} from 'grommet';
 import { Layout, PrimaryButton, Tasks } from '../components';
 import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
@@ -6,6 +15,7 @@ import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { MIGRATE_TOKENS_ABI } from '../contracts/migrateTokens';
 import { use, useEffect, useState, useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
+import { useIsMounted } from '../hooks';
 
 export default function FaucetPage() {
   const { address } = useAccount();
@@ -14,6 +24,7 @@ export default function FaucetPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { FLCTokenBalance, FLOTokenBalance } = useContext(WalletContext);
 
+  const mounted = useIsMounted();
 
   // const { data, write } = useContractWrite({
   //   address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
@@ -33,13 +44,15 @@ export default function FaucetPage() {
     functionName: 'approve',
   });
 
-  const { isSuccess: isSuccessMigrate, isLoading: isLoadingMigrate } = useWaitForTransaction({
-    hash: dataMigrate?.hash,
-  });
+  const { isSuccess: isSuccessMigrate, isLoading: isLoadingMigrate } =
+    useWaitForTransaction({
+      hash: dataMigrate?.hash,
+    });
 
-  const { isSuccess: isSuccessApprove, isLoading: isLoadingApprove } = useWaitForTransaction({
-    hash: dataApprove?.hash,
-  });
+  const { isSuccess: isSuccessApprove, isLoading: isLoadingApprove } =
+    useWaitForTransaction({
+      hash: dataApprove?.hash,
+    });
 
   // const handleMint = async () => {
   //   write?.({ args: [address, amount * 10 ** 18] });
@@ -47,8 +60,13 @@ export default function FaucetPage() {
 
   const handleApprove = async () => {
     setIsLoading(true);
-    writeApprove?.({ args: [process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`, FLCTokenBalance.value] });
-  }
+    writeApprove?.({
+      args: [
+        process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`,
+        FLCTokenBalance.value,
+      ],
+    });
+  };
 
   useEffect(() => {
     if (isSuccessApprove) {
@@ -56,7 +74,7 @@ export default function FaucetPage() {
     }
     if (isSuccessMigrate) {
       setIsLoading(false);
-    } 
+    }
   }, [isSuccessApprove, isSuccessMigrate]);
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -66,8 +84,12 @@ export default function FaucetPage() {
   }, [address, isLoading]);
 
   const roundedFLCBalance = FLCTokenBalance
-  ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
-  : 0;
+    ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
+    : 0;
+
+  if (!mounted) {
+    return <></>;
+  }
 
   return (
     <Layout>
@@ -85,11 +107,12 @@ export default function FaucetPage() {
               <Heading level="2">FLock (FLO) tokens faucet </Heading>
             </Box>
             <Paragraph>
-              Migrate your FLC to FLO tokens for participating in the FLock network.
+              Migrate your FLC to FLO tokens for participating in the FLock
+              network.
             </Paragraph>
             <Paragraph>
               {roundedFLCBalance} FLC tokens available to migrate.
-            </Paragraph> 
+            </Paragraph>
           </Box>
         </Box>
         <Box

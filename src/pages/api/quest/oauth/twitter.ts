@@ -79,13 +79,19 @@ export default async function handler(
     } else {
       if (accessToken) {
         getCurrentUserData = await twitterClient.users.findMyUser();
-        await prismaInsertUserTwitterData(
+        const insertUserTwitterDataResult = await prismaInsertUserTwitterData(
           prismaDB,
           getUser?.id as string,
           getCurrentUserData.data?.id as string,
           getCurrentUserData.data?.name as string,
           accessToken
         );
+
+        if (insertUserTwitterDataResult.error) {
+          return res
+            .status(insertUserTwitterDataResult.status)
+            .json({ data: { message: insertUserTwitterDataResult.message } });
+        }
       } else {
         return res.status(404).json({ data: { message: 'Not Found' } });
       }
@@ -114,15 +120,13 @@ export default async function handler(
         },
       });
     }
-    return res
-      .status(200)
-      .json({
-        data: {
-          twitterName: accessToken
-            ? getCurrentUserData?.data?.name
-            : userTwitterData?.twitterName,
-        },
-      });
+    return res.status(200).json({
+      data: {
+        twitterName: accessToken
+          ? getCurrentUserData?.data?.name
+          : userTwitterData?.twitterName,
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(503).json({ data: { message: 'Internal Server Error' } });
