@@ -275,7 +275,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         {
-                            isConnected && (hasAccess || isWhitelisted) &&
+                            isConnected &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
