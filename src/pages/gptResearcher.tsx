@@ -17,6 +17,7 @@ import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
 import { FLOCK_V2_ABI } from "../contracts/flockV2";
 import { useCreditsData } from "../hooks/useCreditsData";
 import { formatUnits, parseEther } from "viem";
+import { WalletContext } from '../context/walletContext';
 import { event } from "nextjs-google-analytics";
 
 
@@ -30,8 +31,10 @@ export default function GptResearcherPage() {
     const [amount, setAmount] = useState<number>(0);
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [reportData, setReportData] = useState<any>({});
+
+    const { FLOTokenBalance } =
+        useContext(WalletContext);
 
     const {
         userData,
@@ -159,34 +162,43 @@ export default function GptResearcherPage() {
         window.open(downloadLink, '_blank');
     };
 
-    const { data: purchaseCredits, writeAsync: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
+    const { data: purchaseCredits, write: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
         address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
         abi: FLOCK_CREDITS_ABI,
         functionName: 'addCredits',
     });
 
-    const { data: approveTokens, writeAsync: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
+    const { data: approveTokens, write: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
         address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
         abi: FLOCK_V2_ABI,
         functionName: 'approve',
     });
 
-    const { isSuccess: isSuccessApprove } = useWaitForTransaction({
+    const { isSuccess: isSuccessApprove, isLoading: isApproveTxLoading } = useWaitForTransaction({
         hash: approveTokens?.hash,
     });
 
-    const { isSuccess: isSuccessPurchase } = useWaitForTransaction({
+    const { isSuccess: isSuccessPurchase, isLoading: isPurchaseTxLoading } = useWaitForTransaction({
         hash: purchaseCredits?.hash,
     });
 
-    const handleApprove = async () => {
-        await writeApproveTokens?.({ args: [process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`, parseEther(`${amount}`)]});
+    const handleApprove = () => {
+        writeApproveTokens?.({ args: [process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`, parseEther(`${amount}`)]});
     }
 
-    const handlePurchase = async () => {
-        await writePurchaseCredits?.({ args: [amount]});
-        setShowPurchase(false);
+    const handlePurchase = () => {
+        writePurchaseCredits?.({ args: [amount]});
     }  
+
+    useEffect(() => {
+        if (isSuccessApprove) {
+            handlePurchase();
+        }
+
+        if (isSuccessPurchase) {
+            setShowPurchase(false);
+        }
+    }, [isSuccessPurchase, isSuccessApprove]);
 
     return (
         <Layout>
@@ -197,26 +209,44 @@ export default function GptResearcherPage() {
                         <Text alignSelf="start">To use this model you have to deposit FLO as credits which will be used to pay for research.</Text>
                         <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price} credits</Text>
                         <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>
-                        <Box direction="row" align="center" gap="small">
-                            <Button
-                                primary
-                                disabled={purchaseLoading || approveLoading || amount < price}
-                                onClick={(tokenAllowanceValue >= price) ? handlePurchase : handleApprove}
-                                label={
-                                    (purchaseLoading || approveLoading) ? 
-                                        (tokenAllowanceValue >= price) ? 
-                                            "Purchasing..." : "Approving..." 
-                                        : (tokenAllowanceValue >= price) ? 
-                                            "Purchase" : "Approve Tokens"
-                                    }
-                            />
-                            <TextInput type="number" placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
-                        </Box>
+                        {
+                            Number(FLOTokenBalance?.formatted) < price ?
+                            (
+                                <Text weight="bold" alignSelf="start" color="red">Not enough FLO to purchase credits</Text>
+                            ) : (
+                                <Box direction="row" align="center" gap="small">
+                                    <Button
+                                        primary
+                                        disabled={
+                                            purchaseLoading ||
+                                            approveLoading || 
+                                            isApproveTxLoading ||
+                                            isPurchaseTxLoading ||
+                                            amount < price
+                                        }
+                                        onClick={handleApprove}
+                                        label={
+                                            (   purchaseLoading ||
+                                                approveLoading || 
+                                                isApproveTxLoading ||
+                                                isPurchaseTxLoading
+                                            ) ? "Purchasing..." : "Purchase"
+                                        }
+                                    />
+                                    <TextInput type="number" placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
+                                </Box>
+                            )
+                        }
                         <Button
                             margin={{ top: 'medium' }}
                             alignSelf="end"
                             secondary
-                            disabled={purchaseLoading || approveLoading}
+                            disabled={
+                                purchaseLoading ||
+                                approveLoading || 
+                                isApproveTxLoading ||
+                                isPurchaseTxLoading
+                            }
                             onClick={() => setShowPurchase(false)}
                             label="Close"
                         />
