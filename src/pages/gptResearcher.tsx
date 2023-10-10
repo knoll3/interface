@@ -70,8 +70,8 @@ export default function GptResearcherPage() {
         };
       
         const listenToSockEvents = () => {
-          const ws_uri = 'ws://researcher.flock.io/ws';
-          // const ws_uri = process.env.RESEARCHER_WEB_SOCKET_URL!
+          // const ws_uri = 'ws://researcher.flock.io/ws';
+          const ws_uri = process.env.RESEARCHER_WEB_SOCKET_URL!
           const converter = new showdown.Converter();
           const socket = new WebSocket(ws_uri);
           socket.onmessage = (event) => {
