@@ -42,60 +42,6 @@ export default function FaucetPage() {
     setAmount(0);
   }, [isSuccess]);
 
-  // const { data, write } = useContractWrite({
-  //   address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
-  //   abi: FLOCK_ABI,
-  //   functionName: 'mint',
-  // });
-
-  // const { data: dataMigrate, write: writeMigrate, isLoading: migrateLoading } = useContractWrite({
-  //   address: process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`,
-  //   abi: MIGRATE_TOKENS_ABI,
-  //   functionName: 'migrate',
-  // });
-
-  // const { data: dataApprove, write: writeApprove, isLoading: approveLoading } = useContractWrite({
-  //   address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
-  //   abi: FLOCK_ABI,
-  //   functionName: 'approve',
-  // });
-
-  // const { isSuccess: isSuccessMigrate, isLoading: isMigrateTxLoading } =
-  //   useWaitForTransaction({
-  //     hash: dataMigrate?.hash,
-  //   });
-
-  // const { isSuccess: isSuccessApprove, isLoading: isApproveTxLoading } =
-  //   useWaitForTransaction({
-  //     hash: dataApprove?.hash,
-  //   });
-
-  // const handleMigrate = async () => {
-  //   writeMigrate?.();
-  // }
-
-  // const handleApprove = async () => {
-  //   writeApprove?.({
-  //     args: [
-  //       process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`,
-  //       FLCTokenBalance.value,
-  //     ],
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   if (isSuccessApprove) {
-  //     handleMigrate();
-  //   }
-  //   if (isSuccessMigrate) {
-      
-  //   }
-  // }, [isSuccessApprove, isSuccessMigrate]);
-
-  // const roundedFLCBalance = FLCTokenBalance
-  //   ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
-  //   : 0;
-
   const hasErrors = Object.keys(errors).length > 0;
 
   if (!mounted) {
@@ -105,59 +51,6 @@ export default function FaucetPage() {
   return (
     <Layout>
       <Box width="100%" gap="large">
-        {/* <Box
-          background="#EEEEEE"
-          direction="row-responsive"
-          align="center"
-          justify="center"
-          width="100%"
-          pad={{ vertical: 'large', horizontal: 'large' }}
-        >
-          <Box>
-            <Box direction="row-responsive" gap="xsmall">
-              <Heading level="2">FLock (FLO) tokens faucet </Heading>
-            </Box>
-            <Paragraph>
-              Migrate your FLC to FLO tokens for participating in the FLock
-              network.
-            </Paragraph>
-            <Paragraph>
-              {roundedFLCBalance} FLC tokens available to migrate.
-            </Paragraph>
-          </Box>
-        </Box>
-        <Box
-          width="100%"
-          align="center"
-          pad="large"
-          background="white"
-          justify="center"
-          round="small"
-        >
-          <Box direction="row" align="end" justify="end">
-            <Button
-              primary
-              onClick={handleApprove}
-              disabled={
-                !address ||
-                hasErrors ||
-                roundedFLCBalance === 0 ||
-                approveLoading ||
-                isApproveTxLoading ||
-                migrateLoading ||
-                isMigrateTxLoading              
-              }
-              label={
-                (
-                  approveLoading ||
-                  isApproveTxLoading ||
-                  migrateLoading ||
-                  isMigrateTxLoading
-                )
-                 ? 'Migrating...' : 'Migrate'}
-            />
-          </Box>
-        </Box> */}
         <Box
           background="#EEEEEE"
           direction="row-responsive"
