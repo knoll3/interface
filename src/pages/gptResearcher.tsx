@@ -8,7 +8,8 @@ import {
     Text,
     TextInput,
     InfiniteScroll,
-    Layer, 
+    Layer,
+    RangeInput, 
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
 import showdown from 'showdown';
@@ -33,13 +34,12 @@ export default function GptResearcherPage() {
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [reportData, setReportData] = useState<any>({});
 
-    const { FLOTokenBalance } =
+    const { FLCTokenBalance } =
         useContext(WalletContext);
 
     const {
         userData,
         researchPrice,
-        tokenAllowance,
         isWhitelisted,
     } = useCreditsData({
         userAddress: address
@@ -51,10 +51,6 @@ export default function GptResearcherPage() {
 
     const price = researchPrice
         ? Number(researchPrice)
-        : 0;
-
-    const tokenAllowanceValue = tokenAllowance
-        ? Number(formatUnits(tokenAllowance, 18))
         : 0;
 
     const hasAccess = userBalance >= price;
@@ -169,7 +165,7 @@ export default function GptResearcherPage() {
     });
 
     const { data: approveTokens, write: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
-        address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
+        address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
         abi: FLOCK_V2_ABI,
         functionName: 'approve',
     });
@@ -200,21 +196,25 @@ export default function GptResearcherPage() {
         }
     }, [isSuccessPurchase, isSuccessApprove]);
 
+    useEffect(() => {
+        setAmount(price);
+    }, [price]);
+
     return (
         <Layout>
             { showPurchase &&
                 <Layer>
                     <Box pad="large" align="center" gap="small" width="550px">
                         <Heading level="2" margin="xsmall">Purchase Credits</Heading>
-                        <Text alignSelf="start">To use this model you have to deposit FLO as credits which will be used to pay for research.</Text>
+                        <Text alignSelf="start">To use this model you have to deposit FLC as credits which will be used to pay for research.</Text>
                         <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price} credits</Text>
                         <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>
                         {
-                            Number(FLOTokenBalance?.formatted) < price ?
+                            Number(FLCTokenBalance?.formatted) < price ?
                             (
-                                <Text weight="bold" alignSelf="start" color="red">Not enough FLO to purchase credits</Text>
+                                <Text weight="bold" alignSelf="start" color="red">Not enough FLC to purchase credits</Text>
                             ) : (
-                                <Box direction="row" align="center" gap="small">
+                                <Box width="100%" direction="row" justify="between" align="center">
                                     <Button
                                         primary
                                         disabled={
@@ -233,7 +233,17 @@ export default function GptResearcherPage() {
                                             ) ? "Purchasing..." : "Purchase"
                                         }
                                     />
-                                    <TextInput type="number" placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
+                                    <Box direction="row" gap="small" width="65%">
+                                        <Text weight="bold">{amount}</Text>
+                                        <RangeInput
+                                            size={30}
+                                            value={amount}
+                                            min={price}
+                                            max={Number(FLCTokenBalance?.formatted)}
+                                            step={price}
+                                            onChange={event => setAmount(Number(event.target.value))}
+                                        />
+                                    </Box>
                                 </Box>
                             )
                         }
