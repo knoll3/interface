@@ -33,6 +33,7 @@ export default function GptResearcherPage() {
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
+    const [price, setPrice] = useState<number>(0);
 
     const { FLCTokenBalance } =
         useContext(WalletContext);
@@ -49,10 +50,6 @@ export default function GptResearcherPage() {
         ? Math.round(Number(userData[3]) * 100) / 100
         : 0;
 
-    const price = researchPrice
-        ? Number(researchPrice)
-        : 0;
-
     const hasAccess = userBalance >= price;
 
     useEffect(() => {
@@ -60,6 +57,10 @@ export default function GptResearcherPage() {
             setIsConnected(true);
         }
     }, [address]);
+
+    useEffect(() => {
+        setPrice(researchPrice ? Number(researchPrice) : 0)
+    }, [researchPrice]);
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -99,7 +100,6 @@ export default function GptResearcherPage() {
       
         const addAgentResponse = (data: { output: any; }) => {
           setAgentOutput((prev) => [...prev, data.output]);
-          updateScroll();
         };
       
         const writeReport = (data: { output: any; }, converter: { makeHtml: (arg0: any) => any; }) => {
@@ -107,15 +107,10 @@ export default function GptResearcherPage() {
             const markdownOutput = converter.makeHtml(data.output);
             console.log(markdownOutput);
           setReport((prev) => prev + ' ' + markdownOutput);
-          updateScroll();
         };
       
         const updateDownloadLink = (data: { output: any; }) => {
           setDownloadLink(data.output);
-        };
-      
-        const updateScroll = () => {
-          window.scrollTo(0, document.body.scrollHeight);
         };
       
         return {
@@ -214,7 +209,6 @@ export default function GptResearcherPage() {
                 <Layer>
                     <Box pad="large" align="center" gap="small" width="550px">
                         <Heading level="2" margin="xsmall">Purchase Credits</Heading>
-                        <Text alignSelf="start">To use this model you have to deposit FLC as credits which will be used to pay for research.</Text>
                         <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price} credits</Text>
                         <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>
                         {
@@ -310,13 +304,22 @@ export default function GptResearcherPage() {
                                 onChange={({option}) => setReportType(option)} 
                             />
                         </Box>
+                        <Box                        
+                            round="small"
+                            background="white"
+                            pad="medium"
+                        >
+                            <Text alignSelf="start">To use this model you have to deposit FLC as credits which will be used to pay for research.</Text>
+                            <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price ? price : 0} credits</Text>
+                            { isConnected && <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>}
+                        </Box>
                         <Box>
                             { isConnected ?
                                 <Button
                                     alignSelf="start"
                                     primary
                                     onClick={(hasAccess || isWhitelisted) ? handleSubmit : () => setShowPurchase(true)}
-                                    label={"Research"}
+                                    label={(hasAccess || isWhitelisted) ? "Research" : "Purchase Credits"}
                                 />
                                 :
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
