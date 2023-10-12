@@ -49,7 +49,7 @@ export default function JoinDiscord({ showToaster }: IStepProps) {
 
   return (
     <QuestStep
-      label="Join our Discord and acquire a role"
+      label="Join our Discord and acquire a FLockie Role!"
       step={step}
       status={status}
       minWidth="160px"
