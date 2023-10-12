@@ -17,7 +17,7 @@ import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } 
 import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
 import { FLOCK_V2_ABI } from "../contracts/flockV2";
 import { useCreditsData } from "../hooks/useCreditsData";
-import { formatUnits, parseEther } from "viem";
+import { parseEther } from "viem";
 import { WalletContext } from '../context/walletContext';
 import { event } from "nextjs-google-analytics";
 
@@ -32,7 +32,7 @@ export default function GptResearcherPage() {
     const [amount, setAmount] = useState<number>(0);
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [reportData, setReportData] = useState<any>({});
+    const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
 
     const { FLCTokenBalance } =
         useContext(WalletContext);
@@ -123,7 +123,8 @@ export default function GptResearcherPage() {
         };
       })();
     
-    const loadReports = async () => {
+    const loadReport = async () => {
+        setIsLoadingReport(true);
         try {
             const response = await fetch(`/api/getReport`,
                 {
@@ -137,14 +138,15 @@ export default function GptResearcherPage() {
                 }
             );
             const data = await response.json();
-            if (data.error) {
-                console.log(data.error);
+            if (data.message) {
+                console.log(data.message);
                 return;
             }
-            setReportData(data);
+            setReport(data.report);
         } catch (e) {
             console.log(e);
         }
+        setIsLoadingReport(false);
     };   
 
 
@@ -199,6 +201,12 @@ export default function GptResearcherPage() {
     useEffect(() => {
         setAmount(price);
     }, [price]);
+
+    useEffect(() => {
+        if (address) {
+            loadReport();            
+        }
+    }, [address]);
 
     return (
         <Layout>
@@ -351,7 +359,11 @@ export default function GptResearcherPage() {
                                 <Box width="100%" margin={{ top: 'medium' }} gap="small">
                                     <Heading level="2" margin="xsmall">Research Report</Heading>
                                     <Box width="100%" border height={{min: '30px'}} round="small">
-                                        <Text>{report}</Text>
+                                        { isLoadingReport ?
+                                            <Text>Loading...</Text>
+                                            :
+                                            <Text>{report}</Text>
+                                        }
                                     </Box>
                                     <Box direction="row-responsive" gap="small">
                                         <Button
