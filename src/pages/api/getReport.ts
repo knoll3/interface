@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  const { walletAddress } = req.body;
+  const { walletAddress } = req.query;
 
   const getReport = await client.researcherReport.findFirst({
     where: {

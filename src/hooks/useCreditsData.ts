@@ -2,13 +2,6 @@ import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
 import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useContractRead } from 'wagmi';
 
-type UserDataType = {
-    exists: boolean;
-    wallet: string;
-    NFTIssued: boolean;
-    balance: bigint;
-}
-
 export const useCreditsData = ({
   userAddress,
 }: {
@@ -26,7 +19,7 @@ export const useCreditsData = ({
   const { data: researchPrice } = useContractRead({
     address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
     abi: FLOCK_CREDITS_ABI,
-    functionName: 'FIXED_PRICE',
+    functionName: 'price',
     watch: true,
   }) as { data: number };
 

@@ -10,6 +10,11 @@ export const FLOCK_CREDITS_ABI = [
         "internalType": "address",
         "name": "_flockNFTAddress",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -33,19 +38,6 @@ export const FLOCK_CREDITS_ABI = [
     ],
     "name": "OwnershipTransferred",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "FIXED_PRICE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -150,10 +142,10 @@ export const FLOCK_CREDITS_ABI = [
   },
   {
     "inputs": [],
-    "name": "flockTokenV2",
+    "name": "flockToken",
     "outputs": [
       {
-        "internalType": "contract FlockTokenV2",
+        "internalType": "contract FlockToken",
         "name": "",
         "type": "address"
       }
@@ -176,7 +168,33 @@ export const FLOCK_CREDITS_ABI = [
   },
   {
     "inputs": [],
+    "name": "price",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "setPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

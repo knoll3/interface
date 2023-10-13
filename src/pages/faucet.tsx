@@ -11,7 +11,6 @@ import {
 import { Layout, PrimaryButton, Tasks } from '../components';
 import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
-import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { MIGRATE_TOKENS_ABI } from '../contracts/migrateTokens';
 import { use, useEffect, useState, useContext } from 'react';
 import { WalletContext } from '../context/walletContext';
@@ -19,73 +18,31 @@ import { useIsMounted } from '../hooks';
 
 export default function FaucetPage() {
   const { address } = useAccount();
+  const [amount, setAmount] = useState<number>(0);
   const [errors, setErrors] = useState<any>({});
-  const [disabled, setDisabled] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { FLCTokenBalance, FLOTokenBalance } = useContext(WalletContext);
 
   const mounted = useIsMounted();
 
-  // const { data, write } = useContractWrite({
-  //   address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
-  //   abi: FLOCK_ABI,
-  //   functionName: 'mint',
-  // });
-
-  const { data: dataMigrate, write: writeMigrate } = useContractWrite({
-    address: process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`,
-    abi: MIGRATE_TOKENS_ABI,
-    functionName: 'migrate',
-  });
-
-  const { data: dataApprove, write: writeApprove } = useContractWrite({
+  const { data, write } = useContractWrite({
     address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
     abi: FLOCK_ABI,
-    functionName: 'approve',
+    functionName: 'mint',
   });
 
-  const { isSuccess: isSuccessMigrate, isLoading: isLoadingMigrate } =
-    useWaitForTransaction({
-      hash: dataMigrate?.hash,
-    });
+  const { isSuccess, isLoading } = useWaitForTransaction({
+    hash: data?.hash,
+  });
 
-  const { isSuccess: isSuccessApprove, isLoading: isLoadingApprove } =
-    useWaitForTransaction({
-      hash: dataApprove?.hash,
-    });
-
-  // const handleMint = async () => {
-  //   write?.({ args: [address, amount * 10 ** 18] });
-  // };
-
-  const handleApprove = async () => {
-    setIsLoading(true);
-    writeApprove?.({
-      args: [
-        process.env.NEXT_PUBLIC_MIGRATE_TOKENS_ADDRESS as `0x${string}`,
-        FLCTokenBalance.value,
-      ],
-    });
+  const handleMint = async () => {
+    write?.({ args: [address, amount * 10 ** 18] });
   };
 
   useEffect(() => {
-    if (isSuccessApprove) {
-      writeMigrate?.();
-    }
-    if (isSuccessMigrate) {
-      setIsLoading(false);
-    }
-  }, [isSuccessApprove, isSuccessMigrate]);
+    setAmount(0);
+  }, [isSuccess]);
 
   const hasErrors = Object.keys(errors).length > 0;
-
-  useEffect(() => {
-    setDisabled(!address || hasErrors || isLoading);
-  }, [address, isLoading]);
-
-  const roundedFLCBalance = FLCTokenBalance
-    ? Math.round(Number(FLCTokenBalance.formatted) * 100) / 100
-    : 0;
 
   if (!mounted) {
     return <></>;
@@ -104,15 +61,15 @@ export default function FaucetPage() {
         >
           <Box>
             <Box direction="row-responsive" gap="xsmall">
-              <Heading level="2">FLock (FLO) tokens faucet </Heading>
+              <Heading level="2">FLock (FLC) tokens faucet </Heading>
             </Box>
             <Paragraph>
-              Migrate your FLC to FLO tokens for participating in the FLock
-              network.
+              Mint your FLC tokens for participating in the FLock network.
             </Paragraph>
             <Paragraph>
-              {roundedFLCBalance} FLC tokens available to migrate.
-            </Paragraph>
+              Contract Address:{' '}
+              <Text wordBreak="break-word">{process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS}</Text>
+            </Paragraph> 
           </Box>
         </Box>
         <Box
@@ -123,14 +80,35 @@ export default function FaucetPage() {
           justify="center"
           round="small"
         >
-          <Box direction="row" align="end" justify="end">
-            <Button
-              primary
-              onClick={handleApprove}
-              disabled={disabled || roundedFLCBalance === 0}
-              label={isLoading ? 'Migrating...' : 'Migrate'}
-            />
-          </Box>
+          <Form
+            onValidate={(validationResults) => {
+              setErrors(validationResults.errors);
+            }}
+          >
+            <FormField
+              name="amount"
+              htmlFor="amount"
+              label="Amount"
+              required
+              validateOn="blur"
+            >
+              <TextInput
+                type="number"
+                id="amount"
+                name="amount"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+              />
+            </FormField>
+            <Box direction="row" align="end" justify="end">
+              <Button
+                primary
+                onClick={handleMint}
+                disabled={!address || amount === 0 || hasErrors || isLoading}
+                label={isLoading ? 'Minting...' : 'Mint'}
+              />
+            </Box>
+          </Form>
         </Box>
       </Box>
     </Layout>

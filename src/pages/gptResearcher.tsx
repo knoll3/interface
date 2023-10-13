@@ -8,7 +8,8 @@ import {
     Text,
     TextInput,
     InfiniteScroll,
-    Layer, 
+    Layer,
+    RangeInput, 
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
 import showdown from 'showdown';
@@ -16,7 +17,8 @@ import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } 
 import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
 import { FLOCK_V2_ABI } from "../contracts/flockV2";
 import { useCreditsData } from "../hooks/useCreditsData";
-import { formatUnits, parseEther } from "viem";
+import { parseEther } from "viem";
+import { WalletContext } from '../context/walletContext';
 import { event } from "nextjs-google-analytics";
 
 
@@ -30,13 +32,15 @@ export default function GptResearcherPage() {
     const [amount, setAmount] = useState<number>(0);
     const [showPurchase, setShowPurchase] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [reportData, setReportData] = useState<any>({});
+    const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
+    const [price, setPrice] = useState<number>(0);
+
+    const { FLCTokenBalance } =
+        useContext(WalletContext);
 
     const {
         userData,
         researchPrice,
-        tokenAllowance,
         isWhitelisted,
     } = useCreditsData({
         userAddress: address
@@ -46,14 +50,6 @@ export default function GptResearcherPage() {
         ? Math.round(Number(userData[3]) * 100) / 100
         : 0;
 
-    const price = researchPrice
-        ? Number(researchPrice)
-        : 0;
-
-    const tokenAllowanceValue = tokenAllowance
-        ? Number(formatUnits(tokenAllowance, 18))
-        : 0;
-
     const hasAccess = userBalance >= price;
 
     useEffect(() => {
@@ -61,6 +57,10 @@ export default function GptResearcherPage() {
             setIsConnected(true);
         }
     }, [address]);
+
+    useEffect(() => {
+        setPrice(researchPrice ? Number(researchPrice) : 0)
+    }, [researchPrice]);
 
     const GPTResearcher = (() => {
         const startResearch = () => {
@@ -100,7 +100,6 @@ export default function GptResearcherPage() {
       
         const addAgentResponse = (data: { output: any; }) => {
           setAgentOutput((prev) => [...prev, data.output]);
-          updateScroll();
         };
       
         const writeReport = (data: { output: any; }, converter: { makeHtml: (arg0: any) => any; }) => {
@@ -108,15 +107,10 @@ export default function GptResearcherPage() {
             const markdownOutput = converter.makeHtml(data.output);
             console.log(markdownOutput);
           setReport((prev) => prev + ' ' + markdownOutput);
-          updateScroll();
         };
       
         const updateDownloadLink = (data: { output: any; }) => {
           setDownloadLink(data.output);
-        };
-      
-        const updateScroll = () => {
-          window.scrollTo(0, document.body.scrollHeight);
         };
       
         return {
@@ -124,28 +118,27 @@ export default function GptResearcherPage() {
         };
       })();
     
-    const loadReports = async () => {
+    const loadReport = async () => {
+        setIsLoadingReport(true);
         try {
-            const response = await fetch(`/api/getReport`,
+            const response = await fetch(`/api/getReport?walletAddress=${address}`,
                 {
-                    method: 'POST',
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        walletAddress: address,
-                    }),
                 }
             );
             const data = await response.json();
-            if (data.error) {
-                console.log(data.error);
+            if (data.message) {
+                console.log(data.message);
                 return;
             }
-            setReportData(data);
+            setReport(data.report);
         } catch (e) {
             console.log(e);
         }
+        setIsLoadingReport(false);
     };   
 
 
@@ -159,34 +152,53 @@ export default function GptResearcherPage() {
         window.open(downloadLink, '_blank');
     };
 
-    const { data: purchaseCredits, writeAsync: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
+    const { data: purchaseCredits, write: writePurchaseCredits, isLoading: purchaseLoading } = useContractWrite({
         address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
         abi: FLOCK_CREDITS_ABI,
         functionName: 'addCredits',
     });
 
-    const { data: approveTokens, writeAsync: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
-        address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
+    const { data: approveTokens, write: writeApproveTokens, isLoading: approveLoading } = useContractWrite({
+        address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
         abi: FLOCK_V2_ABI,
         functionName: 'approve',
     });
 
-    const { isSuccess: isSuccessApprove } = useWaitForTransaction({
+    const { isSuccess: isSuccessApprove, isLoading: isApproveTxLoading } = useWaitForTransaction({
         hash: approveTokens?.hash,
     });
 
-    const { isSuccess: isSuccessPurchase } = useWaitForTransaction({
+    const { isSuccess: isSuccessPurchase, isLoading: isPurchaseTxLoading } = useWaitForTransaction({
         hash: purchaseCredits?.hash,
     });
 
-    const handleApprove = async () => {
-        await writeApproveTokens?.({ args: [process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`, parseEther(`${amount}`)]});
+    const handleApprove = () => {
+        writeApproveTokens?.({ args: [process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`, parseEther(`${amount}`)]});
     }
 
-    const handlePurchase = async () => {
-        await writePurchaseCredits?.({ args: [amount]});
-        setShowPurchase(false);
+    const handlePurchase = () => {
+        writePurchaseCredits?.({ args: [amount]});
     }  
+
+    useEffect(() => {
+        if (isSuccessApprove) {
+            handlePurchase();
+        }
+
+        if (isSuccessPurchase) {
+            setShowPurchase(false);
+        }
+    }, [isSuccessPurchase, isSuccessApprove]);
+
+    useEffect(() => {
+        setAmount(price);
+    }, [price]);
+
+    useEffect(() => {
+        if (address) {
+            loadReport();            
+        }
+    }, [address]);
 
     return (
         <Layout>
@@ -194,29 +206,56 @@ export default function GptResearcherPage() {
                 <Layer>
                     <Box pad="large" align="center" gap="small" width="550px">
                         <Heading level="2" margin="xsmall">Purchase Credits</Heading>
-                        <Text alignSelf="start">To use this model you have to deposit FLO as credits which will be used to pay for research.</Text>
                         <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price} credits</Text>
                         <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>
-                        <Box direction="row" align="center" gap="small">
-                            <Button
-                                primary
-                                disabled={purchaseLoading || approveLoading || amount < price}
-                                onClick={(tokenAllowanceValue >= price) ? handlePurchase : handleApprove}
-                                label={
-                                    (purchaseLoading || approveLoading) ? 
-                                        (tokenAllowanceValue >= price) ? 
-                                            "Purchasing..." : "Approving..." 
-                                        : (tokenAllowanceValue >= price) ? 
-                                            "Purchase" : "Approve Tokens"
-                                    }
-                            />
-                            <TextInput type="number" placeholder="Amount" onChange={(event) => setAmount(Number(event.target.value))} />
-                        </Box>
+                        {
+                            Number(FLCTokenBalance?.formatted) < price ?
+                            (
+                                <Text weight="bold" alignSelf="start" color="red">Not enough FLC to purchase credits</Text>
+                            ) : (
+                                <Box width="100%" direction="row" justify="between" align="center">
+                                    <Button
+                                        primary
+                                        disabled={
+                                            purchaseLoading ||
+                                            approveLoading || 
+                                            isApproveTxLoading ||
+                                            isPurchaseTxLoading ||
+                                            amount < price
+                                        }
+                                        onClick={handleApprove}
+                                        label={
+                                            (   purchaseLoading ||
+                                                approveLoading || 
+                                                isApproveTxLoading ||
+                                                isPurchaseTxLoading
+                                            ) ? "Purchasing..." : "Purchase"
+                                        }
+                                    />
+                                    <Box direction="row" gap="small" width="65%">
+                                        <Text weight="bold">{amount}</Text>
+                                        <RangeInput
+                                            size={30}
+                                            value={amount}
+                                            min={price}
+                                            max={Number(FLCTokenBalance?.formatted)}
+                                            step={price}
+                                            onChange={event => setAmount(Number(event.target.value))}
+                                        />
+                                    </Box>
+                                </Box>
+                            )
+                        }
                         <Button
                             margin={{ top: 'medium' }}
                             alignSelf="end"
                             secondary
-                            disabled={purchaseLoading || approveLoading}
+                            disabled={
+                                purchaseLoading ||
+                                approveLoading || 
+                                isApproveTxLoading ||
+                                isPurchaseTxLoading
+                            }
                             onClick={() => setShowPurchase(false)}
                             label="Close"
                         />
@@ -262,13 +301,22 @@ export default function GptResearcherPage() {
                                 onChange={({option}) => setReportType(option)} 
                             />
                         </Box>
+                        <Box                        
+                            round="small"
+                            background="white"
+                            pad="medium"
+                        >
+                            <Text alignSelf="start">To use this model you have to deposit FLC as credits which will be used to pay for research.</Text>
+                            <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price ? price : 0} credits</Text>
+                            { isConnected && <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>}
+                        </Box>
                         <Box>
                             { isConnected ?
                                 <Button
                                     alignSelf="start"
                                     primary
                                     onClick={(hasAccess || isWhitelisted) ? handleSubmit : () => setShowPurchase(true)}
-                                    label={"Research"}
+                                    label={(hasAccess || isWhitelisted) ? "Research" : "Purchase Credits"}
                                 />
                                 :
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
@@ -311,7 +359,11 @@ export default function GptResearcherPage() {
                                 <Box width="100%" margin={{ top: 'medium' }} gap="small">
                                     <Heading level="2" margin="xsmall">Research Report</Heading>
                                     <Box width="100%" border height={{min: '30px'}} round="small">
-                                        <Text>{report}</Text>
+                                        { isLoadingReport ?
+                                            <Text>Loading...</Text>
+                                            :
+                                            <Text>{report}</Text>
+                                        }
                                     </Box>
                                     <Box direction="row-responsive" gap="small">
                                         <Button

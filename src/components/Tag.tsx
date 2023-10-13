@@ -78,8 +78,8 @@ export default function Tag({ label, type, timer }: ITagProps) {
 }
 
 export const CustomStyledTag = styled(StyledTag)`
-  padding: 16px 20px;
-  font-size: 14px;
+  padding: 20px 30px;
+  font-size: 20px;
 `;
 
 export function ClaimTag({ label, type, timer }: ITagProps) {
