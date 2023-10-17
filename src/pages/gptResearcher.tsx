@@ -335,7 +335,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         {
-                            isConnected | reportType =="Outline Report" &&
+                            isConnected || reportType =="Outline Report" &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
