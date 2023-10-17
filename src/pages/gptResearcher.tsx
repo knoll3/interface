@@ -25,7 +25,7 @@ import { event } from "nextjs-google-analytics";
 export default function GptResearcherPage() {
     const { address } = useAccount();
     const [task, setTask] = useState<string>("");
-    const [reportType, setReportType] = useState<string>("Research Report");
+    const [reportType, setReportType] = useState<string>("Outline Report");
     const [report, setReport] = useState<string>("");
     const [agentOutput, setAgentOutput] = useState<string[]>([]);
     const [downloadLink, setDownloadLink] = useState<string>("");
@@ -70,8 +70,7 @@ export default function GptResearcherPage() {
         };
       
         const listenToSockEvents = () => {
-          const ws_uri = 'ws://researcher.flock.io/ws';
-        //   const ws_uri = process.env.RESEARCHER_WEB_SOCKET_URL!
+          const ws_uri = 'wss://researcher.flock.io/ws';
           const converter = new showdown.Converter();
           const socket = new WebSocket(ws_uri);
           socket.onmessage = (event) => {
@@ -296,11 +295,12 @@ export default function GptResearcherPage() {
                         <Box>
                             <Text>What type of report would you like me to generate?</Text>
                             <Select 
-                                options={['Research Report', 'Resource Report', 'Outline Report']}
+                                options={['Outline Report', 'Research Report', 'Resource Report']}
                                 value={reportType} 
                                 onChange={({option}) => setReportType(option)} 
                             />
                         </Box>
+                        { reportType !=="Outline Report" &&
                         <Box                        
                             round="small"
                             background="white"
@@ -309,21 +309,33 @@ export default function GptResearcherPage() {
                             <Text alignSelf="start">To use this model you have to deposit FLC as credits which will be used to pay for research.</Text>
                             <Text alignSelf="start" weight="bold">Minimum deposit (single research price): {price ? price : 0} credits</Text>
                             { isConnected && <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>}
+                        </Box>}
+                        <Box>
+                            { reportType =="Outline Report" && 
+                                <Button
+                                    alignSelf="start"
+                                    primary
+                                    onClick={handleSubmit}
+                                    label={"Research"}
+                                />
+                            }
                         </Box>
                         <Box>
-                            { isConnected ?
+                            { reportType =="Outline Report" ?
+                                <Box></Box>
+                                :
+                                isConnected ?
                                 <Button
                                     alignSelf="start"
                                     primary
                                     onClick={(hasAccess || isWhitelisted) ? handleSubmit : () => setShowPurchase(true)}
                                     label={(hasAccess || isWhitelisted) ? "Research" : "Purchase Credits"}
-                                />
-                                :
+                                /> :
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
                             }
                         </Box>
                         {
-                            isConnected &&
+                            isConnected || reportType =="Outline Report" &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
