@@ -25,7 +25,7 @@ import { event } from "nextjs-google-analytics";
 export default function GptResearcherPage() {
     const { address } = useAccount();
     const [task, setTask] = useState<string>("");
-    const [reportType, setReportType] = useState<string>("Outline Report");
+    const [reportType, setReportType] = useState({label: 'Outline Report', value: 'outline_report'});
     const [report, setReport] = useState<string>("");
     const [agentOutput, setAgentOutput] = useState<string[]>([]);
     const [downloadLink, setDownloadLink] = useState<string>("");
@@ -88,7 +88,7 @@ export default function GptResearcherPage() {
       
             const requestData = {
               task: task,
-              report_type: reportType,
+              report_type: reportType.value,
               agent: "Auto Agent",
               walletAddress: address,
             };
@@ -295,12 +295,21 @@ export default function GptResearcherPage() {
                         <Box>
                             <Text>What type of report would you like me to generate?</Text>
                             <Select 
-                                options={['Outline Report', 'Research Report', 'Resource Report']}
-                                value={reportType} 
+                                options={[
+                                    {label: 'Outline Report', value: 'outline_report'},
+                                    {label: 'Research Report', value: 'research_report'},
+                                    {label: 'Resource Report', value: 'resource_report'},
+                                ]}
+                                value={reportType.value}
+                                valueLabel={
+                                    <Box pad="small">
+                                        {reportType.label}
+                                    </Box>
+                                }
                                 onChange={({option}) => setReportType(option)} 
                             />
                         </Box>
-                        { reportType !=="Outline Report" &&
+                        { reportType.value !== "outline_report" &&
                         <Box                        
                             round="small"
                             background="white"
@@ -311,7 +320,7 @@ export default function GptResearcherPage() {
                             { isConnected && <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>}
                         </Box>}
                         <Box>
-                            { reportType =="Outline Report" && 
+                            { reportType.value =="outline_report" && 
                                 <Button
                                     alignSelf="start"
                                     primary
@@ -321,7 +330,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         <Box>
-                            { reportType =="Outline Report" ?
+                            { reportType.value =="outline_report" ?
                                 <Box></Box>
                                 :
                                 isConnected ?
@@ -335,7 +344,7 @@ export default function GptResearcherPage() {
                             }
                         </Box>
                         {
-                            (isConnected || reportType === "Outline Report") &&
+                            (isConnected || reportType.value === "outline_report") &&
                             <Box>
                                 <Box width="100%">
                                     <Heading level="2" margin="xsmall">Agents Output</Heading>
