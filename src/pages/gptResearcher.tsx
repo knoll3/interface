@@ -105,7 +105,9 @@ export default function GptResearcherPage() {
         };
       
         const updateDownloadLink = (data: { output: any; }) => {
-          setDownloadLink(data.output);
+            const position = data.output.search("/output");
+            const link = "https://researcher.flock.io" + data.output.slice(position);
+            setDownloadLink(link);
         };
       
         return {
