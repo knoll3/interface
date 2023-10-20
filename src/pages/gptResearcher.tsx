@@ -124,9 +124,10 @@ export default function GptResearcherPage() {
                     },
                 }
             );
-            const data = await response.json();
-            if (data.message) {
-                console.log(data.message);
+            const { data, message } = await response.json();
+            if (message) {
+                console.log(message);
+                setIsLoadingReport(false);
                 return;
             }
             setReport(data.report);
@@ -380,7 +381,7 @@ export default function GptResearcherPage() {
                                             <Text>Loading...</Text>
                                             :
                                             <Markdown>
-                                                {report}
+                                                {report ? report : ""}
                                             </Markdown>
                                         }
                                     </Box>
