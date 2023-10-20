@@ -9,10 +9,10 @@ import {
     TextInput,
     InfiniteScroll,
     Layer,
-    RangeInput, 
+    RangeInput,
+    Markdown, 
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
-import showdown from 'showdown';
 import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
 import { FLOCK_CREDITS_ABI } from "../contracts/flockCredits";
 import { FLOCK_V2_ABI } from "../contracts/flockV2";
@@ -71,14 +71,13 @@ export default function GptResearcherPage() {
       
         const listenToSockEvents = () => {
           const ws_uri = 'wss://researcher.flock.io/ws';
-          const converter = new showdown.Converter();
           const socket = new WebSocket(ws_uri);
           socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'logs') {
               addAgentResponse(data);
             } else if (data.type === 'report') {
-              writeReport(data, converter);
+              writeReport(data);
             } else if (data.type === 'path') {
               updateDownloadLink(data);
             }
@@ -101,11 +100,8 @@ export default function GptResearcherPage() {
           setAgentOutput((prev) => [...prev, data.output]);
         };
       
-        const writeReport = (data: { output: any; }, converter: { makeHtml: (arg0: any) => any; }) => {
-            console.log(data.output);
-            const markdownOutput = converter.makeHtml(data.output);
-            console.log(markdownOutput);
-          setReport((prev) => prev + ' ' + markdownOutput);
+        const writeReport = (data: { output: any; }) => {
+            setReport((prev) => prev + ' ' + data.output);
         };
       
         const updateDownloadLink = (data: { output: any; }) => {
@@ -128,9 +124,10 @@ export default function GptResearcherPage() {
                     },
                 }
             );
-            const data = await response.json();
-            if (data.message) {
-                console.log(data.message);
+            const { data, message } = await response.json();
+            if (message) {
+                console.log(message);
+                setIsLoadingReport(false);
                 return;
             }
             setReport(data.report);
@@ -383,7 +380,9 @@ export default function GptResearcherPage() {
                                         { isLoadingReport ?
                                             <Text>Loading...</Text>
                                             :
-                                            <Text>{report}</Text>
+                                            <Markdown>
+                                                {report ? report : ""}
+                                            </Markdown>
                                         }
                                     </Box>
                                     <Box direction="row-responsive" gap="small">
