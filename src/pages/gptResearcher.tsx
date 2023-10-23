@@ -10,7 +10,7 @@ import {
     InfiniteScroll,
     Layer,
     RangeInput,
-    Markdown, 
+    Markdown,
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from "react";
 import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
@@ -34,6 +34,7 @@ export default function GptResearcherPage() {
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
     const [price, setPrice] = useState<number>(0);
+    const [isResearching, setIsResearching] = useState<boolean>(false);
 
     const { FLCTokenBalance } =
         useContext(WalletContext);
@@ -50,7 +51,7 @@ export default function GptResearcherPage() {
         ? Math.round(Number(userData[3]) * 100) / 100
         : 0;
 
-    const hasAccess = userBalance >= price;
+    const hasAccess = (userBalance >= price) || (reportType.value === "outline_report") ;
 
     useEffect(() => {
         if (address) {
@@ -64,6 +65,7 @@ export default function GptResearcherPage() {
 
     const GPTResearcher = (() => {
         const startResearch = () => {
+          setIsResearching(true);
           addAgentResponse({ output: "🤔 Too many requests right now, you are in the queue, please be patient." });
       
           listenToSockEvents();
@@ -108,6 +110,7 @@ export default function GptResearcherPage() {
             const position = data.output.search("/output");
             const link = "https://researcher.flock.io" + data.output.slice(position);
             setDownloadLink(link);
+            setIsResearching(false);
         };
       
         return {
@@ -305,7 +308,8 @@ export default function GptResearcherPage() {
                                         {reportType.label}
                                     </Box>
                                 }
-                                onChange={({option}) => setReportType(option)} 
+                                onChange={({option}) => setReportType(option)}
+                                disabled={isResearching} 
                             />
                         </Box>
                         { reportType.value !== "outline_report" &&
@@ -319,26 +323,15 @@ export default function GptResearcherPage() {
                             { isConnected && <Text alignSelf="start" weight="bold">Your current balance: {userBalance} credits</Text>}
                         </Box>}
                         <Box>
-                            { reportType.value =="outline_report" && 
+                            { (isConnected || reportType.value === "outline_report") ?
                                 <Button
                                     alignSelf="start"
                                     primary
-                                    onClick={handleSubmit}
-                                    label={"Research"}
-                                />
-                            }
-                        </Box>
-                        <Box>
-                            { reportType.value =="outline_report" ?
-                                <Box></Box>
-                                :
-                                isConnected ?
-                                <Button
-                                    alignSelf="start"
-                                    primary
+                                    busy={isResearching}
                                     onClick={(hasAccess || isWhitelisted) ? handleSubmit : () => setShowPurchase(true)}
                                     label={(hasAccess || isWhitelisted) ? "Research" : "Purchase Credits"}
-                                /> :
+                                />
+                                :
                                 <Heading level="2" margin="xsmall">Connect your wallet to continue</Heading>
                             }
                         </Box>
@@ -390,12 +383,14 @@ export default function GptResearcherPage() {
                                     <Box direction="row-responsive" gap="small">
                                         <Button
                                             alignSelf="start"
+                                            disabled={!report || isResearching}
                                             primary
                                             onClick={() => navigator.clipboard.writeText(report)}
                                             label="Copy to clipboard"
                                         />
                                         <Button
                                             alignSelf="start"
+                                            disabled={!report || isResearching}
                                             primary
                                             onClick={handleDownload}
                                             label="Download as PDF"
