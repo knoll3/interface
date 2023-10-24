@@ -43,7 +43,7 @@ export default function GptResearcherPage() {
   const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
 
-  const { FLCTokenBalance } = useContext(WalletContext);
+  const { FLCTokenBalance, userToken, publicKey } = useContext(WalletContext);
 
   const { userData, researchPrice, isWhitelisted } = useCreditsData({
     userAddress: address,
@@ -59,6 +59,8 @@ export default function GptResearcherPage() {
   useEffect(() => {
     if (address) {
       setIsConnected(true);
+    } else {
+      setIsConnected(false);
     }
   }, [address]);
 
@@ -78,7 +80,7 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      const ws_uri = 'wss://researcher.flock.io/ws';
+      const ws_uri = `wss://researcher.flock.io/ws?token=${userToken}&authKey=${publicKey}`;
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -364,7 +366,7 @@ export default function GptResearcherPage() {
               </Box>
             )}
             <Box>
-              {isConnected || reportType.value === 'outline_report' ? (
+              {isConnected ? (
                 <Button
                   alignSelf="start"
                   primary
@@ -384,7 +386,7 @@ export default function GptResearcherPage() {
                 </Heading>
               )}
             </Box>
-            {(isConnected || reportType.value === 'outline_report') && (
+            {isConnected && (
               <Box>
                 <Box width="100%">
                   <Heading level="2" margin="xsmall">
