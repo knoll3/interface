@@ -9,6 +9,7 @@ import {
 import { useAccount, useBalance } from 'wagmi';
 import { web3AuthInstance } from '@/src/hooks/web3AuthInstance';
 import { getPublicCompressed } from '@toruslabs/eccrypto';
+import { event } from 'nextjs-google-analytics';
 
 interface WalletContextProviderProps {
   children: ReactNode;
@@ -49,7 +50,7 @@ export function WalletContextProvider({
     token: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
     watch: true,
   });
-  
+
   const loadUserData = useCallback(async () => {
     console.log('loadUserData', address);
     if (web3AuthInstance.connectedAdapterName === 'openlogin') {
@@ -64,6 +65,9 @@ export function WalletContextProvider({
 
       setUserToken(user.idToken!);
       setPublicKey(publicKey);
+      event('login', {
+        method: 'Social',
+      });
     } else {
       try {
         const authenticateUser = await web3AuthInstance.authenticateUser();
@@ -71,6 +75,9 @@ export function WalletContextProvider({
 
         setUserToken(idToken);
         setPublicKey(address!.toLocaleLowerCase());
+        event('login', {
+          method: 'External',
+        });
       } catch (error) {
         setUserToken('');
         setPublicKey('');
