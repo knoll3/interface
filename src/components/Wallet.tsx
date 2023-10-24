@@ -90,14 +90,6 @@ export function Wallet() {
                     >
                       <Text weight="bold">{roundedFLCBalance} FLC</Text>
                     </Box>
-                    <Box
-                      round="small"
-                      background="#E0E4E7"
-                      color="black"
-                      pad="xsmall"
-                    >
-                      <Text weight="bold">{roundedFLOBalance} FLO</Text>
-                    </Box>
                   </Box>
                 }
                 onClick={() => setIsWalletOpen(true)}
