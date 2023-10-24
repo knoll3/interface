@@ -148,6 +148,7 @@ export default function GptResearcherPage() {
 
   const handleSubmit = () => {
     setReport('');
+    setDownloadLink("");
     setAgentOutput([]);
     GPTResearcher.startResearch();
   };
