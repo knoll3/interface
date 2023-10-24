@@ -61,7 +61,7 @@ export const BurgerMenu = ({
           onClick={() => setSelected('/quest')}
           hoverIndicator={false}
           selected={selected === '/quest'}
-          text="Quest"
+          text="Faucet"
         />
         <MenuItem
           href="/train"
@@ -69,14 +69,6 @@ export const BurgerMenu = ({
           hoverIndicator={false}
           selected={selected === '/train'}
           text="Train"
-        />
-
-        <MenuItem
-          href="/faucet"
-          onClick={() => setSelected('/faucet')}
-          hoverIndicator={false}
-          selected={selected === '/faucet'}
-          text="Faucet"
         />
 
         <MenuItem
