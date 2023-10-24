@@ -156,6 +156,16 @@ export const MarketplaceItems = ({
   useEffect(() => {
     loadModels();
   }, []);
+ 
+  const convertLink = (link: string) => {
+    if (link.includes('https://') || link.includes('http://')) {
+      return link;
+    }
+    const currentUrl = window.location.href;
+    const position = currentUrl.indexOf('/marketplace');
+    const baseUrl = currentUrl.substring(0, position);
+    return baseUrl + link;
+  };
 
   const viewTask = async (modelId: string) => {
     if (web3AuthInstance.connected && address) {
@@ -275,7 +285,7 @@ export const MarketplaceItems = ({
                     <Text weight="bold">FLC {model.price}</Text>
                     <PrimaryButton
                       label="Use"
-                      href={model.link}
+                      href={convertLink(model.link)}
                       target="blank"
                       onClick={() => viewTask(model.id)}
                     />
