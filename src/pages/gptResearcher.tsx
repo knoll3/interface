@@ -103,7 +103,7 @@ export default function GptResearcherPage() {
         };
       
         const writeReport = (data: { output: any; }) => {
-            setReport((prev) => prev + ' ' + data.output);
+            setReport((prev) => prev + data.output);
         };
       
         const updateDownloadLink = (data: { output: any; }) => {
@@ -375,9 +375,13 @@ export default function GptResearcherPage() {
                                         { isLoadingReport ?
                                             <Text>Loading...</Text>
                                             :
-                                            <Markdown>
-                                                {report ? report : ""}
-                                            </Markdown>
+                                            <Box
+                                            pad="small"
+                                            >
+                                                <Markdown components={{p: Text}}>
+                                                    {report ? report : ""}
+                                                </Markdown>
+                                            </Box>
                                         }
                                     </Box>
                                     <Box direction="row-responsive" gap="small">
