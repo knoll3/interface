@@ -1,13 +1,28 @@
-import { Box, Button, Form, FormField, Heading, Paragraph, TextInput, Text } from 'grommet';
+import {
+  Box,
+  Button,
+  Form,
+  FormField,
+  Heading,
+  Paragraph,
+  TextInput,
+  Text,
+} from 'grommet';
 import { Layout, PrimaryButton, Tasks } from '../components';
 import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { FLOCK_ABI } from '../contracts/flock';
-import { useEffect, useState } from 'react';
+import { MIGRATE_TOKENS_ABI } from '../contracts/migrateTokens';
+import { use, useEffect, useState, useContext } from 'react';
+import { WalletContext } from '../context/walletContext';
+import { useIsMounted } from '../hooks';
 
 export default function FaucetPage() {
   const { address } = useAccount();
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState<number>(0);
   const [errors, setErrors] = useState<any>({});
+  const { FLCTokenBalance, FLOTokenBalance } = useContext(WalletContext);
+
+  const mounted = useIsMounted();
 
   const { data, write } = useContractWrite({
     address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
@@ -28,6 +43,10 @@ export default function FaucetPage() {
   }, [isSuccess]);
 
   const hasErrors = Object.keys(errors).length > 0;
+
+  if (!mounted) {
+    return <></>;
+  }
 
   return (
     <Layout>

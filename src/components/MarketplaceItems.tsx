@@ -1,11 +1,29 @@
 import { useContractRead, useAccount } from 'wagmi';
 import { FLOCK_TASK_MANAGER_ABI } from '../contracts/flockTaskManager';
-import { Anchor, Avatar, Box, Heading, Layer, Meter, Stack, Text } from 'grommet';
-import { use, useEffect, useState } from 'react';
-import { UserFemale, Favorite, View, Group, Chat, Scorecard, CreditCard, Image } from 'grommet-icons';
+import {
+  Anchor,
+  Avatar,
+  Box,
+  Heading,
+  Layer,
+  Meter,
+  Stack,
+  Text,
+} from 'grommet';
+import { use, useContext, useEffect, useState } from 'react';
+import {
+  UserFemale,
+  Favorite,
+  View,
+  Group,
+  Chat,
+  Scorecard,
+  CreditCard,
+  Image,
+} from 'grommet-icons';
 import { PrimaryButton } from './PrimaryButton';
-import { web3AuthInstance, userDataHook } from '../hooks';
-
+import { web3AuthInstance } from '../hooks';
+import { WalletContext } from '../context/walletContext';
 
 export interface ModelData {
   id: string;
@@ -20,11 +38,11 @@ export interface ModelData {
   likes: number;
   shares: number;
   link: string;
-};
+}
 
 type CardColors = {
   [key: string]: TaskCardProps;
-}
+};
 
 interface TaskCardProps {
   cardColor: string;
@@ -32,19 +50,23 @@ interface TaskCardProps {
 }
 
 const cardColors: CardColors = {
-  "Large Language Model Finetuning": {
-    cardColor: "#A4C0FF", cardIcon: <Chat color="black" size="20px" />
+  'Large Language Model Finetuning': {
+    cardColor: '#A4C0FF',
+    cardIcon: <Chat color="black" size="20px" />,
   },
-  "NLP": {
-    cardColor: "#E69FBD", cardIcon: <Scorecard color="black" size="20px" />
+  NLP: {
+    cardColor: '#E69FBD',
+    cardIcon: <Scorecard color="black" size="20px" />,
   },
-  "Time series prediction": {
-    cardColor: "#D9D9D9", cardIcon: <CreditCard color="black" size="20px" />
+  'Time series prediction': {
+    cardColor: '#D9D9D9',
+    cardIcon: <CreditCard color="black" size="20px" />,
   },
-  "Classification": {
-    cardColor: "#BDD4DA", cardIcon: <Image color="black" size="20px" />
+  Classification: {
+    cardColor: '#BDD4DA',
+    cardIcon: <Image color="black" size="20px" />,
   },
-}
+};
 
 export const MarketplaceItems = ({
   filterItems,
@@ -53,10 +75,7 @@ export const MarketplaceItems = ({
 }) => {
   const [models, setModels] = useState<ModelData[]>([] as ModelData[]);
   const [likes, setLikes] = useState<string[]>([] as string[]);
-  const {
-    userToken,
-    publicKey,
-  } = userDataHook();
+  const { userToken, publicKey } = useContext(WalletContext);
 
   const { address } = useAccount();
 
@@ -85,7 +104,7 @@ export const MarketplaceItems = ({
         console.log(e);
       }
     }
-  }
+  };
 
   const getLikes = async () => {
     try {
@@ -96,7 +115,7 @@ export const MarketplaceItems = ({
         },
         body: JSON.stringify({
           wallet: address,
-        }), 
+        }),
       });
       const loadedLikes = await getLikesRequest.json();
       if (loadedLikes.error) {
@@ -107,7 +126,7 @@ export const MarketplaceItems = ({
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 
   useEffect(() => {
     if (web3AuthInstance.connected && address) {
@@ -137,6 +156,16 @@ export const MarketplaceItems = ({
   useEffect(() => {
     loadModels();
   }, []);
+ 
+  const convertLink = (link: string) => {
+    if (link.includes('https://') || link.includes('http://')) {
+      return link;
+    }
+    const currentUrl = window.location.href;
+    const position = currentUrl.indexOf('/marketplace');
+    const baseUrl = currentUrl.substring(0, position);
+    return baseUrl + link;
+  };
 
   const viewTask = async (modelId: string) => {
     if (web3AuthInstance.connected && address) {
@@ -172,73 +201,99 @@ export const MarketplaceItems = ({
         wrap
         width="100%"
         align="center"
-        justify='center'
+        justify="center"
         gap="small"
       >
         {models
-          ?.filter((model) => filterItems.length === 0 || filterItems.includes(model.type))
+          ?.filter(
+            (model) =>
+              filterItems.length === 0 || filterItems.includes(model.type)
+          )
           .map((model: ModelData, index: number) => {
-          return (
-            <Box
-              background="#FFFFFF"
-              key={index}
-              align="start"
-              justify="center"
-              round="small"
-              elevation="large"
-              pad="medium"
-              margin={{ top: 'small' }}
-              height={{ min: 'small' }}
-              width="440px"
-              border={{ color: 'black', size: 'small' }}
-            >
+            return (
+              <Box
+                background="#FFFFFF"
+                key={index}
+                align="start"
+                justify="center"
+                round="small"
+                elevation="large"
+                pad="medium"
+                margin={{ top: 'small' }}
+                height={{ min: 'small' }}
+                width="440px"
+                border={{ color: 'black', size: 'small' }}
+              >
                 <Heading level="3" margin="none">
-                    {model.name}
+                  {model.name}
                 </Heading>
                 <Text margin={{ bottom: 'medium' }}>{model.description}</Text>
-                <Box 
-                    direction="row" 
-                    width="100%" 
-                    justify="between" 
-                    align="center" 
-                    border={{
-                        color: 'black',
-                        size: 'small',
-                        style: 'solid',
-                        side: 'bottom'
-                    }}
-                    pad={{ bottom: 'xsmall' }}
-                    >
-                    <Box
-                        border={{ color: 'black', size: 'small' }}
-                        round="small"
-                        pad="xsmall"
-                        background={cardColors[model.type]?.cardColor}
-                        direction="row"
-                        gap="small"
-                        align="center"
-                    >
-                        <Chat color="black" size="20px" /><Text weight="bold" truncate={true}>{model.type}</Text>
+                <Box
+                  direction="row"
+                  width="100%"
+                  justify="between"
+                  align="center"
+                  border={{
+                    color: 'black',
+                    size: 'small',
+                    style: 'solid',
+                    side: 'bottom',
+                  }}
+                  pad={{ bottom: 'xsmall' }}
+                >
+                  <Box
+                    border={{ color: 'black', size: 'small' }}
+                    round="small"
+                    pad="xsmall"
+                    background={cardColors[model.type]?.cardColor}
+                    direction="row"
+                    gap="small"
+                    align="center"
+                  >
+                    <Chat color="black" size="20px" />
+                    <Text weight="bold" truncate={true}>
+                      {model.type}
+                    </Text>
+                  </Box>
+                  <Box direction="row" gap="small">
+                    <Box direction="row" gap="1px">
+                      <Favorite
+                        color={likes.includes(model.id) ? 'red' : 'black'}
+                        onClick={() => likeTask(model.id)}
+                      />{' '}
+                      {model.likes}
                     </Box>
-                    <Box direction="row" gap="small">
-                        <Box direction="row" gap="1px"><Favorite color={ likes.includes(model.id) ? "red" : "black"} onClick={() => likeTask(model.id)} /> {model.likes}</Box>
-                        <Box direction="row" gap="1px"><View color="black" /> {model.views}</Box>
-                        <Box direction="row" gap="1px"><Group color="black" /> {model.shares}</Box>
+                    <Box direction="row" gap="1px">
+                      <View color="black" /> {model.views}
                     </Box>
+                    <Box direction="row" gap="1px">
+                      <Group color="black" /> {model.shares}
+                    </Box>
+                  </Box>
                 </Box>
-                <Box direction="row" width="100%" justify="between" margin={{ top: 'small'}}>
-                    <Box direction="row" gap="small">
-                        <UserFemale color='brand' />
-                        <Text>{model.creator}</Text>
-                    </Box>
-                    <Box direction="row" align="center" gap="small">
-                        <Text weight="bold">FLC {model.price}</Text>
-                        <PrimaryButton label="Use" href={model.link} target="blank" onClick={() => viewTask(model.id)} />
-                    </Box>
+                <Box
+                  direction="row"
+                  width="100%"
+                  justify="between"
+                  margin={{ top: 'small' }}
+                >
+                  <Box direction="row" gap="small">
+                    <UserFemale color="brand" />
+                    <Text>{model.creator}</Text>
+                  </Box>
+                  <Box direction="row" align="center" gap="small">
+                    <Text weight="bold">FLC {model.price}</Text>
+                    <PrimaryButton
+                      label="Use"
+                      href={convertLink(model.link)}
+                      target="blank"
+                      onClick={() => viewTask(model.id)}
+                    />
+                  </Box>
                 </Box>
-            </Box>
-          );
-        })}
+              </Box>
+            );
+          })}
       </Box>
     </>
   );

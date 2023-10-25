@@ -30,57 +30,56 @@ export const Menu = () => {
       setSelected(pathname);
     }
   }, [pathname]);
-  
+
   return (
-      <Box>
-        <Box direction="row" align="center" gap="large">
-          <MenuItem
-            href="/"
-            onClick={() => setSelected('/')}
-            hoverIndicator={false}
-            selected={selected === '/'}
-            text="Home"
-          />
+    <Box>
+      <Box direction="row" align="center" gap="large">
+        <MenuItem
+          href="/"
+          onClick={() => setSelected('/')}
+          hoverIndicator={false}
+          selected={selected === '/'}
+          text="Home"
+        />
+        <MenuItem
+          href="/quest"
+          onClick={() => setSelected('/quest')}
+          hoverIndicator={false}
+          selected={selected === '/quest'}
+          text="Faucet"
+        />
+        <MenuItem
+          href="/train"
+          onClick={() => setSelected('/train')}
+          hoverIndicator={false}
+          selected={selected === '/train'}
+          text="Train"
+        />
 
-          <MenuItem
-            href="/train"
-            onClick={() => setSelected('/train')}
-            hoverIndicator={false}
-            selected={selected === '/train'}
-            text="Train"
-          />
+        <MenuItem
+          href="/marketplace"
+          onClick={() => setSelected('/marketplace')}
+          hoverIndicator={false}
+          selected={selected === '/marketplace'}
+          text="Marketplace"
+        />
 
-          <MenuItem
-            href="/faucet"
-            onClick={() => setSelected('/faucet')}
-            hoverIndicator={false}
-            selected={selected === '/faucet'}
-            text="Faucet"
-          />
-
-          <MenuItem
-            href="/marketplace"
-            onClick={() => setSelected('/marketplace')}
-            hoverIndicator={false}
-            selected={selected === '/marketplace'}
-            text="Marketplace"
-          />
-          <MenuItem
-            //href="/analytics"
-            //onClick={() => setSelected('/analytics')}
-            hoverIndicator={false}
-            selected={selected === '/analytics'}
-            text="Analytics"
-          />
-          <MenuItem
-            href="https://flock-io.gitbook.io/flock/"
-            target="_blank"
-            //onClick={() => setSelected('/aboutUs')}
-            hoverIndicator={false}
-            selected={selected === '/aboutUs'}
-            text="About Us"
-          />
-        </Box>
+        <MenuItem
+          //href="/analytics"
+          //onClick={() => setSelected('/analytics')}
+          hoverIndicator={false}
+          selected={selected === '/analytics'}
+          text="Analytics"
+        />
+        <MenuItem
+          href="https://flock-io.gitbook.io/flock/"
+          target="_blank"
+          //onClick={() => setSelected('/aboutUs')}
+          hoverIndicator={false}
+          selected={selected === '/aboutUs'}
+          text="About Us"
+        />
       </Box>
+    </Box>
   );
 };
