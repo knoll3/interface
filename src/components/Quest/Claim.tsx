@@ -1,13 +1,13 @@
 import { Box, Button } from 'grommet';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { WalletContext } from '../context/walletContext';
-import { IStepProps } from '../pages/quest';
-import { toasts } from '../constants/toastMessages';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
+import { WalletContext } from '../../context/walletContext';
+import { IStepProps } from '../../pages/quest';
+import { toasts } from '../../constants/toastMessages';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
 import QuestStep from './QuestStep';
-import { ClaimTag } from './Tag';
+import { ClaimTag } from '../Tag';
 
 export default function Claim({ showToaster }: IStepProps) {
   const { publicKey, userToken } = useContext(WalletContext);

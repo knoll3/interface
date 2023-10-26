@@ -1,15 +1,15 @@
 import { Box } from 'grommet';
 import QuestStep from './QuestStep';
-import { useIsMounted } from '../hooks';
+import { useIsMounted } from '../../hooks';
 import TimerButton from './TimerButton';
-import { toasts } from '../constants/toastMessages';
-import { IStepProps } from '../pages/quest';
+import { toasts } from '../../constants/toastMessages';
+import { IStepProps } from '../../pages/quest';
 import { useAccount } from 'wagmi';
 import { useContext, useState } from 'react';
-import { WalletContext } from '../context/walletContext';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
-import Tag from './Tag';
+import { WalletContext } from '../../context/walletContext';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
+import Tag from '../Tag';
 
 export default function BroadcastTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();

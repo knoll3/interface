@@ -1,13 +1,13 @@
 import QuestStep from './QuestStep';
-import { useIsMounted } from '../hooks';
+import { useIsMounted } from '../../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { WalletContext } from '../context/walletContext';
-import { toasts } from '../constants/toastMessages';
-import { IStepProps } from '../pages/quest';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
-import Tag from './Tag';
+import { WalletContext } from '../../context/walletContext';
+import { toasts } from '../../constants/toastMessages';
+import { IStepProps } from '../../pages/quest';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
+import Tag from '../Tag';
 
 export default function ConnectDiscord({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
