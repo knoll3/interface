@@ -5,15 +5,15 @@ import styled from 'styled-components';
 import useToaster, { IToastContent } from '../hooks/useToaster';
 
 import { Layout } from '../components';
-import BroadcastTwitter from '../components/BroadcastTwitter';
-import Claim from '../components/Claim';
-import ConnectDiscord from '../components/ConnectDiscord';
-import ConnectTwitter from '../components/ConnectTwitter';
-import ConnectWallet from '../components/ConnectWallet';
-import FollowTwitter from '../components/FollowTwitter';
-import JoinDiscord from '../components/JoinDiscord';
+import BroadcastTwitter from '../components/Quest/BroadcastTwitter';
+import Claim from '../components/Quest/Claim';
+import ConnectDiscord from '../components/Quest/ConnectDiscord';
+import ConnectTwitter from '../components/Quest/ConnectTwitter';
+import ConnectWallet from '../components/Quest/ConnectWallet';
+import FollowTwitter from '../components/Quest/FollowTwitter';
+import JoinDiscord from '../components/Quest/JoinDiscord';
 import QuestContextProvider from '../context/questContext';
-import QuestDivider from '../components/QuestDivider';
+import QuestDivider from '../components/Quest/QuestDivider';
 import ToasterList from '../components/ToasterList';
 
 interface IOnSubmitProps {

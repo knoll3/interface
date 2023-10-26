@@ -2,12 +2,12 @@ import { useIsMounted } from '@/src/hooks';
 import { useAccount, useConnect } from 'wagmi';
 import QuestStep from './QuestStep';
 import { useContext, useEffect, useState } from 'react';
-import { WalletContext } from '../context/walletContext';
-import { toasts } from '../constants/toastMessages';
-import { IStepProps } from '../pages/quest';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
-import Tag from './Tag';
+import { WalletContext } from '../../context/walletContext';
+import { toasts } from '../../constants/toastMessages';
+import { IStepProps } from '../../pages/quest';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
+import Tag from '../Tag';
 
 export default function ConnectWallet({ showToaster }: IStepProps) {
   const mounted = useIsMounted();

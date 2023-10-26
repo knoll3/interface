@@ -1,13 +1,13 @@
 import QuestStep from './QuestStep';
-import { useIsMounted } from '../hooks';
+import { useIsMounted } from '../../hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { WalletContext } from '../context/walletContext';
-import { IStepProps } from '../pages/quest';
-import { toasts } from '../constants/toastMessages';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
-import Tag from './Tag';
+import { WalletContext } from '../../context/walletContext';
+import { IStepProps } from '../../pages/quest';
+import { toasts } from '../../constants/toastMessages';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
+import Tag from '../Tag';
 
 export default function ConnectTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
