@@ -1,7 +1,7 @@
 import { Box, Text } from 'grommet';
 import { Checkmark } from 'grommet-icons';
 import { ReactNode } from 'react';
-import { TClaimStatus } from '../context/questContext';
+import { TClaimStatus } from '../../context/questContext';
 
 export interface IQuestStepProps {
   step: number;

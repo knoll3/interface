@@ -1,6 +1,6 @@
 import { Box, Button } from 'grommet';
 import { useEffect, useState } from 'react';
-import Tag from './Tag';
+import Tag from '../Tag';
 
 interface ITimerButtonProps {
   label: string;

@@ -7,12 +7,12 @@ import {
   Text,
 } from 'grommet';
 
-import { XIcon } from './XIcon';
-import { DiscordIcon } from './DiscordIcon';
-import { TelegramIcon } from './TelegramIcon';
-import { Icon1 } from './Icon1';
-import { GithubIcon } from './GithubIcon';
-import { MediumIcon } from './MediumIcon';
+import { XIcon } from './Icons/XIcon';
+import { DiscordIcon } from './Icons/DiscordIcon';
+import { TelegramIcon } from './Icons/TelegramIcon';
+import { Icon1 } from './Icons/Icon1';
+import { GithubIcon } from './Icons/GithubIcon';
+import { MediumIcon } from './Icons/MediumIcon';
 import MailchimpSubscribe from 'react-mailchimp-subscribe';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
