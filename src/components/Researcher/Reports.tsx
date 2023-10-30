@@ -25,7 +25,7 @@ export const Reports = ({
         <Box>
             <Box direction="row" align="center" gap="small">
                 <Heading level="2" margin="none" weight="bold">Report</Heading>
-                <Text color={{light: "#808080"}}>{"(1/5)"}</Text>
+                <Text color={{light: "#808080"}}>{"(" + reports.length + "/5)"}</Text>
             </Box>
             <Text><span>&#42;</span> Download your reports here</Text>
         </Box>
