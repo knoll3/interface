@@ -21,6 +21,7 @@ export const Reports = ({
     <Box
           pad={{ vertical: 'large', horizontal: 'large' }}
           gap="medium"
+          fill="horizontal"
     >
         <Box>
             <Box direction="row" align="center" gap="small">
@@ -29,7 +30,7 @@ export const Reports = ({
             </Box>
             <Text><span>&#42;</span> Download your reports here</Text>
         </Box>
-        <Box direction="row" gap="medium">
+        <Box direction="row" gap="large">
             {
                 reports.map((report, index) => (
                     <Box 
