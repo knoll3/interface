@@ -311,8 +311,18 @@ export default function GptResearcherPage() {
           margin={{ vertical: 'large' }}
         >
           <Instructions />
-          <Research />
-          <Reports reports={[]} />
+          {
+            isConnected ? (
+              <>
+                <Research />
+                <Reports reports={[]} />
+              </>
+            ) : (
+              <Heading level="2" margin="xsmall">
+                Connect your wallet to continue
+              </Heading>
+            )
+          }
           <Box gap="medium" width="100%">
             <Box>
               <Text>What would you like me to research next?</Text>
@@ -370,85 +380,6 @@ export default function GptResearcherPage() {
                 </Heading>
               )}
             </Box>
-            {isConnected && (
-              <Box>
-                <Box width="100%">
-                  <Heading level="2" margin="xsmall">
-                    Agents Output
-                  </Heading>
-                  <Text>
-                    An agent tailored specifically to your task will be
-                    generated to provide the most precise and relevant research
-                    results.
-                  </Text>
-                  <Box
-                    height="medium"
-                    overflow="auto"
-                    width="100%"
-                    border
-                    round="small"
-                    pad="small"
-                  >
-                    <InfiniteScroll
-                      items={agentOutput}
-                      show={agentOutput.length}
-                    >
-                      {(item: any, index: Key | null | undefined) => (
-                        <Box
-                          width="100%"
-                          key={index}
-                          border
-                          round="small"
-                          flex={false}
-                          margin={{ bottom: 'small' }}
-                          pad="small"
-                          background="#EEEEEE"
-                        >
-                          <Text>{item}</Text>
-                        </Box>
-                      )}
-                    </InfiniteScroll>
-                  </Box>
-                </Box>
-                <Box width="100%" margin={{ top: 'medium' }} gap="small">
-                  <Heading level="2" margin="xsmall">
-                    Research Report
-                  </Heading>
-                  <Box
-                    width="100%"
-                    border
-                    height={{ min: '30px' }}
-                    round="small"
-                  >
-                    {isLoadingReport ? (
-                      <Text>Loading...</Text>
-                    ) : (
-                      <Box pad="small">
-                        <Markdown components={{ p: Text }}>
-                          {report ? report : ''}
-                        </Markdown>
-                      </Box>
-                    )}
-                  </Box>
-                  <Box direction="row-responsive" gap="small">
-                    <Button
-                      alignSelf="start"
-                      disabled={!report || isResearching}
-                      primary
-                      onClick={() => navigator.clipboard.writeText(report)}
-                      label="Copy to clipboard"
-                    />
-                    <Button
-                      alignSelf="start"
-                      disabled={!report || isResearching}
-                      primary
-                      onClick={handleDownload}
-                      label="Download as PDF"
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            )}
           </Box>
         </Box>
       </Box>
