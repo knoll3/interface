@@ -25,6 +25,9 @@ import { useCreditsData } from '../hooks/useCreditsData';
 import { parseEther } from 'viem';
 import { WalletContext } from '../context/walletContext';
 import { event } from 'nextjs-google-analytics';
+import { Instructions } from '../components/Researcher/Instructions';
+import { Research } from '../components/Researcher/Research';
+import { Reports } from '../components/Researcher/Reports';
 
 export default function GptResearcherPage() {
   const { address } = useAccount();
@@ -80,7 +83,8 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      const ws_uri = `wss://researcher.flock.io/ws?token=${userToken}&authKey=${publicKey}`;
+      // const ws_uri = `wss://researcher.flock.io/ws?token=${userToken}&authKey=${publicKey}`;
+      const ws_uri = `ws://localhost/ws?token=${userToken}&authKey=${publicKey}`;
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -295,40 +299,20 @@ export default function GptResearcherPage() {
           </Box>
         </Layer>
       )}
-      <Box width="100%" gap="large" align="center">
+      <Box width="100%" gap="large" align="center" background="#F8FAFB">
         <Box
-          background="#EEEEEE"
+          background="#F8FAFB"
           align="center"
           justify="center"
-          width="50%"
+          width="70%"
           pad={{ vertical: 'large', horizontal: 'large' }}
           gap="medium"
           round="small"
           margin={{ vertical: 'large' }}
         >
-          <Box round="small" background="white" pad="medium">
-            <Paragraph fill>
-              Introducing the "FLock Researcher" - an unparalleled multi-agent
-              engine meticulously crafted by the experts at FLock.io. This isn't
-              just another AI model; it's an amalgamation of domain-specific
-              expertise funneled through our unique FLock platform for
-              collaborative finetuning. The result? An agent that outperforms
-              generic pretrained open-source models in terms of proficiency and
-              precision.
-            </Paragraph>
-            <Paragraph fill>
-              At the heart of our innovation lies the agent engine, which
-              transcends the capabilities of traditional pretrained models,
-              offering a more robust, versatile, and dynamic solution. A special
-              thank you to the GPTResearch team for providing the foundational
-              engine that enabled us to deploy our visionary FLock system.
-            </Paragraph>
-            <Paragraph fill>
-              We're inviting you to experience the next evolution in AI. Dive
-              in, try out the FLock Researcher, and witness the future of
-              multi-agent interactions
-            </Paragraph>
-          </Box>
+          <Instructions />
+          <Research />
+          <Reports reports={[]} />
           <Box gap="medium" width="100%">
             <Box>
               <Text>What would you like me to research next?</Text>
