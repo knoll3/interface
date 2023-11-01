@@ -19,10 +19,7 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
-import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useCreditsData } from '../hooks/useCreditsData';
-import { parseEther } from 'viem';
 import { WalletContext } from '../context/walletContext';
 import { event } from 'nextjs-google-analytics';
 import { Instructions } from '../components/Researcher/Instructions';
@@ -33,13 +30,14 @@ import { Logo } from '../components/Researcher/Logo';
 export default function GptResearcherPage() {
   const { address } = useAccount();
   const [report, setReport] = useState<string>('');
+  const [reportType, setReportType] = useState({
+    label: 'Research Report',
+    value: 'research_report',
+  });
   const [agentOutput, setAgentOutput] = useState<string[]>([]);
   const [downloadLink, setDownloadLink] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
-  const [showPurchase, setShowPurchase] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
-  const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
 
   const { userToken, publicKey } = useContext(WalletContext);
@@ -48,10 +46,6 @@ export default function GptResearcherPage() {
     userAddress: address,
   });
 
-  const userBalance = userData
-    ? Math.round(Number(userData[3]) * 100) / 100
-    : 0;
-
   useEffect(() => {
     if (address) {
       setIsConnected(true);
@@ -59,10 +53,6 @@ export default function GptResearcherPage() {
       setIsConnected(false);
     }
   }, [address]);
-
-  useEffect(() => {
-    setPrice(researchPrice ? Number(researchPrice) : 0);
-  }, [researchPrice]);
 
   const GPTResearcher = (() => {
     const startResearch = (task: string, reportType: string) => {
@@ -156,16 +146,6 @@ export default function GptResearcherPage() {
     window.open(downloadLink, '_blank');
   };
 
-  useEffect(() => {
-    setAmount(price);
-  }, [price]);
-
-  useEffect(() => {
-    if (address) {
-      loadReport();
-    }
-  }, [address]);
-
   return (
     <Layout>
       <Box width="100%" gap="large" align="center" background="#F8FAFB">
@@ -181,21 +161,53 @@ export default function GptResearcherPage() {
         >
           <Logo />
           <Instructions />
-          {
-            isConnected ? (
-              <>
-                <Research 
-                  isResearching={isResearching}
-                  handleSubmit={handleSubmit}
-                />
+          {isConnected && (
+            <>
+              <Research 
+                isResearching={isResearching}
+                reportType={reportType}
+                setReportType={setReportType}
+                handleSubmit={handleSubmit}
+              />
+              { reportType.value === "outline_report" ? (
+                <Box 
+                    pad={{ vertical: 'large', horizontal: 'large' }}
+                    gap="medium"
+                    fill="horizontal"              
+                >
+                    <Heading level="2" margin="xsmall">
+                      Research Report
+                    </Heading>
+                    <Box
+                      width="100%"
+                      border
+                      height={{ min: '30px' }}
+                      round="small"
+                    >
+                      <Box pad="small">
+                        <Markdown components={{ p: Text }}>
+                          {report ? report : ''}
+                        </Markdown>
+                      </Box>
+                    </Box>
+                    <Button
+                      alignSelf="end"
+                      disabled={!report || isResearching}
+                      primary
+                      onClick={() => navigator.clipboard.writeText(report)}
+                      label="Copy to clipboard"
+                    />
+                </Box>
+              ) : (
                 <Reports reports={[]} />
-              </>
-            ) : (
+              )}
+            </>
+          )}
+          {!isConnected && (
               <Heading level="2" margin="xsmall">
                 Connect your wallet to continue
               </Heading>
-            )
-          }
+          )}
         </Box>
       </Box>
     </Layout>
