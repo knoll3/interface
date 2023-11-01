@@ -28,6 +28,7 @@ import { event } from 'nextjs-google-analytics';
 import { Instructions } from '../components/Researcher/Instructions';
 import { Research } from '../components/Researcher/Research';
 import { Reports } from '../components/Researcher/Reports';
+import { Logo } from '../components/Researcher/Logo';
 
 export default function GptResearcherPage() {
   const { address } = useAccount();
@@ -178,6 +179,7 @@ export default function GptResearcherPage() {
           round="small"
           margin={{ vertical: 'large' }}
         >
+          <Logo />
           <Instructions />
           {
             isConnected ? (
