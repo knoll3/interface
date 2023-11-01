@@ -32,11 +32,6 @@ import { Reports } from '../components/Researcher/Reports';
 
 export default function GptResearcherPage() {
   const { address } = useAccount();
-  const [task, setTask] = useState<string>('');
-  const [reportType, setReportType] = useState({
-    label: 'Outline Report',
-    value: 'outline_report',
-  });
   const [report, setReport] = useState<string>('');
   const [agentOutput, setAgentOutput] = useState<string[]>([]);
   const [downloadLink, setDownloadLink] = useState<string>('');
@@ -71,7 +66,7 @@ export default function GptResearcherPage() {
     return userNFTs[index] || { name: 'UnknownNFT' };
   });
 
-  const { FLCTokenBalance, userToken, publicKey } = useContext(WalletContext);
+  const { userToken, publicKey } = useContext(WalletContext);
 
   const { userData, researchPrice, isWhitelisted } = useCreditsData({
     userAddress: address,
@@ -80,9 +75,6 @@ export default function GptResearcherPage() {
   const userBalance = userData
     ? Math.round(Number(userData[2]) * 100) / 100
     : 0;
-
-  const hasAccess =
-    userBalance >= price || reportType.value === 'outline_report';
 
   useEffect(() => {
     if (address) {
@@ -98,14 +90,14 @@ export default function GptResearcherPage() {
   }, [researchPrice]);
 
   const GPTResearcher = (() => {
-    const startResearch = () => {
+    const startResearch = (task: string, reportType: string) => {
       setIsResearching(true);
       addAgentResponse({
         output:
           '🤔 Too many requests right now, you are in the queue, please be patient.',
       });
 
-      listenToSockEvents();
+      listenToSockEvents(task, reportType);
     };
 
     const listenToSockEvents = () => {
@@ -125,7 +117,7 @@ export default function GptResearcherPage() {
       socket.onopen = (e) => {
         const requestData = {
           task: task,
-          report_type: reportType.value,
+          report_type: reportType,
           agent: 'Auto Agent',
           walletAddress: address,
         };
@@ -177,11 +169,11 @@ export default function GptResearcherPage() {
     setIsLoadingReport(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (task: string, reportType: string) => {
     setReport('');
     setDownloadLink('');
     setAgentOutput([]);
-    GPTResearcher.startResearch();
+    GPTResearcher.startResearch(task, reportType);
   };
 
   const handleDownload = () => {
@@ -278,77 +270,6 @@ export default function GptResearcherPage() {
 
   return (
     <Layout>
-      {showPurchase && (
-        <Layer>
-          <Box pad="large" align="center" gap="small" width="550px">
-            <Heading level="2" margin="xsmall">
-              Purchase Credits
-            </Heading>
-            <Text alignSelf="start" weight="bold">
-              Minimum deposit (single research price): {price} credits
-            </Text>
-            <Text alignSelf="start" weight="bold">
-              Your current balance: {userBalance} credits
-            </Text>
-            {Number(FLCTokenBalance?.formatted) < price ? (
-              <Text weight="bold" alignSelf="start" color="red">
-                Not enough FLC to purchase credits
-              </Text>
-            ) : (
-              <Box
-                width="100%"
-                direction="row"
-                justify="between"
-                align="center"
-              >
-                <Button
-                  primary
-                  disabled={
-                    purchaseLoading ||
-                    approveLoading ||
-                    isApproveTxLoading ||
-                    isPurchaseTxLoading ||
-                    amount < price
-                  }
-                  onClick={handleApprove}
-                  label={
-                    purchaseLoading ||
-                    approveLoading ||
-                    isApproveTxLoading ||
-                    isPurchaseTxLoading
-                      ? 'Purchasing...'
-                      : 'Purchase'
-                  }
-                />
-                <Box direction="row" gap="small" width="65%">
-                  <Text weight="bold">{amount}</Text>
-                  <RangeInput
-                    size={30}
-                    value={amount}
-                    min={price}
-                    max={Number(FLCTokenBalance?.formatted)}
-                    step={price}
-                    onChange={(event) => setAmount(Number(event.target.value))}
-                  />
-                </Box>
-              </Box>
-            )}
-            <Button
-              margin={{ top: 'medium' }}
-              alignSelf="end"
-              secondary
-              disabled={
-                purchaseLoading ||
-                approveLoading ||
-                isApproveTxLoading ||
-                isPurchaseTxLoading
-              }
-              onClick={() => setShowPurchase(false)}
-              label="Close"
-            />
-          </Box>
-        </Layer>
-      )}
       <Box width="100%" gap="large" align="center" background="#F8FAFB">
         <Box
           background="#F8FAFB"
