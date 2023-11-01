@@ -2,7 +2,7 @@ import { Box, Heading, Text } from 'grommet';
 import { Add, Copy } from 'grommet-icons';
 import { PrimaryButton } from '../PrimaryButton';
 
-type ReportProps = {
+export type ReportProps = {
     reportType: string;
     reportTitle: string;
     agentType: string;
