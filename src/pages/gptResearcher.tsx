@@ -1,7 +1,6 @@
 import { Layout } from '../components';
 import {
   Box,
-  Button,
   Heading,
   Paragraph,
   Select,
@@ -13,7 +12,7 @@ import {
   Markdown,
   Image,
 } from 'grommet';
-import { Key, useEffect, useState, useContext, createContext } from 'react';
+import { useEffect, useState, useContext, createContext } from 'react';
 import {
   useAccount,
   useContractRead,
@@ -63,6 +62,8 @@ export default function GptResearcherPage() {
   const filledNFTs = Array.from({ length: maxNFTs }, (_, index) => {
     return userNFTs[index] || { name: 'UnknownNFT' };
   });
+
+  const [loadedReports, setLoadedReports] = useState<ReportProps[]>([]);
 
   const { userToken, publicKey } = useContext(WalletContext);
 
@@ -140,28 +141,6 @@ export default function GptResearcherPage() {
       startResearch,
     };
   })();
-
-  const loadReport = async () => {
-    setIsLoadingReport(true);
-    try {
-      const response = await fetch(`/api/getReport?walletAddress=${address}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const { data, message } = await response.json();
-      if (message) {
-        console.log(message);
-        setIsLoadingReport(false);
-        return;
-      }
-      setReport(data.report);
-    } catch (e) {
-      console.log(e);
-    }
-    setIsLoadingReport(false);
-  };
 
   const handleSubmit = (task: string, reportType: string) => {
     setReport('');
