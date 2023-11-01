@@ -145,6 +145,7 @@ export default function GptResearcherPage() {
       });
 
       listenToSockEvents();
+      // listenToSockEvents(task, reportType);
     };
 
     const listenToSockEvents = () => {
@@ -164,7 +165,7 @@ export default function GptResearcherPage() {
       socket.onopen = (e) => {
         const requestData = {
           task: task,
-          report_type: reportType.value,
+          report_type: reportType,
           agent: 'Auto Agent',
           walletAddress: address,
         };
