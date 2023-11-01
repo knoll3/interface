@@ -11,6 +11,7 @@ import {
   Layer,
   RangeInput,
   Markdown,
+  Image,
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from 'react';
 import {
@@ -45,6 +46,30 @@ export default function GptResearcherPage() {
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
+  const [userNFTs, setUserNFTs] = useState<NFT[]>([]);
+
+  interface NFT {
+    name: string;
+  }
+
+  const nftImages: { [key: string]: string } = {
+    NewsAgent: 'MathsNFT.png',
+    MathsAgent: 'NewsNFT.png',
+    PhysicistAgent: 'PhysicistNFT.png',
+    FinancialAgent: 'FinAnalystNFT.png',
+    RealEstateAgent: 'RealEstateNFT.png',
+    UnknownNFT: 'UnknownNFT.png',
+  };
+
+  const getNFTImage = (nftName: string): string => {
+    return nftImages[nftName] || nftImages['UnknownNFT'];
+  };
+
+  const maxNFTs = 5;
+
+  const filledNFTs = Array.from({ length: maxNFTs }, (_, index) => {
+    return userNFTs[index] || { name: 'UnknownNFT' };
+  });
 
   const { FLCTokenBalance, userToken, publicKey } = useContext(WalletContext);
 
@@ -53,7 +78,7 @@ export default function GptResearcherPage() {
   });
 
   const userBalance = userData
-    ? Math.round(Number(userData[3]) * 100) / 100
+    ? Math.round(Number(userData[2]) * 100) / 100
     : 0;
 
   const hasAccess =
@@ -62,6 +87,7 @@ export default function GptResearcherPage() {
   useEffect(() => {
     if (address) {
       setIsConnected(true);
+      console.log(userData);
     } else {
       setIsConnected(false);
     }
@@ -83,8 +109,7 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      // const ws_uri = `wss://researcher.flock.io/ws?token=${userToken}&authKey=${publicKey}`;
-      const ws_uri = `ws://localhost/ws?token=${userToken}&authKey=${publicKey}`;
+      const ws_uri = `${process.env.RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -154,7 +179,7 @@ export default function GptResearcherPage() {
 
   const handleSubmit = () => {
     setReport('');
-    setDownloadLink("");
+    setDownloadLink('');
     setAgentOutput([]);
     GPTResearcher.startResearch();
   };
@@ -193,6 +218,29 @@ export default function GptResearcherPage() {
       hash: purchaseCredits?.hash,
     });
 
+  const { data: NFTData } = useContractRead({
+    address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+    abi: FLOCK_CREDITS_ABI,
+    functionName: 'checkNFT',
+    args: [address],
+  });
+
+  useEffect(() => {
+    if (NFTData && (NFTData as NFT[]).length > 0) {
+      setUserNFTs(NFTData as NFT[]);
+    } else {
+      setUserNFTs([]);
+    }
+  }, [NFTData]);
+
+  const agentLabels = [
+    'News Agent',
+    'Maths Agent',
+    'Physicist',
+    'Financial Analyst Agent',
+    'Real Estate Agent',
+  ];
+
   const handleApprove = () => {
     writeApproveTokens?.({
       args: [
@@ -210,11 +258,13 @@ export default function GptResearcherPage() {
     if (isSuccessApprove) {
       handlePurchase();
     }
+  }, [isSuccessApprove]);
 
+  useEffect(() => {
     if (isSuccessPurchase) {
       setShowPurchase(false);
     }
-  }, [isSuccessPurchase, isSuccessApprove]);
+  }, [isSuccessPurchase]);
 
   useEffect(() => {
     setAmount(price);
@@ -379,6 +429,118 @@ export default function GptResearcherPage() {
                   Connect your wallet to continue
                 </Heading>
               )}
+            </Box>
+            {isConnected && (
+              <Box>
+                <Box width="100%">
+                  <Heading level="2" margin="xsmall">
+                    Agents Output
+                  </Heading>
+                  <Text>
+                    An agent tailored specifically to your task will be
+                    generated to provide the most precise and relevant research
+                    results.
+                  </Text>
+                  <Box
+                    height="medium"
+                    overflow="auto"
+                    width="100%"
+                    border
+                    round="small"
+                    pad="small"
+                  >
+                    <InfiniteScroll
+                      items={agentOutput}
+                      show={agentOutput.length}
+                    >
+                      {(item: any, index: Key | null | undefined) => (
+                        <Box
+                          width="100%"
+                          key={index}
+                          border
+                          round="small"
+                          flex={false}
+                          margin={{ bottom: 'small' }}
+                          pad="small"
+                          background="#EEEEEE"
+                        >
+                          <Text>{item}</Text>
+                        </Box>
+                      )}
+                    </InfiniteScroll>
+                  </Box>
+                </Box>
+                <Box width="100%" margin={{ top: 'medium' }} gap="small">
+                  <Heading level="2" margin="xsmall">
+                    Research Report
+                  </Heading>
+                  <Box
+                    width="100%"
+                    border
+                    height={{ min: '30px' }}
+                    round="small"
+                  >
+                    {isLoadingReport ? (
+                      <Text>Loading...</Text>
+                    ) : (
+                      <Box pad="small">
+                        <Markdown components={{ p: Text }}>
+                          {report ? report : ''}
+                        </Markdown>
+                      </Box>
+                    )}
+                  </Box>
+                  <Box direction="row-responsive" gap="small">
+                    <Button
+                      alignSelf="start"
+                      disabled={!report || isResearching}
+                      primary
+                      onClick={() => navigator.clipboard.writeText(report)}
+                      label="Copy to clipboard"
+                    />
+                    <Button
+                      alignSelf="start"
+                      disabled={!report || isResearching}
+                      primary
+                      onClick={handleDownload}
+                      label="Download as PDF"
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            <Box>
+              <Heading level="2" margin="xsmall">
+                Step2: Claim your NFT
+              </Heading>
+              <Text>
+                For each completed use that generates a report, you can unlock
+                and receive one of the NFTs listed below.
+              </Text>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {filledNFTs.map((nft, index) => (
+                  <div
+                    key={index}
+                    style={{ margin: '10px', textAlign: 'center' }}
+                  >
+                    <Image
+                      src={getNFTImage(nft.name)}
+                      alt={nft.name}
+                      style={{ width: '120px', height: '120px' }}
+                    />
+                    <div style={{ marginTop: '5px', fontSize: '12px' }}>
+                      {agentLabels[index]}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Box>
           </Box>
         </Box>
