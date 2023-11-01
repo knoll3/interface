@@ -20,10 +20,7 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
-import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useCreditsData } from '../hooks/useCreditsData';
-import { parseEther } from 'viem';
 import { WalletContext } from '../context/walletContext';
 import { event } from 'nextjs-google-analytics';
 import { Instructions } from '../components/Researcher/Instructions';
@@ -33,13 +30,14 @@ import { Reports } from '../components/Researcher/Reports';
 export default function GptResearcherPage() {
   const { address } = useAccount();
   const [report, setReport] = useState<string>('');
+  const [reportType, setReportType] = useState({
+    label: 'Research Report',
+    value: 'research_report',
+  });
   const [agentOutput, setAgentOutput] = useState<string[]>([]);
   const [downloadLink, setDownloadLink] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
-  const [showPurchase, setShowPurchase] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
-  const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
   const [userNFTs, setUserNFTs] = useState<NFT[]>([]);
 
@@ -84,10 +82,6 @@ export default function GptResearcherPage() {
       setIsConnected(false);
     }
   }, [address]);
-
-  useEffect(() => {
-    setPrice(researchPrice ? Number(researchPrice) : 0);
-  }, [researchPrice]);
 
   const GPTResearcher = (() => {
     const startResearch = (task: string, reportType: string) => {

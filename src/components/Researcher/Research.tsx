@@ -10,19 +10,19 @@ import { parseEther } from 'viem';
 
 export const Research = ({
     isResearching,
+    reportType,
+    setReportType,
     handleSubmit,
 }:{
     isResearching: boolean,
+    reportType: { label: string, value: string },
+    setReportType: (option: { label: string, value: string }) => void,
     handleSubmit: (task: string, reportType: string) => void,
 }) => {
     const [showPurchase, setShowPurchase] = useState(false);
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number>(1);
     const [task, setTask] = useState<string>('');
-    const [reportType, setReportType] = useState({
-      label: 'Research Report',
-      value: 'research_report',
-    });
-      const { address } = useAccount();
+    const { address } = useAccount();
 
     const { FLCTokenBalance } = useContext(WalletContext);
     const { userData, researchPrice, isWhitelisted } = useCreditsData({
@@ -71,13 +71,13 @@ export const Research = ({
         writeApproveTokens?.({
           args: [
             process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-            parseEther(`${amount}`),
+            parseEther(`${amount * price}`),
           ],
         });
       };
     
       const handlePurchase = () => {
-        writePurchaseCredits?.({ args: [amount] });
+        writePurchaseCredits?.({ args: [amount * price] });
       };
     
       useEffect(() => {
@@ -90,10 +90,6 @@ export const Research = ({
         }
       }, [isSuccessPurchase, isSuccessApprove]);
     
-
-    useEffect(() => {
-        setAmount(price);
-      }, [price]);
 
   return (
     <>
@@ -117,44 +113,48 @@ export const Research = ({
                             justify="between"
                             align="center"
                         >
-                            <Button
-                            primary
-                            busy={
-                                purchaseLoading ||
-                                approveLoading ||
-                                isApproveTxLoading ||
-                                isPurchaseTxLoading
-                            }
-                            disabled={amount < price}
-                            onClick={handleApprove}
-                            label="Purchase"
-                            />
+                            <Text weight="bold">Researches</Text>
                             <Box direction="row" gap="small" width="65%">
                             <Text weight="bold">{amount}</Text>
                             <RangeInput
                                 size={30}
                                 value={amount}
-                                min={price}
-                                max={Number(FLCTokenBalance?.formatted)}
-                                step={price}
+                                min={1}
+                                max={Math.trunc(Number(FLCTokenBalance?.formatted) / price)}
+                                step={1}
                                 onChange={(event) => setAmount(Number(event.target.value))}
                             />
                             </Box>
                         </Box>
                     )}
-                    <Button
-                    margin={{ top: 'medium' }}
-                    alignSelf="end"
-                    secondary
-                    disabled={
-                        purchaseLoading ||
-                        approveLoading ||
-                        isApproveTxLoading ||
-                        isPurchaseTxLoading
-                    }
-                    onClick={() => setShowPurchase(false)}
-                    label="Close"
-                    />
+                    <Box direction="row" justify="between" fill="horizontal">
+                        { Number(FLCTokenBalance?.formatted) > price && (
+                            <Button
+                                primary
+                                busy={
+                                    purchaseLoading ||
+                                    approveLoading ||
+                                    isApproveTxLoading ||
+                                    isPurchaseTxLoading
+                                }
+                                onClick={handleApprove}
+                                label="Purchase"
+                            />
+                        )}
+                        <Button
+                            margin={{ top: 'medium' }}
+                            alignSelf="end"
+                            secondary
+                            disabled={
+                                purchaseLoading ||
+                                approveLoading ||
+                                isApproveTxLoading ||
+                                isPurchaseTxLoading
+                            }
+                            onClick={() => setShowPurchase(false)}
+                            label="Close"
+                        />
+                    </Box>
                 </Box>
             </Layer>
         )}
