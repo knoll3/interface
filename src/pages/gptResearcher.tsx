@@ -26,6 +26,7 @@ import { Instructions } from '../components/Researcher/Instructions';
 import { Research } from '../components/Researcher/Research';
 import { Reports } from '../components/Researcher/Reports';
 import { Logo } from '../components/Researcher/Logo';
+import { ReportOutput } from '../components/Researcher/ReportOutput';
 
 export default function GptResearcherPage() {
   const { address } = useAccount();
@@ -142,9 +143,9 @@ export default function GptResearcherPage() {
     GPTResearcher.startResearch(task, reportType);
   };
 
-  const handleDownload = () => {
-    window.open(downloadLink, '_blank');
-  };
+  useEffect(() => {
+    setReport('');
+  }, [reportType]);
 
   return (
     <Layout>
@@ -161,7 +162,7 @@ export default function GptResearcherPage() {
         >
           <Logo />
           <Instructions />
-          {isConnected && (
+          {isConnected ? (
             <>
               <Research 
                 isResearching={isResearching}
@@ -170,43 +171,18 @@ export default function GptResearcherPage() {
                 handleSubmit={handleSubmit}
               />
               { reportType.value === "outline_report" ? (
-                <Box 
-                    pad={{ vertical: 'large', horizontal: 'large' }}
-                    gap="medium"
-                    fill="horizontal"              
-                >
-                    <Heading level="2" margin="xsmall">
-                      Research Report
-                    </Heading>
-                    <Box
-                      width="100%"
-                      border
-                      height={{ min: '30px' }}
-                      round="small"
-                    >
-                      <Box pad="small">
-                        <Markdown components={{ p: Text }}>
-                          {report ? report : ''}
-                        </Markdown>
-                      </Box>
-                    </Box>
-                    <Button
-                      alignSelf="end"
-                      disabled={!report || isResearching}
-                      primary
-                      onClick={() => navigator.clipboard.writeText(report)}
-                      label="Copy to clipboard"
-                    />
-                </Box>
+                <ReportOutput
+                  report={report}
+                  isResearching={isResearching}
+                />
               ) : (
                 <Reports reports={[]} />
               )}
             </>
-          )}
-          {!isConnected && (
-              <Heading level="2" margin="xsmall">
-                Connect your wallet to continue
-              </Heading>
+          ) : (
+            <Heading level="2" margin="xsmall">
+              Connect your wallet to continue
+            </Heading>
           )}
         </Box>
       </Box>
