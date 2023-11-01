@@ -170,9 +170,9 @@ export default function GptResearcherPage() {
     GPTResearcher.startResearch(task, reportType);
   };
 
-  const handleDownload = () => {
-    window.open(downloadLink, '_blank');
-  };
+  useEffect(() => {
+    setReport('');
+  }, [reportType]);
 
   const {
     data: purchaseCredits,
