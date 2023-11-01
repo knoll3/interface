@@ -8,13 +8,44 @@ type ReportProps = {
     reportLink: string;
 }
 
+
 export const Reports = ({
+    supabase,
+    userAddress,
   reports,
 }: {
+    supabase: any;
+    userAddress: `0x${string}` | undefined;
   reports: ReportProps[];
 }) => {
 
-    const downloadLink = async (link: string) => {};
+    const downloadFile = async (link: string) => {
+
+        const { data, error } = await supabase
+            .storage
+            .from('researcher-reports')
+            .download(link)
+        
+        console.log(data)
+        console.log(data.type)
+        
+        const urlData = URL.createObjectURL(data)
+
+        const linkToDownload = document.createElement('a')
+        linkToDownload.href = urlData
+        linkToDownload.download = "report.pdf"
+
+        document.body.appendChild(linkToDownload)
+        linkToDownload.dispatchEvent(
+            new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            })
+        )
+
+        document.body.removeChild(linkToDownload)
+    }
 
   return (
     <>
@@ -52,7 +83,11 @@ export const Reports = ({
                             <Text weight="bold">{report.reportTitle}</Text>
                         </Box>
                         <Box justify="end" align="end">
-                            <PrimaryButton label="Download" size="small" onClick={() => downloadLink(report.reportLink)} />
+                            <PrimaryButton 
+                                label="Download" 
+                                size="small"
+                                onClick={() => downloadFile(`${userAddress}/${report.reportType}/${report.reportLink}`)}  
+                            />
                         </Box>
                     </Box> 
                 ))

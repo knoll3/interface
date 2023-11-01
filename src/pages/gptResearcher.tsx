@@ -1,18 +1,9 @@
 import { Layout } from '../components';
 import {
   Box,
-  Button,
   Heading,
-  Paragraph,
-  Select,
-  Text,
-  TextInput,
-  InfiniteScroll,
-  Layer,
-  RangeInput,
-  Markdown,
 } from 'grommet';
-import { Key, useEffect, useState, useContext, createContext } from 'react';
+import { useEffect, useState, useContext, createContext } from 'react';
 import {
   useAccount,
   useContractRead,
@@ -27,6 +18,18 @@ import { Research } from '../components/Researcher/Research';
 import { Reports } from '../components/Researcher/Reports';
 import { Logo } from '../components/Researcher/Logo';
 import { ReportOutput } from '../components/Researcher/ReportOutput';
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.SUPABASE_URL as string,
+  process.env.SUPABASE_KEY as string
+)
+
+type ReportProps = {
+  reportType: string;
+  reportTitle: string;
+  reportLink: string;
+}
 
 export default function GptResearcherPage() {
   const { address } = useAccount();
@@ -41,15 +44,49 @@ export default function GptResearcherPage() {
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
   const [isResearching, setIsResearching] = useState<boolean>(false);
 
+  const [loadedReports, setLoadedReports] = useState<ReportProps[]>([]);
+
   const { userToken, publicKey } = useContext(WalletContext);
 
   const { userData, researchPrice, isWhitelisted } = useCreditsData({
     userAddress: address,
   });
 
+  const agentLabels = [
+    'News Agent',
+    'Maths Agent',
+    'Physicist Agent',
+    'Financial Analyst Agent',
+    'Real Estate Agent',
+  ];
+
+  async function getReports() {
+
+    const reports : ReportProps[] = [];
+
+    agentLabels.forEach(async (agentLabel) => {
+
+      const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      });
+      if (data?.length === 0 || error) {
+        return;
+      }
+      reports.push({
+        reportType: agentLabel,
+        reportTitle: agentLabel,
+        reportLink: data[0].name,
+      });
+    })
+    setLoadedReports(reports);
+  }
+
   useEffect(() => {
     if (address) {
       setIsConnected(true);
+      getReports();
     } else {
       setIsConnected(false);
     }
@@ -114,28 +151,6 @@ export default function GptResearcherPage() {
     };
   })();
 
-  const loadReport = async () => {
-    setIsLoadingReport(true);
-    try {
-      const response = await fetch(`/api/getReport?walletAddress=${address}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const { data, message } = await response.json();
-      if (message) {
-        console.log(message);
-        setIsLoadingReport(false);
-        return;
-      }
-      setReport(data.report);
-    } catch (e) {
-      console.log(e);
-    }
-    setIsLoadingReport(false);
-  };
-
   const handleSubmit = (task: string, reportType: string) => {
     setReport('');
     setDownloadLink("");
@@ -176,7 +191,11 @@ export default function GptResearcherPage() {
                   isResearching={isResearching}
                 />
               ) : (
-                <Reports reports={[]} />
+                <Reports 
+                supabase={supabase}
+                  userAddress={address}
+                  reports={loadedReports}
+                />
               )}
             </>
           ) : (
