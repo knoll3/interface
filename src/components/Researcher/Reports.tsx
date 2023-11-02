@@ -61,13 +61,18 @@ export const Reports = ({
             </Box>
             <Text><span>&#42;</span> Download your reports here</Text>
         </Box>
-        <Box direction="row" gap="large">
+        <Box 
+            direction="row-responsive"
+            align="center"
+            justify="between"
+            gap="small"
+        >
             {
                 reports.map((report, index) => (
                     <Box 
                         key={index}
                         height="250px"
-                        width="small"
+                        width="200px"
                         round="small"
                         justify="between"
                         border={{ style:"solid", size: "small" }} 
@@ -97,8 +102,8 @@ export const Reports = ({
                     <Box 
                         key={i+reports.length}
                         height="250px"
-                        width="small"
                         round="small"
+                        width="200px"
                         border={{ style:"dashed", size: "small" }}
                         justify="center"    
                     >
