@@ -134,6 +134,7 @@ export default function GptResearcherPage() {
       const position = data.output.search('/output');
       const link = 'https://researcher.flock.io' + data.output.slice(position);
       setDownloadLink(link);
+      getReports();
       setIsResearching(false);
     };
 
