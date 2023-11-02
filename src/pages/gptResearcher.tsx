@@ -13,7 +13,7 @@ import {
   Markdown,
   Image,
 } from 'grommet';
-import { Key, useEffect, useState, useContext, createContext } from 'react';
+import { Key, useEffect, useState, useContext } from 'react';
 import {
   useAccount,
   useContractRead,
@@ -26,8 +26,11 @@ import { useCreditsData } from '../hooks/useCreditsData';
 import { parseEther } from 'viem';
 import { WalletContext } from '../context/walletContext';
 import { event } from 'nextjs-google-analytics';
+import { FLOCK_NFT_ABI } from '../contracts/flockNFT';
+import { useIsMounted } from '../hooks';
 
 export default function GptResearcherPage() {
+  const mounted = useIsMounted();
   const { address } = useAccount();
   const [task, setTask] = useState<string>('');
   const [reportType, setReportType] = useState({
@@ -44,19 +47,28 @@ export default function GptResearcherPage() {
   const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
   const [userNFTs, setUserNFTs] = useState<NFT[]>([]);
+  const [showVoteComplete, setShowVoteComplete] = useState<boolean>(false);
 
   interface NFT {
     name: string;
   }
 
   const nftImages: { [key: string]: string } = {
-    NewsAgent: 'MathsNFT.png',
-    MathsAgent: 'NewsNFT.png',
+    NewsAgent: 'NewsNFT.png',
+    MathsAgent: 'MathsNFT.png',
     PhysicistAgent: 'PhysicistNFT.png',
-    FinancialAgent: 'FinAnalystNFT.png',
+    FinancialAnalystAgent: 'FinAnalystNFT.png',
     RealEstateAgent: 'RealEstateNFT.png',
     UnknownNFT: 'UnknownNFT.png',
   };
+
+  const agentLabels = [
+    'News Agent',
+    'Maths Agent',
+    'Physicist Agent',
+    'Financial Analyst Agent',
+    'Real Estate Agent',
+  ];
 
   const getNFTImage = (nftName: string): string => {
     return nftImages[nftName] || nftImages['UnknownNFT'];
@@ -70,9 +82,14 @@ export default function GptResearcherPage() {
 
   const { FLCTokenBalance, userToken, publicKey } = useContext(WalletContext);
 
-  const { userData, researchPrice, isWhitelisted } = useCreditsData({
-    userAddress: address,
-  });
+  const { userData, researchPrice, isWhitelisted, voterToAgentName } =
+    useCreditsData({
+      userAddress: address,
+    });
+  9;
+  const [prediction, setPrediction] = useState(
+    voterToAgentName // camelCase to Sentence Case
+  );
 
   const userBalance = userData
     ? Math.round(Number(userData[2]) * 100) / 100
@@ -106,7 +123,7 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      const ws_uri = `${process.env.RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`
+      const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -220,7 +237,23 @@ export default function GptResearcherPage() {
     abi: FLOCK_CREDITS_ABI,
     functionName: 'checkNFT',
     args: [address],
+    watch: true,
   });
+
+  const {
+    data: vote,
+    write: writeVote,
+    isLoading: voteLoading,
+  } = useContractWrite({
+    address: process.env.NEXT_PUBLIC_FLOCK_NFT_ADDRESS as `0x${string}`,
+    abi: FLOCK_NFT_ABI,
+    functionName: 'vote',
+  });
+
+  const { isSuccess: isSuccessVote, isLoading: isVoteTxLoading } =
+    useWaitForTransaction({
+      hash: vote?.hash,
+    });
 
   useEffect(() => {
     if (NFTData && (NFTData as NFT[]).length > 0) {
@@ -229,14 +262,6 @@ export default function GptResearcherPage() {
       setUserNFTs([]);
     }
   }, [NFTData]);
-
-  const agentLabels = [
-    'News Agent',
-    'Maths Agent',
-    'Physicist',
-    'Financial Analyst Agent',
-    'Real Estate Agent',
-  ];
 
   const handleApprove = () => {
     writeApproveTokens?.({
@@ -249,6 +274,14 @@ export default function GptResearcherPage() {
 
   const handlePurchase = () => {
     writePurchaseCredits?.({ args: [amount] });
+  };
+
+  const handlePrediction = (agent: string) => {
+    if (agent === prediction) {
+      setPrediction('');
+      return;
+    }
+    setPrediction(agent);
   };
 
   useEffect(() => {
@@ -272,6 +305,16 @@ export default function GptResearcherPage() {
       loadReport();
     }
   }, [address]);
+
+  useEffect(() => {
+    if (isSuccessVote) {
+      setShowVoteComplete(true);
+    }
+  }, [isSuccessVote]);
+
+  if (!mounted) {
+    return <></>;
+  }
 
   return (
     <Layout>
@@ -548,6 +591,129 @@ export default function GptResearcherPage() {
                   </div>
                 ))}
               </div>
+            </Box>
+            <Box gap="medium">
+              <Box>
+                <Heading level="2" margin="xsmall">
+                  Step3: Make your Prediction
+                </Heading>
+                <Text>
+                  Predict the LLM agent that FLock Researcher V2.0 utilises,
+                  then split the winnings!
+                </Text>
+              </Box>
+              <Box gap="medium">
+                <Box align="center" justify="center" gap="medium">
+                  <Box gap="small" align="center">
+                    <Image
+                      src={getNFTImage(prediction)}
+                      alt={prediction}
+                      style={{ width: '120px', height: '120px' }}
+                    />
+                    <Text>
+                      {prediction?.replace(/([A-Z]+)*([A-Z][a-z])/g, '$1 $2')}
+                    </Text>
+                  </Box>
+                  <Box
+                    direction="row-responsive"
+                    gap="large"
+                    width="large"
+                    wrap
+                    align="center"
+                    justify="center"
+                  >
+                    {agentLabels.map((label, index) => {
+                      const claimed =
+                        userNFTs.find(
+                          (nft) => nft.name === label?.replaceAll(' ', '')
+                        ) !== undefined;
+                      const selected =
+                        prediction === label?.replaceAll(' ', '');
+                      const voted =
+                        voterToAgentName === label?.replaceAll(' ', '');
+                      return (
+                        <Box
+                          border={
+                            (claimed && voterToAgentName === '') || voted
+                              ? { color: 'black' }
+                              : { color: '' }
+                          }
+                          round
+                          pad="medium"
+                          align="center"
+                          justify="center"
+                          key={index}
+                          margin={{ vertical: 'small' }}
+                          hoverIndicator={
+                            claimed && voterToAgentName === ''
+                              ? '#6C94EC'
+                              : false
+                          }
+                          background={
+                            voted
+                              ? '#6C94EC'
+                              : claimed
+                              ? selected
+                                ? '#6C94EC'
+                                : ''
+                              : ''
+                          }
+                          onClick={() =>
+                            claimed && voterToAgentName === ''
+                              ? handlePrediction(label?.replaceAll(' ', ''))
+                              : {}
+                          }
+                        >
+                          <Text color={claimed || voted ? 'black' : ''}>
+                            {label}
+                          </Text>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+                {voterToAgentName === '' && (
+                  <Box direction="row" align="center" justify="end">
+                    <Button
+                      label="Confirm"
+                      disabled={!prediction || voteLoading}
+                      busy={voteLoading}
+                      onClick={() =>
+                        prediction && writeVote({ args: [prediction] })
+                      }
+                    />
+                  </Box>
+                )}
+                {showVoteComplete && (
+                  <Layer>
+                    <Box
+                      pad="large"
+                      align="center"
+                      justify="center"
+                      gap="medium"
+                    >
+                      <Box width="small" height="small">
+                        <Image src="voteDone.png" />
+                      </Box>
+                      <Box align="center" justify="center" width="medium">
+                        <Heading level="4" textAlign="center">
+                          You have submitted your prediction successfully
+                        </Heading>
+                        <Text textAlign="center">
+                          The FLock Agent Specialist NFT will be airdropped to
+                          your wallet within 24 hours!
+                        </Text>
+                      </Box>
+                      <Box>
+                        <Button
+                          label="Got it!"
+                          onClick={() => setShowVoteComplete(false)}
+                        />
+                      </Box>
+                    </Box>
+                  </Layer>
+                )}
+              </Box>
             </Box>
           </Box>
         </Box>
