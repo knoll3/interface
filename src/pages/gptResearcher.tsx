@@ -33,6 +33,7 @@ export default function GptResearcherPage() {
     label: 'Research Report',
     value: 'research_report',
   });
+  const [task, setTask] = useState<string>('');
   const [agentOutput, setAgentOutput] = useState<string[]>([]);
   const [downloadLink, setDownloadLink] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -85,14 +86,14 @@ export default function GptResearcherPage() {
   }, [address]);
 
   const GPTResearcher = (() => {
-    const startResearch = (task: string, reportType: string) => {
+    const startResearch = () => {
       setIsResearching(true);
       addAgentResponse({
         output:
           '🤔 Too many requests right now, you are in the queue, please be patient.',
       });
 
-      listenToSockEvents(task, reportType);
+      listenToSockEvents();
     };
 
     const listenToSockEvents = () => {
@@ -112,7 +113,7 @@ export default function GptResearcherPage() {
       socket.onopen = (e) => {
         const requestData = {
           task: task,
-          report_type: reportType,
+          report_type: reportType.value,
           agent: 'Auto Agent',
           walletAddress: address,
         };
@@ -143,15 +144,16 @@ export default function GptResearcherPage() {
     };
   })();
 
-  const handleSubmit = (task: string, reportType: string) => {
+  const handleSubmit = () => {
     setReport('');
     setDownloadLink('');
     setAgentOutput([]);
-    GPTResearcher.startResearch(task, reportType);
+    GPTResearcher.startResearch();
   };
 
   useEffect(() => {
     setReport('');
+    setTask('');
   }, [reportType]);
 
   const {
