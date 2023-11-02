@@ -24,7 +24,7 @@ export default async function handler(
     );
 
     res.redirect(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/oauth/twitter?accessToken=${token.access_token}`
+      `${process.env.NEXT_PUBLIC_SITE_URL}/oauth/twitter?accessToken=${token.access_token}&expiresAt=${token.expires_at}`
     );
   } catch (error) {
     console.log(error);
