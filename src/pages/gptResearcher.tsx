@@ -21,8 +21,8 @@ import { ReportOutput } from '../components/Researcher/ReportOutput';
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_KEY as string
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+  process.env.NEXT_PUBLIC_ANON_KEY as string,
 )
 
 type ReportProps = {

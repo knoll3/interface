@@ -79,7 +79,7 @@ export const FLOCK_CREDITS_ABI = [
         "type": "address"
       }
     ],
-    "name": "checkIfNFTIsIssued",
+    "name": "checkIfWhiteListed",
     "outputs": [
       {
         "internalType": "bool",
@@ -98,12 +98,34 @@ export const FLOCK_CREDITS_ABI = [
         "type": "address"
       }
     ],
-    "name": "checkIfWhiteListed",
+    "name": "checkNFT",
     "outputs": [
       {
-        "internalType": "bool",
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "tokenIds",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "voteCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "voters",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct FLockNFT.Agent[]",
         "name": "",
-        "type": "bool"
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -115,11 +137,6 @@ export const FLOCK_CREDITS_ABI = [
         "internalType": "address",
         "name": "_userAddress",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
       }
     ],
     "name": "consumeCredits",
@@ -177,6 +194,19 @@ export const FLOCK_CREDITS_ABI = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "removeUsersFromWhiteList",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -250,11 +280,6 @@ export const FLOCK_CREDITS_ABI = [
         "internalType": "address",
         "name": "wallet",
         "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "NFTIssued",
-        "type": "bool"
       },
       {
         "internalType": "uint256",
