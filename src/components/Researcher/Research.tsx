@@ -10,18 +10,21 @@ import { parseEther } from 'viem';
 
 export const Research = ({
     isResearching,
+    task,
     reportType,
+    setTask,
     setReportType,
     handleSubmit,
 }:{
     isResearching: boolean,
+    task: string,
     reportType: { label: string, value: string },
+    setTask: (task: string) => void,
     setReportType: (option: { label: string, value: string }) => void,
-    handleSubmit: (task: string, reportType: string) => void,
+    handleSubmit: () => void,
 }) => {
     const [showPurchase, setShowPurchase] = useState(false);
     const [amount, setAmount] = useState<number>(1);
-    const [task, setTask] = useState<string>('');
     const { address } = useAccount();
 
     const { FLCTokenBalance } = useContext(WalletContext);
@@ -178,7 +181,7 @@ export const Research = ({
                 <Box>
                 <Text>What would you like me to research next?</Text>
                 <Box background="white">
-                    <TextInput onChange={(e) => setTask(e.target.value)} />
+                    <TextInput value={task} onChange={(e) => setTask(e.target.value)} />
                 </Box>
                 </Box>
                 <Box>
@@ -204,7 +207,7 @@ export const Research = ({
                     busy={isResearching}
                     onClick={
                         hasAccess
-                          ? () => handleSubmit(task, reportType.value)
+                          ? () => handleSubmit()
                           : () => setShowPurchase(true)
                       }
                     />
