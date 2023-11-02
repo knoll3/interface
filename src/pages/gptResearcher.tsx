@@ -75,8 +75,8 @@ export default function GptResearcherPage() {
         return;
       }
       reports.push({
-        reportType: agentLabel,
-        reportTitle: agentLabel,
+        reportType: "Research Report",
+        reportTitle: "Research",
         reportLink: data[0].name,
       });
     })
@@ -143,6 +143,7 @@ export default function GptResearcherPage() {
       const position = data.output.search('/output');
       const link = 'https://researcher.flock.io' + data.output.slice(position);
       setDownloadLink(link);
+      getReports();
       setIsResearching(false);
     };
 
