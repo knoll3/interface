@@ -321,4 +321,4 @@ export const FLOCK_CREDITS_ABI = [
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+];
