@@ -36,6 +36,7 @@ const supabase = createClient(
 type ReportProps = {
   reportType: string;
   reportTitle: string;
+  agentType: string;
   reportLink: string;
 }
 
@@ -73,7 +74,7 @@ export default function GptResearcherPage() {
     'News Agent',
     'Maths Agent',
     'Physicist Agent',
-    'Financial Analyst Agent',
+    'Finance Agent',
     'Real Estate Agent',
   ];
 
@@ -117,6 +118,7 @@ export default function GptResearcherPage() {
       reports.push({
         reportType: "Research Report",
         reportTitle: "Research",
+        agentType: agentLabel,
         reportLink: data[0].name,
       });
     })
