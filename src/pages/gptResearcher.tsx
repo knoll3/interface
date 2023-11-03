@@ -105,23 +105,26 @@ export default function GptResearcherPage() {
 
     const reports : ReportProps[] = [];
 
-    agentLabels.forEach(async (agentLabel) => {
+    const agentLabel = "Finance Agent"
 
-      const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: 'name', order: 'asc' },
-      });
-      if (data?.length === 0 || error) {
-        return;
-      }
+    const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
+      limit: 5,
+      offset: 0,
+      sortBy: { column: 'created_at', order: 'desc' },
+    });
+
+    console.log(data);
+    if (data?.length === 0 || error) {
+      return;
+    }
+    data.forEach((reportData) => {
       reports.push({
         reportType: "Research Report",
         reportTitle: "Research",
         agentType: agentLabel,
-        reportLink: data[0].name,
+        reportLink: reportData.name,
       });
-    })
+    });
     setLoadedReports(reports);
   }
 
