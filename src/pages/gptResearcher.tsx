@@ -61,7 +61,7 @@ export default function GptResearcherPage() {
     'News Agent',
     'Maths Agent',
     'Physicist Agent',
-    'Financial Analyst Agent',
+    'Finance Agent',
     'Real Estate Agent',
   ];
 
