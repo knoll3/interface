@@ -148,7 +148,8 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
+      // const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
+      const ws_uri = `ws://localhost/ws?token=${userToken}&authKey=${publicKey}`
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
