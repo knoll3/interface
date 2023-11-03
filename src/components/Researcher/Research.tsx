@@ -33,11 +33,10 @@ export const Research = ({
     });
 
     const userBalance = userData
-        ? Math.round(Number(userData[3]) * 100) / 100
+        ? Math.round(Number(userData[2]) * 100) / 100
         : 0;
     const price = researchPrice ? Number(researchPrice) : 0;
     const numberOfResearchesAvailable = Math.trunc(userBalance / price);
-
     const hasAccess = reportType.value === 'outline_report' || numberOfResearchesAvailable > 0
 
     const {
@@ -74,13 +73,13 @@ export const Research = ({
         writeApproveTokens?.({
             args: [
             process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-            parseEther(`${amount}`),
+            parseEther(`${amount * price}`),
             ],
         });
         };
     
     const handlePurchase = () => {
-        writePurchaseCredits?.({ args: [amount] });
+        writePurchaseCredits?.({ args: [amount * price] });
         };
     
     useEffect(() => {
