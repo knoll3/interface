@@ -22,6 +22,7 @@ export const AgentOutput = ({
                 border
                 round="small"
                 fill="horizontal"
+                pad="small"
             >
             <InfiniteScroll
                 items={agentOutput}
