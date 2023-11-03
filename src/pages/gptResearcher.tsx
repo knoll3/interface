@@ -1,6 +1,7 @@
 import { Layout } from '../components';
 import {
   Box,
+  Button,
   Heading,
   Paragraph,
   Select,
