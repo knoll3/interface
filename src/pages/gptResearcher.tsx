@@ -26,6 +26,7 @@ import { createClient } from '@supabase/supabase-js'
 import { FLOCK_NFT_ABI } from '../contracts/flockNFT';
 import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
 import { useIsMounted } from '../hooks';
+import { AgentOutput } from '../components/Researcher/AgentOutput';
         
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -277,12 +278,20 @@ export default function GptResearcherPage() {
                 handleSubmit={handleSubmit}
               />
               { reportType.value === "outline_report" ? (
-                <ReportOutput
-                  report={report}
-                  isResearching={isResearching}
-                />
+                <>
+                  <ReportOutput
+                    report={report}
+                    isResearching={isResearching}
+                  />
+                  <AgentOutput 
+                    agentOutput={agentOutput}
+                  />
+                </>
               ) : (
                 <>
+                  <AgentOutput 
+                    agentOutput={agentOutput}
+                  />
                   <Reports 
                     supabase={supabase}
                     userAddress={address}
