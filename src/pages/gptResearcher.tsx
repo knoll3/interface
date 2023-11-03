@@ -1,7 +1,11 @@
 import { Layout } from '../components';
 import {
   Box,
+  Button,
   Heading,
+  Image,
+  Layer,
+  Text,
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from 'react';
 import {
@@ -20,6 +24,7 @@ import { Logo } from '../components/Researcher/Logo';
 import { ReportOutput } from '../components/Researcher/ReportOutput';
 import { createClient } from '@supabase/supabase-js'
 import { FLOCK_NFT_ABI } from '../contracts/flockNFT';
+import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
 import { useIsMounted } from '../hooks';
         
 const supabase = createClient(
@@ -76,6 +81,10 @@ export default function GptResearcherPage() {
   };
 
   const maxNFTs = 5;
+
+  const filledNFTs = Array.from({ length: maxNFTs }, (_, index) => {
+    return userNFTs[index] || { name: 'UnknownNFT' };
+  });
 
   const [loadedReports, setLoadedReports] = useState<ReportProps[]>([]);
 
@@ -218,10 +227,6 @@ export default function GptResearcherPage() {
       setUserNFTs([]);
     }
   }, [NFTData]);
-
-  const handlePurchase = () => {
-    writePurchaseCredits?.({ args: [amount] });
-  };
 
   const handlePrediction = (agent: string) => {
     if (agent === prediction) {
