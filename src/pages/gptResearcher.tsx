@@ -241,6 +241,7 @@ export default function GptResearcherPage() {
   useEffect(() => {
     setReport('');
     setTask('');
+    setAgentOutput([]);
   }, [reportType]);
 
   useEffect(() => {
