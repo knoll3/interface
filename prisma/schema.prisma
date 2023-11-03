@@ -29,6 +29,7 @@ model UserDiscordData {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   discordAccessToken String   @default("")
+  discordExpiresAt   String   @default("")
   user               User     @relation(fields: [userId], references: [id])
 }
 

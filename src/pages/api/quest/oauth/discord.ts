@@ -47,6 +47,7 @@ async function getDiscordUserInfo(code: string, redirectUri: string) {
 
   const userInfo = await responseGetUserInfo.json();
   userInfo.accessToken = tokenData.access_token;
+  userInfo.expiresAt = Date.now() + tokenData.expires_in * 1000;
   return userInfo;
 }
 
@@ -91,7 +92,8 @@ async function prismaInsertUserDiscordData(
   userId: string,
   discordId: string,
   discordUserName: string,
-  discordAccessToken: string
+  discordAccessToken: string,
+  discordExpiresAt: string
 ) {
   try {
     const userDiscordData = await prismaDB.userDiscordData.create({
@@ -100,6 +102,7 @@ async function prismaInsertUserDiscordData(
         discordId: discordId,
         discordName: discordUserName,
         discordAccessToken,
+        discordExpiresAt,
       },
     });
     return { error: false, status: 201, message: 'OK', data: userDiscordData };
@@ -126,6 +129,17 @@ export default async function handler(
   const prismaDB = new PrismaClient();
   await prismaDB.$connect();
 
+  const discordUserInfo = await getDiscordUserInfo(
+    discord_code as string,
+    redirectUri as string
+  );
+
+  if (discordUserInfo.error) {
+    return res
+      .status(discordUserInfo.status)
+      .json({ data: { message: discordUserInfo.message } });
+  }
+
   const getUser = await prismaDB.user.findUnique({
     where: {
       wallet: wallet as string,
@@ -134,6 +148,8 @@ export default async function handler(
       userDiscordData: {
         select: {
           discordName: true,
+          discordAccessToken: true,
+          discordExpiresAt: true,
         },
       },
       userQuestTask: true,
@@ -143,6 +159,20 @@ export default async function handler(
   if (getUser) {
     const userDiscordData = getUser.userDiscordData;
     if (userDiscordData) {
+      if (discordUserInfo.accessToken !== '') {
+        await prismaDB.userDiscordData.update({
+          where: {
+            userId: getUser.id,
+          },
+          data: {
+            discordAccessToken: discordUserInfo.accessToken,
+            discordExpiresAt: discordUserInfo.expiresAt.toString(),
+          },
+          select: {
+            discordName: true,
+          },
+        });
+      }
       const getQuestTask = await prismaDB.questTask.findUnique({
         where: {
           taskName: 'discord_connect',
@@ -164,36 +194,23 @@ export default async function handler(
       return res.status(200).json({ data: userDiscordData });
     } else {
       // if the user has not yer completed the task
-      if (discord_code) {
-        const resp = await getDiscordUserInfo(
-          discord_code as string,
-          redirectUri as string
-        );
-        if (resp.error) {
-          return res
-            .status(resp.status)
-            .json({ data: { message: resp.message } });
-        }
-
-        let result = await prismaInsertUserDiscordData(
-          prismaDB,
-          getUser.id,
-          resp.id,
-          resp.username,
-          resp.accessToken
-        );
-        if (result.error) {
-          return res
-            .status(result.status)
-            .json({ data: { message: resp.message } });
-        }
-
-        const userTask = await createUserTask(prismaDB, getUser.id);
-        console.log(userTask);
-        return res.status(result.status).json({ data: result.data });
-      } else {
-        return res.status(404).json({ data: { message: 'Not Found' } });
+      let result = await prismaInsertUserDiscordData(
+        prismaDB,
+        getUser.id,
+        discordUserInfo.id,
+        discordUserInfo.username,
+        discordUserInfo.accessToken,
+        discordUserInfo.expiresAt.toString()
+      );
+      if (result.error) {
+        return res
+          .status(result.status)
+          .json({ data: { message: discordUserInfo.message } });
       }
+
+      const userTask = await createUserTask(prismaDB, getUser.id);
+      console.log(userTask);
+      return res.status(result.status).json({ data: result.data });
     }
   }
 
