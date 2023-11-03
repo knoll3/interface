@@ -8,19 +8,51 @@ type ReportProps = {
     reportLink: string;
 }
 
+
 export const Reports = ({
+    supabase,
+    userAddress,
   reports,
 }: {
+    supabase: any;
+    userAddress: `0x${string}` | undefined;
   reports: ReportProps[];
 }) => {
 
-    const downloadLink = async (link: string) => {};
+    const downloadFile = async (link: string) => {
+
+        const { data, error } = await supabase
+            .storage
+            .from('researcher-reports')
+            .download(link)
+        
+        console.log(data)
+        console.log(data.type)
+        
+        const urlData = URL.createObjectURL(data)
+
+        const linkToDownload = document.createElement('a')
+        linkToDownload.href = urlData
+        linkToDownload.download = "report.pdf"
+
+        document.body.appendChild(linkToDownload)
+        linkToDownload.dispatchEvent(
+            new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            })
+        )
+
+        document.body.removeChild(linkToDownload)
+    }
 
   return (
     <>
     <Box
           pad={{ vertical: 'large', horizontal: 'large' }}
           gap="medium"
+          fill="horizontal"
     >
         <Box>
             <Box direction="row" align="center" gap="small">
@@ -29,13 +61,18 @@ export const Reports = ({
             </Box>
             <Text><span>&#42;</span> Download your reports here</Text>
         </Box>
-        <Box direction="row" gap="medium">
+        <Box 
+            direction="row-responsive"
+            align="center"
+            justify="between"
+            gap="small"
+        >
             {
                 reports.map((report, index) => (
                     <Box 
                         key={index}
                         height="250px"
-                        width="small"
+                        width="200px"
                         round="small"
                         justify="between"
                         border={{ style:"solid", size: "small" }} 
@@ -51,7 +88,11 @@ export const Reports = ({
                             <Text weight="bold">{report.reportTitle}</Text>
                         </Box>
                         <Box justify="end" align="end">
-                            <PrimaryButton label="Download" size="small" onClick={() => downloadLink(report.reportLink)} />
+                            <PrimaryButton 
+                                label="Download" 
+                                size="small"
+                                onClick={() => downloadFile(`${userAddress}/${report.reportType}/${report.reportLink}`)}  
+                            />
                         </Box>
                     </Box> 
                 ))
@@ -61,8 +102,8 @@ export const Reports = ({
                     <Box 
                         key={i+reports.length}
                         height="250px"
-                        width="small"
                         round="small"
+                        width="200px"
                         border={{ style:"dashed", size: "small" }}
                         justify="center"    
                     >

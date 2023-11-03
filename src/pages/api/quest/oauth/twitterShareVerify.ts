@@ -52,7 +52,7 @@ export default async function handler(
     );
 
     const tweeted = usersTweets.data?.find((tweet) =>
-    tweet.text.includes('$FLC')
+      tweet.text.includes('FLockQuest')
     );
 
     if (tweeted?.id) {
