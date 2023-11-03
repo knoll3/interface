@@ -70,28 +70,30 @@ export const Research = ({
           hash: purchaseCredits?.hash,
         });
     
-      const handleApprove = () => {
+    const handleApprove = () => {
         writeApproveTokens?.({
-          args: [
+            args: [
             process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-            parseEther(`${amount * price}`),
-          ],
+            parseEther(`${amount}`),
+            ],
         });
-      };
+        };
     
-      const handlePurchase = () => {
-        writePurchaseCredits?.({ args: [amount * price] });
-      };
+    const handlePurchase = () => {
+        writePurchaseCredits?.({ args: [amount] });
+        };
     
-      useEffect(() => {
+    useEffect(() => {
         if (isSuccessApprove) {
-          handlePurchase();
+            handlePurchase();
         }
-    
-        if (isSuccessPurchase) {
-          setShowPurchase(false);
-        }
-      }, [isSuccessPurchase, isSuccessApprove]);
+        }, [isSuccessApprove]);
+        
+    useEffect(() => {
+    if (isSuccessPurchase) {
+        setShowPurchase(false);
+    }
+    }, [isSuccessPurchase]);
     
 
   return (
