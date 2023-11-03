@@ -65,7 +65,7 @@ export default async function handler(
     const userTwitterData = getUser.userTwitterData;
     let getCurrentUserData;
     if (userTwitterData) {
-      if (accessToken.accessToken) {
+      if (accessToken.accessToken !== '') {
         await prismaDB.userTwitterData.update({
           where: {
             userId: getUser.id,
@@ -80,7 +80,7 @@ export default async function handler(
         });
       }
     } else {
-      if (accessToken) {
+      if (accessToken.accessToken !== '') {
         getCurrentUserData = await twitterClient.users.findMyUser();
         const insertUserTwitterDataResult = await prismaInsertUserTwitterData(
           prismaDB,
@@ -126,7 +126,7 @@ export default async function handler(
     }
     return res.status(200).json({
       data: {
-        twitterName: accessToken
+        twitterName: !userTwitterData?.twitterName
           ? getCurrentUserData?.data?.name
           : userTwitterData?.twitterName,
       },

@@ -19,6 +19,7 @@ const getUser = async (prismaDB: PrismaClient, wallet: string) => {
       userDiscordData: {
         select: {
           discordName: true,
+          discordExpiresAt: true,
         },
       },
       userTwitterData: {
@@ -51,9 +52,20 @@ export default async function handler(
     let user = await getUser(prismaDB, req.body.wallet);
     console.log(user);
     if (user) {
-      const expiresAt = new Date(user.userTwitterData?.twitterExpiresAt!);
+      const now = new Date();
+      const discordExpiresAt = new Date(
+        Number(user.userDiscordData?.discordExpiresAt!)
+      ); // milliseconds
+      const twitterExpiresAt = new Date(
+        Number(user.userTwitterData?.twitterExpiresAt!)
+      );
 
-      if (expiresAt.getTime() < Date.now()) {
+      if (
+        user.userTwitterData?.twitterExpiresAt === '' ||
+        user.userDiscordData?.discordExpiresAt === '' ||
+        twitterExpiresAt.getTime() < Date.now() ||
+        discordExpiresAt.getTime() < Date.now()
+      ) {
         await prismaDB.userQuestTask.deleteMany({
           where: {
             userId: user.id,
