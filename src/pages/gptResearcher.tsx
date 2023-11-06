@@ -113,7 +113,6 @@ export default function GptResearcherPage() {
       sortBy: { column: 'created_at', order: 'desc' },
     });
 
-    console.log(data);
     if (data?.length === 0 || error) {
       return;
     }
@@ -421,7 +420,10 @@ export default function GptResearcherPage() {
                           <Button
                             label="Confirm"
                             disabled={!prediction || voteLoading}
-                            busy={voteLoading}
+                            busy={
+                              voteLoading ||
+                              isVoteTxLoading
+                            }
                             onClick={() =>
                               prediction && writeVote({ args: [prediction] })
                             }
