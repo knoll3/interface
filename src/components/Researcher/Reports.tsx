@@ -5,6 +5,7 @@ import { PrimaryButton } from '../PrimaryButton';
 type ReportProps = {
     reportType: string;
     reportTitle: string;
+    agentType: string;
     reportLink: string;
 }
 
@@ -12,11 +13,11 @@ type ReportProps = {
 export const Reports = ({
     supabase,
     userAddress,
-  reports,
+    reports,
 }: {
     supabase: any;
     userAddress: `0x${string}` | undefined;
-  reports: ReportProps[];
+    reports: ReportProps[];
 }) => {
 
     const downloadFile = async (link: string) => {
@@ -25,9 +26,8 @@ export const Reports = ({
             .storage
             .from('researcher-reports')
             .download(link)
-        
-        console.log(data)
-        console.log(data.type)
+
+        if (!data) return;
         
         const urlData = URL.createObjectURL(data)
 
@@ -91,7 +91,7 @@ export const Reports = ({
                             <PrimaryButton 
                                 label="Download" 
                                 size="small"
-                                onClick={() => downloadFile(`${userAddress}/${report.reportType}/${report.reportLink}`)}  
+                                onClick={() => downloadFile(`${userAddress}/${report.agentType}/${report.reportLink}`)}  
                             />
                         </Box>
                     </Box> 
