@@ -301,9 +301,12 @@ export default function GptResearcherPage() {
                     reports={loadedReports}
                   />
                   <Box>
-                    <Heading level="2" margin="xsmall">
-                      Step2: Claim your NFT
-                    </Heading>
+                    <Box direction="row" align="center" gap="small">
+                      <Heading level="2" margin="xsmall">
+                        Step2: Claim your NFT
+                      </Heading>
+                      <Text color={{light: "#808080"}}>{"(" + filledNFTs.length + "/5)"}</Text>
+                    </Box>
                     <Text>
                       For each completed use that generates a report, you can unlock
                       and receive one of the NFTs listed below.
