@@ -299,45 +299,53 @@ export default function GptResearcherPage() {
                     userAddress={address}
                     reports={loadedReports}
                   />
-                  <Box>
-                    <Box direction="row" align="center" gap="small">
-                      <Heading level="2" margin="xsmall">
-                        Step2: Claim your NFT
-                      </Heading>
-                      <Text color={{light: "#808080"}}>{"(" + filledNFTs.length + "/5)"}</Text>
+                  <Box
+                    pad={{ vertical: 'large', horizontal: 'large' }}
+                    gap="medium"
+                    fill="horizontal"
+                  >
+                    <Box>
+                      <Box direction="row" align="center" gap="small">
+                        <Heading level="2" margin="none" weight="bold">
+                          Step2: Claim your NFT
+                        </Heading>
+                        <Text color={{light: "#808080"}}>{"(" + filledNFTs.length + "/5)"}</Text>
+                      </Box>
+                      <Text>
+                        For each completed use that generates a report, you can unlock
+                        and receive one of the NFTs listed below.
+                      </Text>                      
                     </Box>
-                    <Text>
-                      For each completed use that generates a report, you can unlock
-                      and receive one of the NFTs listed below.
-                    </Text>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                    <Box
+                      direction="row-responsive"
+                      justify="between"
                     >
                       {filledNFTs.map((nft, index) => (
-                        <div
+                        <Box
                           key={index}
-                          style={{ margin: '10px', textAlign: 'center' }}
+                          align='center'
+                          gap='small'
+                          width={{ max: '160px' }}
                         >
                           <Image
                             src={getNFTImage(nft.name)}
                             alt={nft.name}
-                            style={{ width: '120px', height: '120px' }}
+                            style={{ width: '160px', height: '160px' }}
                           />
-                          <div style={{ marginTop: '5px', fontSize: '12px' }}>
-                            {agentLabels[index]}
-                          </div>
-                        </div>
+                          <Text weight="bold" textAlign="center">
+                            FLock {agentLabels[index]} NFT
+                          </Text>
+                        </Box>
                       ))}
-                    </div>
+                    </Box>
                   </Box>
-                  <Box gap="medium">
+                  <Box
+                    pad={{ vertical: 'large', horizontal: 'large' }}
+                    gap="large"
+                    fill="horizontal"                  
+                  >
                     <Box>
-                      <Heading level="2" margin="xsmall">
+                      <Heading level="2" margin="none" weight="bold">
                         Step3: Make your Prediction
                       </Heading>
                       <Text>
@@ -351,12 +359,13 @@ export default function GptResearcherPage() {
                           <Image
                             src={getNFTImage(prediction)}
                             alt={prediction}
-                            style={{ width: '120px', height: '120px' }}
+                            style={{ width: '160px', height: '160px' }}
                           />
                           <Text>
                             {prediction?.replace(/([A-Z]+)*([A-Z][a-z])/g, '$1 $2')}
                           </Text>
                         </Box>
+                        <Box width="30%" border={{size: "xsmall"}}></Box>
                         <Box
                           direction="row-responsive"
                           gap="large"
@@ -427,6 +436,7 @@ export default function GptResearcherPage() {
                             onClick={() =>
                               prediction && writeVote({ args: [prediction] })
                             }
+                            pad={{ vertical: 'small', horizontal: 'large' }}
                           />
                         </Box>
                       )}
