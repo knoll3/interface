@@ -170,7 +170,7 @@ export const Research = ({
         >
             <Box>
                 <Box>
-                    <Heading level="2" margin="none" weight="bold">Step 1: Research & Download Reports</Heading>
+                    <Heading level="2" margin="none" weight="bold">Step1: Research & Download Reports</Heading>
                     {reportType.value !== 'outline_report' &&
                         <Text>
                             <span>&#42;</span> You need to pay <b>$FLC{price}</b> for single research. You have <b>{numberOfResearchesAvailable}</b> researches left.
@@ -211,6 +211,7 @@ export const Research = ({
                           ? () => handleSubmit()
                           : () => setShowPurchase(true)
                       }
+                    pad={{ vertical: 'small', horizontal: 'large' }}
                     />
             </Box>
         </Box>
