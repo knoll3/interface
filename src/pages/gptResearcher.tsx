@@ -307,7 +307,7 @@ export default function GptResearcherPage() {
                     <Box>
                       <Box direction="row" align="center" gap="small">
                         <Heading level="2" margin="none" weight="bold">
-                          Step2: Claim your NFT
+                          Step2: Check your NFT rewards
                         </Heading>
                         <Text color={{light: "#808080"}}>{"(" + filledNFTs.length + "/5)"}</Text>
                       </Box>
@@ -456,8 +456,7 @@ export default function GptResearcherPage() {
                                 You have submitted your prediction successfully
                               </Heading>
                               <Text textAlign="center">
-                                The FLock Agent Specialist NFT will be airdropped to
-                                your wallet within 24 hours!
+                                The FLock Agent Specialist NFT will be airdropped to your wallet within the week after the campaign concludes.
                               </Text>
                             </Box>
                             <Box>
