@@ -132,7 +132,7 @@ export const Research = ({
                         </Box>
                     )}
                     <Box direction="row" justify="between" fill="horizontal">
-                        { Number(FLCTokenBalance?.formatted) > price && (
+                        { Number(FLCTokenBalance?.formatted) >= price && (
                             <Button
                                 primary
                                 busy={
