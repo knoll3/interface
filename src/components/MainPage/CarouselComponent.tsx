@@ -16,14 +16,29 @@ export const CarouselComponent = () => {
           activeChild={activeSlide}
           onChild={setActiveSlide}
         >
-          <Box pad="medium" >
-            <Image fill src="CarouselFrame1.png" alt="carousel image" />
+          <Box pad="medium">
+            <Image
+              fill
+              src="CarouselFrame1.png"
+              alt="carousel image" 
+              onClick={() => (window.location.href = 'https://github.com/FLock-io/v1-sdk/tree/main/examples/flock_llm')}
+            />
           </Box>
           <Box pad="medium">
-            <Image fill src="CarouselFrame2.png" alt="carousel image" />
+            <Image
+              fill
+              src="CarouselFrame2.png"
+              alt="carousel image"
+              onClick={() => (window.location.href = '/gptResearcher')}  
+            />
           </Box>
           <Box pad="medium">
-            <Image fill src="CarouselFrame3.png" alt="carousel image" />
+            <Image
+              fill
+              src="CarouselFrame3.png"
+              alt="carousel image"
+              onClick={() => (window.location.href = '/quest')}  
+            />
           </Box>
         </Carousel>
       </Box>
