@@ -148,8 +148,7 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      //const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
-      const ws_uri = `ws://localhost/ws?token=${userToken}&authKey=${publicKey}`
+      const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -310,7 +309,7 @@ export default function GptResearcherPage() {
                         <Heading level="2" margin="none" weight="bold">
                           Step2: Check your NFT rewards
                         </Heading>
-                        <Text color={{light: "#808080"}}>{"(" + filledNFTs.length + "/5)"}</Text>
+                        <Text color={{light: "#808080"}}>{"(" + userNFTs.length + "/5)"}</Text>
                       </Box>
                       <Text>
                         For each completed use that generates a report, you can unlock
