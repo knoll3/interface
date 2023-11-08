@@ -8,6 +8,39 @@ type Response = {
   };
 };
 
+const getUser = async (prismaDB: PrismaClient, wallet: string) => {
+  return await prismaDB.user.findUnique({
+    where: {
+      wallet,
+    },
+    select: {
+      wallet: true,
+      id: true,
+      userDiscordData: {
+        select: {
+          discordName: true,
+          discordExpiresAt: true,
+        },
+      },
+      userTwitterData: {
+        select: {
+          twitterName: true,
+          twitterExpiresAt: true,
+        },
+      },
+      userQuestTask: {
+        select: {
+          questTask: {
+            select: {
+              taskName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
@@ -16,36 +49,37 @@ export default async function handler(
   await prismaDB.$connect();
 
   try {
-    let getUser = await prismaDB.user.findUnique({
-      where: {
-        wallet: req.body.wallet,
-      },
-      select: {
-        wallet: true,
-        userDiscordData: {
-          select: {
-            discordName: true,
-          },
-        },
-        userTwitterData: {
-          select: {
-            twitterName: true,
-          },
-        },
-        userQuestTask: {
-          select: {
-            questTask: {
-              select: {
-                taskName: true,
-              },
+    let user = await getUser(prismaDB, req.body.wallet);
+    console.log(user);
+    if (user) {
+      if (
+        !user?.userQuestTask.find(
+          (task) => task.questTask.taskName === 'claim_reward'
+        )
+      ) {
+        const discordExpiresAt = new Date(
+          Number(user.userDiscordData?.discordExpiresAt!)
+        ); // milliseconds
+        const twitterExpiresAt = new Date(
+          Number(user.userTwitterData?.twitterExpiresAt!)
+        );
+
+        if (
+          user.userTwitterData?.twitterExpiresAt === '' ||
+          user.userDiscordData?.discordExpiresAt === '' ||
+          twitterExpiresAt.getTime() < Date.now() ||
+          discordExpiresAt.getTime() < Date.now()
+        ) {
+          await prismaDB.userQuestTask.deleteMany({
+            where: {
+              userId: user.id,
             },
-          },
-        },
-      },
-    });
-    console.log(getUser);
-    if (getUser) {
-      return res.status(200).json({ data: { message: 'OK', user: getUser } });
+          });
+          user = await getUser(prismaDB, req.body.wallet);
+        }
+      }
+
+      return res.status(200).json({ data: { message: 'OK', user } });
     }
 
     const createUser = await prismaDB.user.create({

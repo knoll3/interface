@@ -9,7 +9,8 @@ async function prismaInsertUserTwitterData(
   userId: string,
   twitterIdstr: string,
   twitterName: string,
-  twitterAccessToken: string
+  twitterAccessToken: string,
+  twitterExpiresAt: string
 ) {
   try {
     await prismaDB.userTwitterData.create({
@@ -18,6 +19,7 @@ async function prismaInsertUserTwitterData(
         twitterIdstr,
         twitterName,
         twitterAccessToken,
+        twitterExpiresAt,
       },
     });
     return { error: false, status: 200, message: 'OK' };
@@ -44,7 +46,7 @@ export default async function handler(
 
   try {
     const { wallet, accessToken } = req.body;
-    const twitterClient = new Client(accessToken);
+    const twitterClient = new Client(accessToken.accessToken);
 
     const getUser = await prismaDB.user.findUnique({
       where: {
@@ -63,13 +65,14 @@ export default async function handler(
     const userTwitterData = getUser.userTwitterData;
     let getCurrentUserData;
     if (userTwitterData) {
-      if (accessToken) {
+      if (accessToken.accessToken !== '') {
         await prismaDB.userTwitterData.update({
           where: {
             userId: getUser.id,
           },
           data: {
-            twitterAccessToken: accessToken,
+            twitterAccessToken: accessToken.accessToken,
+            twitterExpiresAt: accessToken.expiresAt,
           },
           select: {
             twitterName: true,
@@ -77,14 +80,15 @@ export default async function handler(
         });
       }
     } else {
-      if (accessToken) {
+      if (accessToken.accessToken !== '') {
         getCurrentUserData = await twitterClient.users.findMyUser();
         const insertUserTwitterDataResult = await prismaInsertUserTwitterData(
           prismaDB,
           getUser?.id as string,
           getCurrentUserData.data?.id as string,
           getCurrentUserData.data?.name as string,
-          accessToken
+          accessToken.accessToken as string,
+          accessToken.expiresAt as string
         );
 
         if (insertUserTwitterDataResult.error) {
@@ -122,7 +126,7 @@ export default async function handler(
     }
     return res.status(200).json({
       data: {
-        twitterName: accessToken
+        twitterName: !userTwitterData?.twitterName
           ? getCurrentUserData?.data?.name
           : userTwitterData?.twitterName,
       },

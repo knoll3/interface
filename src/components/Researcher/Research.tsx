@@ -173,7 +173,7 @@ export const Research = ({
                     <Heading level="2" margin="none" weight="bold">Step1: Research & Download Reports</Heading>
                     {reportType.value !== 'outline_report' &&
                         <Text>
-                            <span>&#42;</span> You need to pay <b>$FLC{price}</b> for single research. You have <b>{numberOfResearchesAvailable}</b> researches left.
+                            <span>&#42;</span> You need to pay <b>$FLC{price}</b> for single report. You have <b>{numberOfResearchesAvailable}</b> {numberOfResearchesAvailable > 1 ? 'reports' : 'report'} left.
                         </Text>
                     }
                 </Box>

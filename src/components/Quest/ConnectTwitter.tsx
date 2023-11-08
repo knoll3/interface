@@ -13,7 +13,10 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
   const { publicKey, userToken } = useContext(WalletContext);
-  const [twitterAccessToken, setTwitterAccessToken] = useState('');
+  const [twitterAccessToken, setTwitterAccessToken] = useState({
+    accessToken: '',
+    expiresAt: '',
+  });
   const { getStepInfo, user, nextStep } = useContext(QuestContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -29,7 +32,10 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
     popup?.postMessage('message', window.location.href);
   };
 
-  const checkTwitterAuth = async (accessToken: string) => {
+  const checkTwitterAuth = async (accessToken: {
+    accessToken: string;
+    expiresAt: string;
+  }) => {
     setIsLoading(true);
     const response = await fetch('/api/quest/oauth/twitter', {
       method: 'POST',
@@ -60,8 +66,9 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
     const bc = new BroadcastChannel('twitterChannel');
     bc.onmessage = (event) => {
       const accessToken = event?.data?.accessToken;
-      if (accessToken) {
-        setTwitterAccessToken(accessToken);
+      const expiresAt = event?.data?.expiresAt;
+      if (accessToken && expiresAt) {
+        setTwitterAccessToken({ accessToken, expiresAt });
       }
     };
 
@@ -69,7 +76,9 @@ export default function ConnectTwitter({ showToaster }: IStepProps) {
   }, []);
 
   useEffect(() => {
-    twitterAccessToken && checkTwitterAuth(twitterAccessToken);
+    twitterAccessToken.accessToken &&
+      twitterAccessToken.expiresAt &&
+      checkTwitterAuth(twitterAccessToken);
   }, [twitterAccessToken]);
 
   if (!mounted) {

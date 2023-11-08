@@ -29,6 +29,7 @@ model UserDiscordData {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   discordAccessToken String   @default("")
+  discordExpiresAt   String   @default("")
   user               User     @relation(fields: [userId], references: [id])
 }
 
@@ -40,6 +41,7 @@ model UserTwitterData {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   twitterAccessToken String   @default("")
+  twitterExpiresAt   String   @default("")
   twitterTweetId     String   @default("")
   user               User     @relation(fields: [userId], references: [id])
 }
@@ -120,10 +122,10 @@ model ClaimedRewards {
 }
 
 model ResearcherReport {
-    id         String   @id @default(cuid())
-    wallet     String   @db.VarChar(255)
-    reportPath String   @db.VarChar(255)
-    report     String   @db.Text
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  wallet     String   @db.VarChar(255)
+  reportPath String   @db.VarChar(255)
+  report     String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 }
