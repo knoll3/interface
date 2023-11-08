@@ -316,17 +316,9 @@ export const FLOCK_CREDITS_ABI = [
         type: 'uint256',
       },
     ],
-<<<<<<< HEAD
     "name": "withdrawFunds",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
-=======
-    name: 'withdrawFunds',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
->>>>>>> 73fb12b (add prediction and voting (#95))
 ];
