@@ -2,6 +2,7 @@ import { Box, Heading, Text, Image } from 'grommet';
 import { Layout, PrimaryButton, SecondaryButton, TasksForHome } from '../components';
 import { useState } from 'react';
 import { CarouselComponent } from '../components/MainPage/CarouselComponent';
+import { FLockDescription } from '../components/MainPage/FLockDescription';
 
 export default function IndexPage() {
   const [numberOfTasks, setNumberOfTasks] = useState(0);
@@ -33,11 +34,14 @@ export default function IndexPage() {
           />
         </Box>
       </Box>
-        <Image
-          src="/try-model.png" 
-          alt="Image Description"
-          margin={{ bottom: 'xlarge' }}
-        />
+      <Box align="center" margin={{ vertical: "xlarge" }}>
+        <FLockDescription />
+      </Box>
+      <Image
+        src="/try-model.png" 
+        alt="Image Description"
+        margin={{ bottom: 'xlarge' }}
+      />
       <Box
           align="center"
           justify="center"

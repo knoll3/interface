@@ -19,7 +19,7 @@ export const CarouselComponent = () => {
           <Box pad="medium">
             <Image
               fill
-              src="CarouselFrame1.png"
+              src="Carousel images/CarouselFrame1.png"
               alt="carousel image" 
               onClick={() => (window.location.href = 'https://github.com/FLock-io/v1-sdk/tree/main/examples/flock_llm')}
             />
@@ -27,7 +27,7 @@ export const CarouselComponent = () => {
           <Box pad="medium">
             <Image
               fill
-              src="CarouselFrame2.png"
+              src="Carousel images/CarouselFrame2.png"
               alt="carousel image"
               onClick={() => (window.location.href = '/gptResearcher')}  
             />
@@ -35,7 +35,7 @@ export const CarouselComponent = () => {
           <Box pad="medium">
             <Image
               fill
-              src="CarouselFrame3.png"
+              src="Carousel images/CarouselFrame3.png"
               alt="carousel image"
               onClick={() => (window.location.href = '/quest')}  
             />
