@@ -1,6 +1,8 @@
 import { Box, Heading, Text, Image } from 'grommet';
 import { Layout, PrimaryButton, SecondaryButton, TasksForHome } from '../components';
 import { useState } from 'react';
+import { CarouselComponent } from '../components/MainPage/CarouselComponent';
+import { FLockDescription } from '../components/MainPage/FLockDescription';
 
 export default function IndexPage() {
   const [numberOfTasks, setNumberOfTasks] = useState(0);
@@ -10,17 +12,10 @@ export default function IndexPage() {
         align="center"
         justify="center"
         alignSelf="center"
-        gap="xlarge"
+        gap="small"
         height="100vh"
       >
-        <Box>
-          <Heading size="large" color="black" textAlign="center">
-            The On-Chain Decentralized Machine Learning Platform
-          </Heading>
-          <Text size="xxlarge" textAlign="center" color="black">
-            <b>F</b>ederated <b>L</b>earning on Bl<b>ock</b>chain{' '}
-          </Text>
-        </Box>
+        <CarouselComponent />
         <Box direction="row-responsive" gap="xlarge">
           <SecondaryButton
             margin={{ top: 'large' }}
@@ -39,11 +34,14 @@ export default function IndexPage() {
           />
         </Box>
       </Box>
-        <Image
-          src="/try-model.png" 
-          alt="Image Description"
-          margin={{ bottom: 'xlarge' }}
-        />
+      <Box align="center" margin={{ vertical: "xlarge" }}>
+        <FLockDescription />
+      </Box>
+      <Image
+        src="/try-model.png" 
+        alt="Image Description"
+        margin={{ bottom: 'xlarge' }}
+      />
       <Box
           align="center"
           justify="center"
