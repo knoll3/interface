@@ -1,4 +1,4 @@
-import { Box, Heading, Text, Image, Carousel, Button } from 'grommet';
+import { Box, Image, Carousel, Button } from 'grommet';
 import { useState } from 'react';
 
 export const CarouselComponent = () => {
@@ -7,7 +7,7 @@ export const CarouselComponent = () => {
   
   return (
     <>
-    <Box pad={{ vertical: 'large', horizontal: 'large' }} fill>
+    <Box pad={{ horizontal: 'large' }}>
       <Box round="small">
         <Carousel
           controls={false}

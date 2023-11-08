@@ -11,7 +11,7 @@ export default function IndexPage() {
         align="center"
         justify="center"
         alignSelf="center"
-        gap="xlarge"
+        gap="small"
         height="100vh"
       >
         <CarouselComponent />
