@@ -110,16 +110,19 @@ export default function GptResearcherPage() {
     const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
       limit: 5,
       offset: 0,
-      sortBy: { column: 'created_at', order: 'desc' },
+      sortBy: { column: 'created_at', order: 'asc' },
     });
 
     if (data?.length === 0 || error) {
       return;
     }
     data.forEach((reportData) => {
+      const reportTitleMock = reportData.name.slice(40, reportData.name.length - 4);
+      const reportTitle = reportTitleMock.length > 0 ? reportTitleMock : "Research";
+
       reports.push({
         reportType: "Research Report",
-        reportTitle: "Research",
+        reportTitle: reportTitle,
         agentType: agentLabel,
         reportLink: reportData.name,
       });
@@ -314,7 +317,11 @@ export default function GptResearcherPage() {
                       <Text>
                         For each completed use that generates a report, you can unlock
                         and receive one of the NFTs listed below.
-                      </Text>                      
+                      </Text>
+                      <Box>
+                        <li>To improve your chances of correctly guessing the Agent's Identity, we recommend using FLock Researcher multiple times to generate additional research reports and acquire more Agent NFTs.</li>
+                        <li>By obtaining more NFTs, you'll also gain access to more voting options.</li>
+                      </Box>                  
                     </Box>
                     <Box
                       direction="row-responsive"
@@ -350,8 +357,13 @@ export default function GptResearcherPage() {
                       </Heading>
                       <Text>
                         Predict the LLM agent that FLock Researcher V2.0 utilises,
-                        then split the winnings!
+                        then split the winnings!         
                       </Text>
+                      <Box>
+                        <li>Each NFT corresponds to one voting option, and you have only one vote.</li>
+                        <li>200 USDT divided among all participants' addresses.</li>
+                        <li>300 USDT awarded to addresses that correctly guess the Agent's identity.</li>
+                      </Box>
                     </Box>
                     <Box gap="medium">
                       <Box align="center" justify="center" gap="medium">
