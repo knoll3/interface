@@ -29,7 +29,7 @@ export const CarouselComponent = () => {
               fill
               src="Carousel images/CarouselFrame2.png"
               alt="carousel image"
-              onClick={() => (window.location.href = '/gptResearcher')}  
+              onClick={() => (window.location.href = '/flockresearcher')}  
             />
           </Box>
           <Box pad="medium">
