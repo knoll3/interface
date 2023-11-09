@@ -110,7 +110,7 @@ export default function GptResearcherPage() {
     const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
       limit: 5,
       offset: 0,
-      sortBy: { column: 'created_at', order: 'desc' },
+      sortBy: { column: 'created_at', order: 'asc' },
     });
 
     if (data?.length === 0 || error) {
