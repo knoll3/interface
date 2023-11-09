@@ -1,13 +1,13 @@
 import { Box } from 'grommet';
 import QuestStep from './QuestStep';
-import { useIsMounted } from '../hooks';
-import { toasts } from '../constants/toastMessages';
-import { IStepProps } from '../pages/quest';
+import { useIsMounted } from '../../hooks';
+import { toasts } from '../../constants/toastMessages';
+import { IStepProps } from '../../pages/quest';
 import { useAccount } from 'wagmi';
 import { useContext, useState } from 'react';
-import { WalletContext } from '../context/walletContext';
-import { QuestContext } from '../context/questContext';
-import PressableButton from './PressableButton';
+import { WalletContext } from '../../context/walletContext';
+import { QuestContext } from '../../context/questContext';
+import PressableButton from '../PressableButton';
 
 export default function FollowTwitter({ showToaster }: IStepProps) {
   const { address } = useAccount();

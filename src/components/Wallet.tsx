@@ -4,7 +4,7 @@ import truncateEthAddress from 'truncate-eth-address';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { WalletContext } from '../context/walletContext';
 import { useIsMounted } from '../hooks';
-import { MaticIcon } from './MaticIcon';
+import { MaticIcon } from './Icons/MaticIcon';
 import { Down } from 'grommet-icons';
 
 export function Wallet() {

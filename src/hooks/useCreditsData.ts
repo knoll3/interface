@@ -1,4 +1,5 @@
 import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
+import { FLOCK_NFT_ABI } from '../contracts/flockNFT';
 import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useContractRead } from 'wagmi';
 
@@ -7,7 +8,6 @@ export const useCreditsData = ({
 }: {
   userAddress?: `0x${string}`;
 }) => {
-
   const { data: userData } = useContractRead({
     address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
     abi: FLOCK_CREDITS_ABI,
@@ -27,7 +27,10 @@ export const useCreditsData = ({
     address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_V2_ADDRESS as `0x${string}`,
     abi: FLOCK_V2_ABI,
     functionName: 'allowance',
-    args: [userAddress, process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`],
+    args: [
+      userAddress,
+      process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
+    ],
     watch: true,
   }) as { data: bigint };
 
@@ -39,11 +42,20 @@ export const useCreditsData = ({
     watch: true,
   }) as { data: boolean };
 
+  const { data: voterToAgentName } = useContractRead({
+    address: process.env.NEXT_PUBLIC_FLOCK_NFT_ADDRESS as `0x${string}`,
+    abi: FLOCK_NFT_ABI,
+    functionName: 'voterToAgentName',
+    args: [userAddress],
+    watch: true,
+  }) as { data: string };
+
   return {
     userData,
     researchPrice,
     tokenAllowance,
     isWhitelisted,
+    voterToAgentName,
   };
 };
 

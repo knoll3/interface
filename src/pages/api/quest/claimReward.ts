@@ -37,7 +37,8 @@ export default async function handler(
   const userHasTask = getUser.userQuestTask.filter(
     (usertask) => usertask.taskId == getQuestTask.id
   );
-  if (userHasTask.length) {
+
+  if (userHasTask.length > 0) {
     return res.status(200).json({ data: { message: 'OK' } });
   }
 
@@ -91,9 +92,11 @@ export default async function handler(
   try {
     const txResponse = await claimContract.claim(walletAddress);
     await txResponse.wait();
-  } catch (error) {
-    res.status(200).json({ message: error });
-    return;
+  } catch (error: any) {
+    if (!error.error.reason.includes('Address has already claimed rewards.')) {
+      res.status(500).json({ message: error });
+      return;
+    }
   }
 
   const createTask = await client.userQuestTask.create({

@@ -3,14 +3,9 @@ import {
   Box,
   Button,
   Heading,
-  Paragraph,
-  Select,
-  Text,
-  TextInput,
-  InfiniteScroll,
+  Image,
   Layer,
-  RangeInput,
-  Markdown,
+  Text,
 } from 'grommet';
 import { Key, useEffect, useState, useContext, createContext } from 'react';
 import {
@@ -19,54 +14,127 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
-import { FLOCK_V2_ABI } from '../contracts/flockV2';
 import { useCreditsData } from '../hooks/useCreditsData';
-import { parseEther } from 'viem';
 import { WalletContext } from '../context/walletContext';
 import { event } from 'nextjs-google-analytics';
+import { Instructions } from '../components/Researcher/Instructions';
+import { Research } from '../components/Researcher/Research';
+import { Reports } from '../components/Researcher/Reports';
+import { Logo } from '../components/Researcher/Logo';
+import { ReportOutput } from '../components/Researcher/ReportOutput';
+import { createClient } from '@supabase/supabase-js'
+import { FLOCK_NFT_ABI } from '../contracts/flockNFT';
+import { FLOCK_CREDITS_ABI } from '../contracts/flockCredits';
+import { useIsMounted } from '../hooks';
+import { AgentOutput } from '../components/Researcher/AgentOutput';
+        
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+  process.env.NEXT_PUBLIC_ANON_KEY as string,
+)
+
+type ReportProps = {
+  reportType: string;
+  reportTitle: string;
+  agentType: string;
+  reportLink: string;
+}
 
 export default function GptResearcherPage() {
+  const mounted = useIsMounted();
   const { address } = useAccount();
-  const [task, setTask] = useState<string>('');
-  const [reportType, setReportType] = useState({
-    label: 'Outline Report',
-    value: 'outline_report',
-  });
   const [report, setReport] = useState<string>('');
+  const [reportType, setReportType] = useState({
+    label: 'Research Report',
+    value: 'research_report',
+  });
+  const [task, setTask] = useState<string>('');
   const [agentOutput, setAgentOutput] = useState<string[]>([]);
   const [downloadLink, setDownloadLink] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
-  const [showPurchase, setShowPurchase] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
-  const [price, setPrice] = useState<number>(0);
   const [isResearching, setIsResearching] = useState<boolean>(false);
+  const [userNFTs, setUserNFTs] = useState<NFT[]>([]);
+  const [showVoteComplete, setShowVoteComplete] = useState<boolean>(false);
 
-  const { FLCTokenBalance, userToken, publicKey } = useContext(WalletContext);
+  interface NFT {
+    name: string;
+  }
 
-  const { userData, researchPrice, isWhitelisted } = useCreditsData({
-    userAddress: address,
+  const nftImages: { [key: string]: string } = {
+    NewsAgent: 'NewsNFT.png',
+    MathsAgent: 'MathsNFT.png',
+    PhysicistAgent: 'PhysicistNFT.png',
+    FinancialAnalystAgent: 'FinAnalystNFT.png',
+    RealEstateAgent: 'RealEstateNFT.png',
+    UnknownNFT: 'UnknownNFT.png',
+  };
+
+  const agentLabels = [
+    'News Agent',
+    'Maths Agent',
+    'Physicist Agent',
+    'Financial Analyst Agent',
+    'Real Estate Agent',
+  ];
+
+  const getNFTImage = (nftName: string): string => {
+    return nftImages[nftName] || nftImages['UnknownNFT'];
+  };
+
+  const maxNFTs = 5;
+
+  const filledNFTs = Array.from({ length: maxNFTs }, (_, index) => {
+    return userNFTs[index] || { name: 'UnknownNFT' };
   });
 
-  const userBalance = userData
-    ? Math.round(Number(userData[3]) * 100) / 100
-    : 0;
+  const [loadedReports, setLoadedReports] = useState<ReportProps[]>([]);
 
-  const hasAccess =
-    userBalance >= price || reportType.value === 'outline_report';
+  const { userToken, publicKey } = useContext(WalletContext);
+
+  const { userData, researchPrice, isWhitelisted, voterToAgentName } =
+    useCreditsData({
+      userAddress: address,
+    });
+
+  const [prediction, setPrediction] = useState(
+    voterToAgentName // camelCase to Sentence Case
+  );
+
+  async function getReports() {
+
+    const reports : ReportProps[] = [];
+
+    const agentLabel = "Finance Agent"
+
+    const { data, error } = await supabase.storage.from('researcher-reports').list(address + '/' + agentLabel, {
+      limit: 5,
+      offset: 0,
+      sortBy: { column: 'created_at', order: 'desc' },
+    });
+
+    if (data?.length === 0 || error) {
+      return;
+    }
+    data.forEach((reportData) => {
+      reports.push({
+        reportType: "Research Report",
+        reportTitle: "Research",
+        agentType: agentLabel,
+        reportLink: reportData.name,
+      });
+    });
+    setLoadedReports(reports);
+  }
 
   useEffect(() => {
     if (address) {
       setIsConnected(true);
+      getReports();
     } else {
       setIsConnected(false);
     }
   }, [address]);
-
-  useEffect(() => {
-    setPrice(researchPrice ? Number(researchPrice) : 0);
-  }, [researchPrice]);
 
   const GPTResearcher = (() => {
     const startResearch = () => {
@@ -80,7 +148,7 @@ export default function GptResearcherPage() {
     };
 
     const listenToSockEvents = () => {
-      const ws_uri = `wss://researcher.flock.io/ws?token=${userToken}&authKey=${publicKey}`;
+      const ws_uri = `${process.env.NEXT_PUBLIC_RESEARCHER_WEB_SOCKET_URL}?token=${userToken}&authKey=${publicKey}`;
       const socket = new WebSocket(ws_uri);
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -118,6 +186,7 @@ export default function GptResearcherPage() {
       const position = data.output.search('/output');
       const link = 'https://researcher.flock.io' + data.output.slice(position);
       setDownloadLink(link);
+      getReports();
       setIsResearching(false);
     };
 
@@ -126,28 +195,6 @@ export default function GptResearcherPage() {
     };
   })();
 
-  const loadReport = async () => {
-    setIsLoadingReport(true);
-    try {
-      const response = await fetch(`/api/getReport?walletAddress=${address}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const { data, message } = await response.json();
-      if (message) {
-        console.log(message);
-        setIsLoadingReport(false);
-        return;
-      }
-      setReport(data.report);
-    } catch (e) {
-      console.log(e);
-    }
-    setIsLoadingReport(false);
-  };
-
   const handleSubmit = () => {
     setReport('');
     setDownloadLink("");
@@ -155,317 +202,282 @@ export default function GptResearcherPage() {
     GPTResearcher.startResearch();
   };
 
-  const handleDownload = () => {
-    window.open(downloadLink, '_blank');
-  };
-
-  const {
-    data: purchaseCredits,
-    write: writePurchaseCredits,
-    isLoading: purchaseLoading,
-  } = useContractWrite({
+  const { data: NFTData } = useContractRead({
     address: process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
     abi: FLOCK_CREDITS_ABI,
-    functionName: 'addCredits',
+    functionName: 'checkNFT',
+    args: [address],
+    watch: true,
   });
 
   const {
-    data: approveTokens,
-    write: writeApproveTokens,
-    isLoading: approveLoading,
+    data: vote,
+    write: writeVote,
+    isLoading: voteLoading,
   } = useContractWrite({
-    address: process.env.NEXT_PUBLIC_FLOCK_TOKEN_ADDRESS as `0x${string}`,
-    abi: FLOCK_V2_ABI,
-    functionName: 'approve',
+    address: process.env.NEXT_PUBLIC_FLOCK_NFT_ADDRESS as `0x${string}`,
+    abi: FLOCK_NFT_ABI,
+    functionName: 'vote',
   });
 
-  const { isSuccess: isSuccessApprove, isLoading: isApproveTxLoading } =
+  const { isSuccess: isSuccessVote, isLoading: isVoteTxLoading } =
     useWaitForTransaction({
-      hash: approveTokens?.hash,
+      hash: vote?.hash,
     });
 
-  const { isSuccess: isSuccessPurchase, isLoading: isPurchaseTxLoading } =
-    useWaitForTransaction({
-      hash: purchaseCredits?.hash,
-    });
+  useEffect(() => {
+    if (NFTData && (NFTData as NFT[]).length > 0) {
+      setUserNFTs(NFTData as NFT[]);
+    } else {
+      setUserNFTs([]);
+    }
+  }, [NFTData]);
 
-  const handleApprove = () => {
-    writeApproveTokens?.({
-      args: [
-        process.env.NEXT_PUBLIC_FLOCK_CREDITS_ADDRESS as `0x${string}`,
-        parseEther(`${amount}`),
-      ],
-    });
+  const handlePrediction = (agent: string) => {
+    if (agent === prediction) {
+      setPrediction('');
+      return;
+    }
+    setPrediction(agent);
   };
 
-  const handlePurchase = () => {
-    writePurchaseCredits?.({ args: [amount] });
-  };
+  useEffect(() => {
+    setReport('');
+    setTask('');
+    setAgentOutput([]);
+  }, [reportType]);
 
   useEffect(() => {
-    if (isSuccessApprove) {
-      handlePurchase();
+    if (isSuccessVote) {
+      setShowVoteComplete(true);
     }
+  }, [isSuccessVote]);
 
-    if (isSuccessPurchase) {
-      setShowPurchase(false);
-    }
-  }, [isSuccessPurchase, isSuccessApprove]);
-
-  useEffect(() => {
-    setAmount(price);
-  }, [price]);
-
-  useEffect(() => {
-    if (address) {
-      loadReport();
-    }
-  }, [address]);
+  if (!mounted) {
+    return <></>;
+  }
 
   return (
     <Layout>
-      {showPurchase && (
-        <Layer>
-          <Box pad="large" align="center" gap="small" width="550px">
-            <Heading level="2" margin="xsmall">
-              Purchase Credits
-            </Heading>
-            <Text alignSelf="start" weight="bold">
-              Minimum deposit (single research price): {price} credits
-            </Text>
-            <Text alignSelf="start" weight="bold">
-              Your current balance: {userBalance} credits
-            </Text>
-            {Number(FLCTokenBalance?.formatted) < price ? (
-              <Text weight="bold" alignSelf="start" color="red">
-                Not enough FLC to purchase credits
-              </Text>
-            ) : (
-              <Box
-                width="100%"
-                direction="row"
-                justify="between"
-                align="center"
-              >
-                <Button
-                  primary
-                  disabled={
-                    purchaseLoading ||
-                    approveLoading ||
-                    isApproveTxLoading ||
-                    isPurchaseTxLoading ||
-                    amount < price
-                  }
-                  onClick={handleApprove}
-                  label={
-                    purchaseLoading ||
-                    approveLoading ||
-                    isApproveTxLoading ||
-                    isPurchaseTxLoading
-                      ? 'Purchasing...'
-                      : 'Purchase'
-                  }
-                />
-                <Box direction="row" gap="small" width="65%">
-                  <Text weight="bold">{amount}</Text>
-                  <RangeInput
-                    size={30}
-                    value={amount}
-                    min={price}
-                    max={Number(FLCTokenBalance?.formatted)}
-                    step={price}
-                    onChange={(event) => setAmount(Number(event.target.value))}
-                  />
-                </Box>
-              </Box>
-            )}
-            <Button
-              margin={{ top: 'medium' }}
-              alignSelf="end"
-              secondary
-              disabled={
-                purchaseLoading ||
-                approveLoading ||
-                isApproveTxLoading ||
-                isPurchaseTxLoading
-              }
-              onClick={() => setShowPurchase(false)}
-              label="Close"
-            />
-          </Box>
-        </Layer>
-      )}
-      <Box width="100%" gap="large" align="center">
+      <Box width="100%" gap="large" align="center" background="#F8FAFB">
         <Box
-          background="#EEEEEE"
+          background="#F8FAFB"
           align="center"
           justify="center"
-          width="50%"
+          width="70%"
           pad={{ vertical: 'large', horizontal: 'large' }}
           gap="medium"
           round="small"
           margin={{ vertical: 'large' }}
         >
-          <Box round="small" background="white" pad="medium">
-            <Paragraph fill>
-              Introducing the "FLock Researcher" - an unparalleled multi-agent
-              engine meticulously crafted by the experts at FLock.io. This isn't
-              just another AI model; it's an amalgamation of domain-specific
-              expertise funneled through our unique FLock platform for
-              collaborative finetuning. The result? An agent that outperforms
-              generic pretrained open-source models in terms of proficiency and
-              precision.
-            </Paragraph>
-            <Paragraph fill>
-              At the heart of our innovation lies the agent engine, which
-              transcends the capabilities of traditional pretrained models,
-              offering a more robust, versatile, and dynamic solution. A special
-              thank you to the GPTResearch team for providing the foundational
-              engine that enabled us to deploy our visionary FLock system.
-            </Paragraph>
-            <Paragraph fill>
-              We're inviting you to experience the next evolution in AI. Dive
-              in, try out the FLock Researcher, and witness the future of
-              multi-agent interactions
-            </Paragraph>
-          </Box>
-          <Box gap="medium" width="100%">
-            <Box>
-              <Text>What would you like me to research next?</Text>
-              <TextInput onChange={(e) => setTask(e.target.value)} />
-            </Box>
-            <Box>
-              <Text>What type of report would you like me to generate?</Text>
-              <Select
-                options={[
-                  { label: 'Outline Report', value: 'outline_report' },
-                  { label: 'Research Report', value: 'research_report' },
-                  { label: 'Resource Report', value: 'resource_report' },
-                ]}
-                value={reportType.value}
-                valueLabel={<Box pad="small">{reportType.label}</Box>}
-                onChange={({ option }) => setReportType(option)}
-                disabled={isResearching}
+          <Logo />
+          <Instructions />
+          {isConnected ? (
+            <>
+              <Research 
+                isResearching={isResearching}
+                task={task}
+                reportType={reportType}
+                setTask={setTask}
+                setReportType={setReportType}
+                handleSubmit={handleSubmit}
               />
-            </Box>
-            {reportType.value !== 'outline_report' && (
-              <Box round="small" background="white" pad="medium">
-                <Text alignSelf="start">
-                  To use this model you have to deposit FLC as credits which
-                  will be used to pay for research.
-                </Text>
-                <Text alignSelf="start" weight="bold">
-                  Minimum deposit (single research price): {price ? price : 0}{' '}
-                  credits
-                </Text>
-                {isConnected && (
-                  <Text alignSelf="start" weight="bold">
-                    Your current balance: {userBalance} credits
-                  </Text>
-                )}
-              </Box>
-            )}
-            <Box>
-              {isConnected ? (
-                <Button
-                  alignSelf="start"
-                  primary
-                  busy={isResearching}
-                  onClick={
-                    hasAccess || isWhitelisted
-                      ? handleSubmit
-                      : () => setShowPurchase(true)
-                  }
-                  label={
-                    hasAccess || isWhitelisted ? 'Research' : 'Purchase Credits'
-                  }
-                />
+              <AgentOutput 
+                agentOutput={agentOutput}
+              />
+              { reportType.value === "outline_report" ? (
+                <>
+                  <ReportOutput
+                    report={report}
+                    isResearching={isResearching}
+                  />
+                </>
               ) : (
-                <Heading level="2" margin="xsmall">
-                  Connect your wallet to continue
-                </Heading>
-              )}
-            </Box>
-            {isConnected && (
-              <Box>
-                <Box width="100%">
-                  <Heading level="2" margin="xsmall">
-                    Agents Output
-                  </Heading>
-                  <Text>
-                    An agent tailored specifically to your task will be
-                    generated to provide the most precise and relevant research
-                    results.
-                  </Text>
+                <>
+                  <Reports 
+                    supabase={supabase}
+                    userAddress={address}
+                    reports={loadedReports}
+                  />
                   <Box
-                    height="medium"
-                    overflow="auto"
-                    width="100%"
-                    border
-                    round="small"
-                    pad="small"
+                    pad={{ vertical: 'large', horizontal: 'large' }}
+                    gap="medium"
+                    fill="horizontal"
                   >
-                    <InfiniteScroll
-                      items={agentOutput}
-                      show={agentOutput.length}
+                    <Box>
+                      <Box direction="row" align="center" gap="small">
+                        <Heading level="2" margin="none" weight="bold">
+                          Step2: Check your NFT rewards
+                        </Heading>
+                        <Text color={{light: "#808080"}}>{"(" + userNFTs.length + "/5)"}</Text>
+                      </Box>
+                      <Text>
+                        For each completed use that generates a report, you can unlock
+                        and receive one of the NFTs listed below.
+                      </Text>                      
+                    </Box>
+                    <Box
+                      direction="row-responsive"
+                      justify="between"
                     >
-                      {(item: any, index: Key | null | undefined) => (
+                      {filledNFTs.map((nft, index) => (
                         <Box
-                          width="100%"
                           key={index}
-                          border
-                          round="small"
-                          flex={false}
-                          margin={{ bottom: 'small' }}
-                          pad="small"
-                          background="#EEEEEE"
+                          align='center'
+                          gap='small'
+                          width={{ max: '160px' }}
                         >
-                          <Text>{item}</Text>
+                          <Image
+                            src={getNFTImage(nft.name)}
+                            alt={nft.name}
+                            style={{ width: '160px', height: '160px' }}
+                          />
+                          <Text weight="bold" textAlign="center">
+                            FLock {agentLabels[index]} NFT
+                          </Text>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                  <Box
+                    pad={{ vertical: 'large', horizontal: 'large' }}
+                    gap="large"
+                    fill="horizontal"                  
+                  >
+                    <Box>
+                      <Heading level="2" margin="none" weight="bold">
+                        Step3: Make your Prediction
+                      </Heading>
+                      <Text>
+                        Predict the LLM agent that FLock Researcher V2.0 utilises,
+                        then split the winnings!
+                      </Text>
+                    </Box>
+                    <Box gap="medium">
+                      <Box align="center" justify="center" gap="medium">
+                        <Box gap="small" align="center">
+                          <Image
+                            src={getNFTImage(prediction)}
+                            alt={prediction}
+                            style={{ width: '160px', height: '160px' }}
+                          />
+                          <Text>
+                            {prediction?.replace(/([A-Z]+)*([A-Z][a-z])/g, '$1 $2')}
+                          </Text>
+                        </Box>
+                        <Box width="30%" border={{size: "xsmall"}}></Box>
+                        <Box
+                          direction="row-responsive"
+                          gap="large"
+                          width="large"
+                          wrap
+                          align="center"
+                          justify="center"
+                        >
+                          {agentLabels.map((label, index) => {
+                            const claimed =
+                              userNFTs.find(
+                                (nft) => nft.name === label?.replaceAll(' ', '')
+                              ) !== undefined;
+                            const selected =
+                              prediction === label?.replaceAll(' ', '');
+                            const voted =
+                              voterToAgentName === label?.replaceAll(' ', '');
+                            return (
+                              <Box
+                                border={
+                                  (claimed && voterToAgentName === '') || voted
+                                    ? { color: 'black' }
+                                    : { color: '' }
+                                }
+                                round
+                                pad="medium"
+                                align="center"
+                                justify="center"
+                                key={index}
+                                margin={{ vertical: 'small' }}
+                                hoverIndicator={
+                                  claimed && voterToAgentName === ''
+                                    ? '#6C94EC'
+                                    : false
+                                }
+                                background={
+                                  voted
+                                    ? '#6C94EC'
+                                    : claimed
+                                    ? selected
+                                      ? '#6C94EC'
+                                      : ''
+                                    : ''
+                                }
+                                onClick={() =>
+                                  claimed && voterToAgentName === ''
+                                    ? handlePrediction(label?.replaceAll(' ', ''))
+                                    : {}
+                                }
+                              >
+                                <Text color={claimed || voted ? 'black' : ''}>
+                                  {label}
+                                </Text>
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                      {voterToAgentName === '' && (
+                        <Box direction="row" align="center" justify="end">
+                          <Button
+                            label="Confirm"
+                            disabled={!prediction || voteLoading}
+                            busy={
+                              voteLoading ||
+                              isVoteTxLoading
+                            }
+                            onClick={() =>
+                              prediction && writeVote({ args: [prediction] })
+                            }
+                            pad={{ vertical: 'small', horizontal: 'large' }}
+                          />
                         </Box>
                       )}
-                    </InfiniteScroll>
+                      {showVoteComplete && (
+                        <Layer>
+                          <Box
+                            pad="large"
+                            align="center"
+                            justify="center"
+                            gap="medium"
+                          >
+                            <Box width="small" height="small">
+                              <Image src="voteDone.png" />
+                            </Box>
+                            <Box align="center" justify="center" width="medium">
+                              <Heading level="4" textAlign="center">
+                                You have submitted your prediction successfully
+                              </Heading>
+                              <Text textAlign="center">
+                                The FLock Agent Specialist NFT will be airdropped to your wallet within the week after the campaign concludes.
+                              </Text>
+                            </Box>
+                            <Box>
+                              <Button
+                                label="Got it!"
+                                onClick={() => setShowVoteComplete(false)}
+                              />
+                            </Box>
+                          </Box>
+                        </Layer>
+                      )}
+                    </Box>
                   </Box>
-                </Box>
-                <Box width="100%" margin={{ top: 'medium' }} gap="small">
-                  <Heading level="2" margin="xsmall">
-                    Research Report
-                  </Heading>
-                  <Box
-                    width="100%"
-                    border
-                    height={{ min: '30px' }}
-                    round="small"
-                  >
-                    {isLoadingReport ? (
-                      <Text>Loading...</Text>
-                    ) : (
-                      <Box pad="small">
-                        <Markdown components={{ p: Text }}>
-                          {report ? report : ''}
-                        </Markdown>
-                      </Box>
-                    )}
-                  </Box>
-                  <Box direction="row-responsive" gap="small">
-                    <Button
-                      alignSelf="start"
-                      disabled={!report || isResearching}
-                      primary
-                      onClick={() => navigator.clipboard.writeText(report)}
-                      label="Copy to clipboard"
-                    />
-                    <Button
-                      alignSelf="start"
-                      disabled={!report || isResearching}
-                      primary
-                      onClick={handleDownload}
-                      label="Download as PDF"
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            )}
-          </Box>
+                </>
+              )}
+            </>
+          ) : (
+            <Heading level="2" margin="xsmall">
+              Connect your wallet to continue
+            </Heading>
+          )}
         </Box>
       </Box>
     </Layout>
