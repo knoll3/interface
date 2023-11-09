@@ -190,9 +190,7 @@ export const Research = ({
                     <Box background="white">
                         <Select
                             options={[
-                            { label: 'Outline Report', value: 'outline_report' },
                             { label: 'Research Report', value: 'research_report' },
-                            { label: 'Resource Report', value: 'resource_report' },
                             ]}
                             value={reportType.value}
                             valueLabel={<Box pad="small">{reportType.label}</Box>}
