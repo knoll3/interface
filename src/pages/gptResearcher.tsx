@@ -117,9 +117,12 @@ export default function GptResearcherPage() {
       return;
     }
     data.forEach((reportData) => {
+      const reportTitleMock = reportData.name.slice(40, reportData.name.length - 4);
+      const reportTitle = reportTitleMock.length > 0 ? reportTitleMock : "Research";
+
       reports.push({
         reportType: "Research Report",
-        reportTitle: "Research",
+        reportTitle: reportTitle,
         agentType: agentLabel,
         reportLink: reportData.name,
       });

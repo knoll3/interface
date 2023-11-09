@@ -20,7 +20,7 @@ export const Reports = ({
     reports: ReportProps[];
 }) => {
 
-    const downloadFile = async (link: string) => {
+    const downloadFile = async (link: string, reportTitle: string) => {
 
         const { data, error } = await supabase
             .storage
@@ -33,7 +33,7 @@ export const Reports = ({
 
         const linkToDownload = document.createElement('a')
         linkToDownload.href = urlData
-        linkToDownload.download = "report.pdf"
+        linkToDownload.download = reportTitle + '.pdf'
 
         document.body.appendChild(linkToDownload)
         linkToDownload.dispatchEvent(
@@ -91,7 +91,7 @@ export const Reports = ({
                             <PrimaryButton 
                                 label="Download" 
                                 size="small"
-                                onClick={() => downloadFile(`${userAddress}/${report.agentType}/${report.reportLink}`)}  
+                                onClick={() => downloadFile(`${userAddress}/${report.agentType}/${report.reportLink}`, report.reportTitle)}  
                             />
                         </Box>
                     </Box> 
