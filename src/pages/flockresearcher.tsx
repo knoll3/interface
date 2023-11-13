@@ -314,13 +314,9 @@ export default function GptResearcherPage() {
                         </Heading>
                         <Text color={{light: "#808080"}}>{"(" + userNFTs.length + "/5)"}</Text>
                       </Box>
-                      <Text>
-                        For each completed use that generates a report, you can unlock
-                        and receive one of the NFTs listed below.
-                      </Text>
                       <Box>
-                        <li>To improve your chances of correctly guessing the Agent's Identity, we recommend using FLock Researcher multiple times to generate additional research reports and acquire more Agent NFTs.</li>
-                        <li>By obtaining more NFTs, you'll also gain access to more voting options.</li>
+                        <Text>1. To improve your chances of correctly guessing the Agent's Identity, we recommend using FLock Researcher multiple times to generate additional research reports and acquire more Agent NFTs.</Text>
+                        <Text>2. By obtaining more NFTs, you'll also gain access to more voting options.</Text>
                       </Box>                  
                     </Box>
                     <Box
@@ -355,15 +351,13 @@ export default function GptResearcherPage() {
                       <Heading level="2" margin="none" weight="bold">
                         Step3: Make your Prediction
                       </Heading>
-                      <Text>
-                        Predict the LLM agent that FLock Researcher V2.0 utilises,
-                        then split the winnings!         
-                      </Text>
                       <Box>
-                        <li>Each NFT corresponds to one voting option, and you have only one vote.</li>
-                        <li>200 USDT divided among all participants' addresses.</li>
-                        <li>300 USDT awarded to addresses that correctly guess the Agent's identity.</li>
+                        <Text>1. Each NFT corresponds to one voting option, and you have only one vote.</Text>
+                        <Text>2. 200 USDT divided among all participants' addresses.</Text>
+                        <Text>3. 300 USDT awarded to addresses that correctly guess the Agent's identity.</Text>
+                        <Text>4. An exclusive NFT for all addresses that participate.</Text>
                       </Box>
+                      <Text size='small' color={"grey"}><b>*Please note that you must follow the instructions, complete all three steps, and finish the voting process in order to be eligible to receive the FLock Agent Specialist airdrop.</b></Text>
                     </Box>
                     <Box gap="medium">
                       <Box align="center" justify="center" gap="medium">

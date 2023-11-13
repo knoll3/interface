@@ -61,7 +61,7 @@ export const Layout = ({ children }: Props) => {
           </Box>
         </Layer>
       )}
-      <Main background={pathname === '/' ? 'url(main-bg.png)' : ''} fill>
+      <Main>
         <Box fill>{children}</Box>
       </Main>
       <Footer />
