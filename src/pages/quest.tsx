@@ -37,7 +37,6 @@ export default function QuestPage() {
   const size = useContext(ResponsiveContext);
   const { toasts, addToast } = useToaster();
   const isMobile = size === 'small';
-  const isDesktop = size === 'large';
 
   const showToaster = ({ toast }: IOnSubmitProps) => addToast(toast);
 
@@ -51,7 +50,6 @@ export default function QuestPage() {
           pad={{ vertical: 'large', horizontal: 'xlarge' }}
           background="white"
           gap="30px"
-          height={isDesktop ? 'calc(100vh - 450px)' : undefined}
         >
           <ToasterList toasts={toasts} />
           <Box gap="large" width={isMobile ? '300px' : undefined}>
